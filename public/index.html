@@ -6,176 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>Dot Remote</title>
-    <style>
-        @font-face {
-            font-family: 'Bebas Neue';
-            src: url('fonts/BebasNeue-Regular.ttf') format('truetype');
-            font-weight: normal;
-            font-style: normal;
-            font-display: swap;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        :root {
-            --hunch-red: #ed1c24;
-            --black: #1a1a1a;
-            --white: #ffffff;
-            --grey-text: #999999;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--white);
-            color: var(--black);
-            min-height: 100dvh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 3rem 2rem 2rem;
-        }
-
-        header {
-            margin-bottom: 3rem;
-        }
-
-        header img {
-            height: 44px;
-            width: auto;
-        }
-
-        .controls {
-            width: 100%;
-            max-width: 320px;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            flex: 1;
-        }
-
-        /* Pill input/button base styles */
-        .pill {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.4rem;
-            letter-spacing: 0.08em;
-            background: var(--white);
-            color: var(--black);
-            border: 2.5px solid var(--hunch-red);
-            padding: 1rem 1.5rem;
-            border-radius: 999px;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.15s ease;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .pill:active {
-            transform: scale(0.98);
-            background: #fff5f5;
-        }
-
-        /* UPDATE text input */
-        input.pill {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.4rem;
-            letter-spacing: 0.08em;
-            text-align: center;
-        }
-
-        input.pill::placeholder {
-            color: var(--black);
-            opacity: 1;
-        }
-
-        input.pill:focus {
-            outline: none;
-            border-color: var(--black);
-        }
-
-        input.pill:focus::placeholder {
-            color: var(--grey-text);
-        }
-
-        /* WIP dropdown */
-        select.pill {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.4rem;
-            letter-spacing: 0.08em;
-            appearance: none;
-            padding-right: 2.5rem;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='%23ed1c24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 1.25rem center;
-        }
-
-        select.pill:focus {
-            outline: none;
-            border-color: var(--black);
-        }
-
-        /* SEND button - solid red */
-        .send-btn {
-            background: var(--hunch-red);
-            color: var(--white);
-            border-color: var(--hunch-red);
-            margin-top: 0.5rem;
-        }
-
-        .send-btn:active {
-            background: #c91820;
-            border-color: #c91820;
-        }
-
-        /* Status message */
-        .status {
-            text-align: center;
-            padding: 0.5rem;
-            font-size: 0.85rem;
-            color: var(--grey-text);
-            font-weight: 500;
-            min-height: 2rem;
-        }
-
-        .status.success {
-            color: #22c55e;
-        }
-
-        .status.error {
-            color: var(--hunch-red);
-        }
-
-        /* Footer */
-        footer {
-            margin-top: auto;
-            padding-top: 2rem;
-        }
-
-        footer img {
-            height: 36px;
-            width: auto;
-        }
-
-        /* Sending animation */
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.6; }
-            100% { opacity: 1; }
-        }
-
-        .sending {
-            animation: pulse 0.6s ease-in-out infinite;
-            pointer-events: none;
-        }
-    </style>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
     <header>
@@ -185,13 +16,9 @@
     <div class="controls">
         <input type="text" class="pill" id="update-text" placeholder="UPDATE">
 
-        <select class="pill" id="client-select">
-            <option value="" disabled selected>WIP</option>
-            <option value="sky">SKY</option>
-            <option value="onenz">ONE NZ</option>
-            <option value="fisher">FISHER FUNDS</option>
-            <option value="tower">TOWER</option>
-        </select>
+        <button class="pill wip-btn" id="wip-btn" onclick="openSheet()">
+            WIP <span class="arrow">▼</span>
+        </button>
 
         <button class="pill" onclick="triggerTodo()" id="btn-todo">TO DO</button>
 
@@ -204,14 +31,71 @@
         <img src="images/ai2-logo.png" alt="ai²">
     </footer>
 
+    <!-- Bottom Sheet -->
+    <div class="sheet-overlay" id="sheet-overlay" onclick="closeSheet()"></div>
+    <div class="sheet" id="sheet">
+        <div class="sheet-header">
+            <span class="sheet-title">SELECT CLIENT</span>
+            <button class="sheet-close" onclick="closeSheet()">×</button>
+        </div>
+        <div class="sheet-list" id="sheet-list">
+            <button class="sheet-item" data-value="ONE">One NZ – Marketing</button>
+            <button class="sheet-item" data-value="ONS">One NZ – Simplification</button>
+            <button class="sheet-item" data-value="ONB">One NZ – Business</button>
+            <button class="sheet-item" data-value="SKY">Sky</button>
+            <button class="sheet-item" data-value="TOW">Tower</button>
+            <button class="sheet-item" data-value="FIS">Fisher Funds</button>
+            <button class="sheet-item" data-value="HUN">Hunch</button>
+            <button class="sheet-item" data-value="FST">Firestop</button>
+            <button class="sheet-item" data-value="WKA">Whakarongorau</button>
+            <button class="sheet-item" data-value="N4L">N4L</button>
+            <button class="sheet-item" data-value="EON">Eon Fibre</button>
+            <button class="sheet-item" data-value="LAB">Labour</button>
+            <button class="sheet-item" data-value="OTH">Other</button>
+        </div>
+    </div>
+
     <script>
-        // Replace these with your actual n8n webhook URLs
+        // n8n webhook URLs
         const WEBHOOKS = {
             todo: 'https://your-n8n.app/webhook/dot-todo',
             wip: 'https://your-n8n.app/webhook/dot-wip',
             update: 'https://your-n8n.app/webhook/dot-update'
         };
 
+        let selectedClient = null;
+        let selectedClientName = null;
+
+        // Sheet controls
+        function openSheet() {
+            document.getElementById('sheet-overlay').classList.add('active');
+            document.getElementById('sheet').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSheet() {
+            document.getElementById('sheet-overlay').classList.remove('active');
+            document.getElementById('sheet').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Client selection
+        document.querySelectorAll('.sheet-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.sheet-item').forEach(i => i.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedClient = this.dataset.value;
+                selectedClientName = this.textContent;
+                
+                const wipBtn = document.getElementById('wip-btn');
+                wipBtn.innerHTML = selectedClientName + ' <span class="arrow">▼</span>';
+                wipBtn.classList.add('selected');
+                
+                closeSheet();
+            });
+        });
+
+        // Status updates
         function updateStatus(message, type = '') {
             const status = document.getElementById('status');
             status.textContent = message;
@@ -225,6 +109,7 @@
             }
         }
 
+        // To-do trigger
         async function triggerTodo() {
             const btn = document.getElementById('btn-todo');
             btn.classList.add('sending');
@@ -244,14 +129,12 @@
             btn.classList.remove('sending');
         }
 
+        // Send handler
         async function handleSend() {
             const btn = document.getElementById('btn-send');
             const updateText = document.getElementById('update-text').value.trim();
-            const client = document.getElementById('client-select').value;
 
-            // Determine what to send
             if (updateText) {
-                // Send update
                 btn.classList.add('sending');
                 updateStatus('Sending update...');
 
@@ -264,7 +147,6 @@
                     if (response.ok) {
                         updateStatus('✓ Update sent', 'success');
                         document.getElementById('update-text').value = '';
-                        document.getElementById('update-text').placeholder = 'UPDATE';
                     } else {
                         throw new Error('Failed');
                     }
@@ -274,16 +156,19 @@
 
                 btn.classList.remove('sending');
 
-            } else if (client) {
-                // Send WIP request
+            } else if (selectedClient) {
                 btn.classList.add('sending');
                 updateStatus('Sending WIP...');
 
                 try {
-                    const response = await fetch(WEBHOOKS.wip + '?client=' + client, { method: 'GET' });
+                    const response = await fetch(WEBHOOKS.wip + '?ClientCode=' + selectedClient, { method: 'GET' });
                     if (response.ok) {
                         updateStatus('✓ WIP sent', 'success');
-                        document.getElementById('client-select').selectedIndex = 0;
+                        selectedClient = null;
+                        selectedClientName = null;
+                        document.getElementById('wip-btn').innerHTML = 'WIP <span class="arrow">▼</span>';
+                        document.getElementById('wip-btn').classList.remove('selected');
+                        document.querySelectorAll('.sheet-item').forEach(i => i.classList.remove('selected'));
                     } else {
                         throw new Error('Failed');
                     }
@@ -298,17 +183,13 @@
             }
         }
 
-        // Clear placeholder on focus
+        // Input placeholder handling
         document.getElementById('update-text').addEventListener('focus', function() {
-            if (this.value === '') {
-                this.placeholder = '';
-            }
+            if (this.value === '') this.placeholder = '';
         });
 
         document.getElementById('update-text').addEventListener('blur', function() {
-            if (this.value === '') {
-                this.placeholder = 'UPDATE';
-            }
+            if (this.value === '') this.placeholder = 'UPDATE';
         });
     </script>
 </body>

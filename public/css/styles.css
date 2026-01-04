@@ -1,0 +1,268 @@
+/* Fonts */
+@font-face {
+    font-family: 'Bebas Neue';
+    src: url('../fonts/BebasNeue-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Variables */
+:root {
+    --hunch-red: #ed1c24;
+    --black: #1a1a1a;
+    --white: #ffffff;
+    --grey-text: #999999;
+    --grey-light: #f5f5f5;
+    
+    --font-heading: 'Bebas Neue', sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Base */
+body {
+    font-family: var(--font-body);
+    background: var(--white);
+    color: var(--black);
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3rem 2rem 2rem;
+}
+
+/* Header */
+header {
+    margin-bottom: 3rem;
+}
+
+header img {
+    height: 44px;
+    width: auto;
+}
+
+/* Controls Container */
+.controls {
+    width: 100%;
+    max-width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    flex: 1;
+}
+
+/* Pill Base */
+.pill {
+    font-family: var(--font-heading);
+    font-size: 1.4rem;
+    letter-spacing: 0.08em;
+    background: var(--white);
+    color: var(--black);
+    border: 2.5px solid var(--hunch-red);
+    padding: 1rem 1.5rem;
+    border-radius: 999px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s ease;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.pill:active {
+    transform: scale(0.98);
+    background: #fff5f5;
+}
+
+/* Update Input */
+input.pill {
+    font-family: var(--font-heading);
+    font-size: 1.4rem;
+    letter-spacing: 0.08em;
+    text-align: center;
+}
+
+input.pill::placeholder {
+    color: var(--black);
+    opacity: 1;
+}
+
+input.pill:focus {
+    outline: none;
+    border-color: var(--black);
+}
+
+input.pill:focus::placeholder {
+    color: var(--grey-text);
+}
+
+/* WIP Button */
+.wip-btn .arrow {
+    color: var(--hunch-red);
+    font-size: 0.8rem;
+    margin-left: 0.25rem;
+}
+
+.wip-btn.selected {
+    border-color: var(--black);
+}
+
+/* Send Button */
+.send-btn {
+    background: var(--hunch-red);
+    color: var(--white);
+    border-color: var(--hunch-red);
+    margin-top: 0.5rem;
+}
+
+.send-btn:active {
+    background: #c91820;
+    border-color: #c91820;
+}
+
+/* Status Message */
+.status {
+    text-align: center;
+    padding: 0.5rem;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    color: var(--grey-text);
+    font-weight: 500;
+    min-height: 2rem;
+}
+
+.status.success {
+    color: #22c55e;
+}
+
+.status.error {
+    color: var(--hunch-red);
+}
+
+/* Footer */
+footer {
+    margin-top: auto;
+    padding-top: 2rem;
+}
+
+footer img {
+    height: 36px;
+    width: auto;
+}
+
+/* Bottom Sheet Overlay */
+.sheet-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 100;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.sheet-overlay.active {
+    display: block;
+    opacity: 1;
+}
+
+/* Bottom Sheet */
+.sheet {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--white);
+    border-radius: 20px 20px 0 0;
+    z-index: 101;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    max-height: 70vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.sheet.active {
+    transform: translateY(0);
+}
+
+.sheet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--grey-light);
+}
+
+.sheet-title {
+    font-family: var(--font-heading);
+    font-size: 1.3rem;
+    letter-spacing: 0.05em;
+}
+
+.sheet-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--grey-text);
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.sheet-list {
+    overflow-y: auto;
+    flex: 1;
+    padding-bottom: env(safe-area-inset-bottom, 1rem);
+}
+
+.sheet-item {
+    display: block;
+    width: 100%;
+    padding: 1rem 1.5rem;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--grey-light);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.sheet-item:active {
+    background: var(--grey-light);
+}
+
+.sheet-item.selected {
+    color: var(--hunch-red);
+    font-weight: 600;
+}
+
+/* Animations */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+}
+
+.sending {
+    animation: pulse 0.6s ease-in-out infinite;
+    pointer-events: none;
+}
