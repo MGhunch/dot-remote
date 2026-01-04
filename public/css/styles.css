@@ -119,12 +119,39 @@ input.pill:focus::placeholder {
     border-color: var(--black);
 }
 
+/* Dropdown Button */
+.dropdown-btn .arrow {
+    color: var(--hunch-red);
+    font-size: 0.8rem;
+    margin-left: 0.25rem;
+}
+
+.dropdown-btn.selected {
+    border-color: var(--black);
+}
+
+/* Section Label */
+.section-label {
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    color: var(--grey-text);
+    margin-top: 0.5rem;
+    margin-bottom: -0.5rem;
+}
+
+/* Divider */
+.divider {
+    height: 1px;
+    background: var(--grey-light);
+    margin: 0.5rem 0;
+}
+
 /* Send Button */
 .send-btn {
     background: var(--hunch-red);
     color: var(--white);
     border-color: var(--hunch-red);
-    margin-top: 0.5rem;
 }
 
 .send-btn:active {
