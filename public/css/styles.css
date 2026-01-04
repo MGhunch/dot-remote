@@ -24,6 +24,7 @@
     --white: #ffffff;
     --grey-text: #999999;
     --grey-light: #f5f5f5;
+    --grey-border: #e0e0e0;
     
     --font-heading: 'Bebas Neue', sans-serif;
     --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -38,16 +39,16 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 3rem 2rem 2rem;
+    padding: 2.5rem 2rem 2rem;
 }
 
 /* Header */
 header {
-    margin-bottom: 3rem;
+    margin-bottom: 2.5rem;
 }
 
 header img {
-    height: 44px;
+    height: 48px;
     width: auto;
 }
 
@@ -57,94 +58,44 @@ header img {
     max-width: 320px;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.75rem;
     flex: 1;
 }
 
 /* Pill Base */
 .pill {
-    font-family: var(--font-heading);
-    font-size: 1.4rem;
-    letter-spacing: 0.08em;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
     background: var(--white);
     color: var(--black);
-    border: 2.5px solid var(--hunch-red);
+    border: 2px solid var(--hunch-red);
     padding: 1rem 1.5rem;
     border-radius: 999px;
     cursor: pointer;
     text-align: center;
     transition: all 0.15s ease;
     width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
 }
 
 .pill:active {
     transform: scale(0.98);
+}
+
+/* Action Buttons */
+.action-btn {
+    background: var(--white);
+}
+
+.action-btn:active {
     background: #fff5f5;
 }
 
-/* Update Input */
-input.pill {
-    font-family: var(--font-heading);
-    font-size: 1.4rem;
-    letter-spacing: 0.08em;
-    text-align: center;
-}
-
-input.pill::placeholder {
-    color: var(--black);
-    opacity: 1;
-}
-
-input.pill:focus {
-    outline: none;
-    border-color: var(--black);
-}
-
-input.pill:focus::placeholder {
-    color: var(--grey-text);
-}
-
-/* WIP Button */
-.wip-btn .arrow {
-    color: var(--hunch-red);
-    font-size: 0.8rem;
-    margin-left: 0.25rem;
-}
-
-.wip-btn.selected {
-    border-color: var(--black);
-}
-
-/* Dropdown Button */
-.dropdown-btn .arrow {
-    color: var(--hunch-red);
-    font-size: 0.8rem;
-    margin-left: 0.25rem;
-}
-
-.dropdown-btn.selected {
-    border-color: var(--black);
-}
-
-/* Section Label */
-.section-label {
-    font-family: var(--font-heading);
-    font-size: 1rem;
-    letter-spacing: 0.1em;
-    color: var(--grey-text);
-    margin-top: 0.5rem;
-    margin-bottom: -0.5rem;
-}
-
-/* Divider */
-.divider {
-    height: 1px;
-    background: var(--grey-light);
-    margin: 0.5rem 0;
+.action-btn.selected {
+    background: var(--hunch-red);
+    color: var(--white);
+    border-color: var(--hunch-red);
 }
 
 /* Send Button */
@@ -152,6 +103,7 @@ input.pill:focus::placeholder {
     background: var(--hunch-red);
     color: var(--white);
     border-color: var(--hunch-red);
+    margin-top: 0.5rem;
 }
 
 .send-btn:active {
@@ -163,8 +115,7 @@ input.pill:focus::placeholder {
 .status {
     text-align: center;
     padding: 0.5rem;
-    font-family: var(--font-body);
-    font-size: 0.85rem;
+    font-size: 0.875rem;
     color: var(--grey-text);
     font-weight: 500;
     min-height: 2rem;
@@ -185,7 +136,7 @@ footer {
 }
 
 footer img {
-    height: 36px;
+    height: 40px;
     width: auto;
 }
 
@@ -219,7 +170,7 @@ footer img {
     z-index: 101;
     transform: translateY(100%);
     transition: transform 0.3s ease;
-    max-height: 70vh;
+    max-height: 80vh;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -238,9 +189,12 @@ footer img {
 }
 
 .sheet-title {
-    font-family: var(--font-heading);
-    font-size: 1.3rem;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 600;
     letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--grey-text);
 }
 
 .sheet-close {
@@ -280,6 +234,58 @@ footer img {
 .sheet-item.selected {
     color: var(--hunch-red);
     font-weight: 600;
+}
+
+/* Update Form Sheet */
+.sheet-form {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--grey-text);
+}
+
+.form-value {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--black);
+}
+
+.form-input {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    padding: 0.875rem 1rem;
+    border: 2px solid var(--grey-border);
+    border-radius: 12px;
+    background: var(--white);
+    transition: border-color 0.15s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--hunch-red);
+}
+
+.form-input::placeholder {
+    color: var(--grey-text);
+}
+
+.form-textarea {
+    min-height: 100px;
+    resize: none;
 }
 
 /* Animations */

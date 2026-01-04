@@ -14,34 +14,19 @@
     </header>
 
     <div class="controls">
-        <!-- Update Section -->
-        <div class="section-label">UPDATE</div>
-        
-        <button class="pill dropdown-btn" id="update-client-btn" onclick="openSheet('update')">
-            Client <span class="arrow">▼</span>
+        <button class="pill action-btn" id="btn-update" onclick="selectAction('update')">
+            MAKE UPDATE
         </button>
 
-        <input type="text" class="pill" id="job-number" placeholder="Job #">
-
-        <input type="text" class="pill" id="update-text" placeholder="Message">
-
-        <button class="pill send-btn" onclick="sendUpdate()" id="btn-update">SEND UPDATE</button>
-
-        <!-- Divider -->
-        <div class="divider"></div>
-
-        <!-- WIP Section -->
-        <button class="pill dropdown-btn" id="wip-btn" onclick="openSheet('wip')">
-            WIP <span class="arrow">▼</span>
+        <button class="pill action-btn" id="btn-wip" onclick="selectAction('wip')">
+            SEND WIP
         </button>
 
-        <button class="pill" onclick="triggerWip()" id="btn-wip-send">SEND WIP</button>
+        <button class="pill action-btn" id="btn-todo" onclick="selectAction('todo')">
+            GET TO DO
+        </button>
 
-        <!-- Divider -->
-        <div class="divider"></div>
-
-        <!-- To Do Section -->
-        <button class="pill" onclick="triggerTodo()" id="btn-todo">TO DO</button>
+        <button class="pill send-btn" onclick="handleSend()" id="btn-send">SEND</button>
 
         <div class="status" id="status"></div>
     </div>
@@ -50,14 +35,14 @@
         <img src="images/ai2-logo.png" alt="ai²">
     </footer>
 
-    <!-- Bottom Sheet -->
+    <!-- Client Picker Sheet -->
     <div class="sheet-overlay" id="sheet-overlay" onclick="closeSheet()"></div>
-    <div class="sheet" id="sheet">
+    <div class="sheet" id="client-sheet">
         <div class="sheet-header">
             <span class="sheet-title">SELECT CLIENT</span>
             <button class="sheet-close" onclick="closeSheet()">×</button>
         </div>
-        <div class="sheet-list" id="sheet-list">
+        <div class="sheet-list">
             <button class="sheet-item" data-value="ONE">One NZ – Marketing</button>
             <button class="sheet-item" data-value="ONS">One NZ – Simplification</button>
             <button class="sheet-item" data-value="ONB">One NZ – Business</button>
@@ -74,6 +59,29 @@
         </div>
     </div>
 
+    <!-- Update Form Sheet -->
+    <div class="sheet" id="update-sheet">
+        <div class="sheet-header">
+            <span class="sheet-title">UPDATE DETAILS</span>
+            <button class="sheet-close" onclick="closeUpdateSheet()">×</button>
+        </div>
+        <div class="sheet-form">
+            <div class="form-group">
+                <label>Client</label>
+                <div class="form-value" id="selected-client-display">—</div>
+            </div>
+            <div class="form-group">
+                <label>Job #</label>
+                <input type="text" class="form-input" id="job-number" placeholder="e.g. 017">
+            </div>
+            <div class="form-group">
+                <label>Message</label>
+                <textarea class="form-input form-textarea" id="update-message" placeholder="What's the update?"></textarea>
+            </div>
+            <button class="pill send-btn" onclick="confirmUpdate()">DONE</button>
+        </div>
+    </div>
+
     <script>
         // n8n webhook URLs
         const WEBHOOKS = {
@@ -82,59 +90,101 @@
             update: 'https://your-n8n.app/webhook/dot-update'
         };
 
-        let updateClient = null;
-        let updateClientName = null;
-        let wipClient = null;
-        let wipClientName = null;
-        let activeSheet = null;
+        // State
+        let currentAction = null;
+        let selectedClient = null;
+        let selectedClientName = null;
+        let jobNumber = null;
+        let updateMessage = null;
 
-        // Sheet controls
-        function openSheet(type) {
-            activeSheet = type;
+        // Select action (TO DO, WIP, UPDATE)
+        function selectAction(action) {
+            // Reset previous selection
+            document.querySelectorAll('.action-btn').forEach(btn => btn.classList.remove('selected'));
+            
+            currentAction = action;
+            
+            if (action === 'todo') {
+                // Just highlight, no picker needed
+                document.getElementById('btn-todo').classList.add('selected');
+                updateStatus('Ready to send To Do');
+            } else if (action === 'wip') {
+                // Open client picker for WIP
+                document.getElementById('btn-wip').classList.add('selected');
+                openClientSheet();
+            } else if (action === 'update') {
+                // Open client picker, then update form
+                document.getElementById('btn-update').classList.add('selected');
+                openClientSheet();
+            }
+        }
+
+        // Client sheet
+        function openClientSheet() {
             document.getElementById('sheet-overlay').classList.add('active');
-            document.getElementById('sheet').classList.add('active');
+            document.getElementById('client-sheet').classList.add('active');
             document.body.style.overflow = 'hidden';
-            
-            // Update sheet title
-            const title = type === 'update' ? 'SELECT CLIENT' : 'SELECT CLIENT FOR WIP';
-            document.querySelector('.sheet-title').textContent = title;
-            
-            // Highlight current selection
-            const currentValue = type === 'update' ? updateClient : wipClient;
-            document.querySelectorAll('.sheet-item').forEach(i => {
-                i.classList.toggle('selected', i.dataset.value === currentValue);
-            });
         }
 
         function closeSheet() {
             document.getElementById('sheet-overlay').classList.remove('active');
-            document.getElementById('sheet').classList.remove('active');
+            document.getElementById('client-sheet').classList.remove('active');
             document.body.style.overflow = '';
-            activeSheet = null;
         }
 
         // Client selection
         document.querySelectorAll('.sheet-item').forEach(item => {
             item.addEventListener('click', function() {
-                const value = this.dataset.value;
-                const name = this.textContent;
-                
-                if (activeSheet === 'update') {
-                    updateClient = value;
-                    updateClientName = name;
-                    const btn = document.getElementById('update-client-btn');
-                    btn.innerHTML = name + ' <span class="arrow">▼</span>';
-                    btn.classList.add('selected');
-                } else if (activeSheet === 'wip') {
-                    wipClient = value;
-                    wipClientName = name;
-                    const btn = document.getElementById('wip-btn');
-                    btn.innerHTML = name + ' <span class="arrow">▼</span>';
-                    btn.classList.add('selected');
-                }
+                selectedClient = this.dataset.value;
+                selectedClientName = this.textContent;
                 
                 closeSheet();
+                
+                if (currentAction === 'wip') {
+                    // WIP: client selected, ready to send
+                    updateStatus(selectedClientName + ' selected');
+                } else if (currentAction === 'update') {
+                    // UPDATE: show update form
+                    document.getElementById('selected-client-display').textContent = selectedClientName;
+                    openUpdateSheet();
+                }
             });
+        });
+
+        // Update form sheet
+        function openUpdateSheet() {
+            document.getElementById('sheet-overlay').classList.add('active');
+            document.getElementById('update-sheet').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeUpdateSheet() {
+            document.getElementById('sheet-overlay').classList.remove('active');
+            document.getElementById('update-sheet').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function confirmUpdate() {
+            jobNumber = document.getElementById('job-number').value.trim();
+            updateMessage = document.getElementById('update-message').value.trim();
+            
+            if (!jobNumber) {
+                alert('Enter a job number');
+                return;
+            }
+            if (!updateMessage) {
+                alert('Enter a message');
+                return;
+            }
+            
+            closeUpdateSheet();
+            updateStatus(selectedClientName + ' ' + jobNumber + ' ready');
+        }
+
+        // Close overlay clicks
+        document.getElementById('sheet-overlay').addEventListener('click', function() {
+            closeSheet();
+            closeUpdateSheet();
         });
 
         // Status updates
@@ -151,98 +201,54 @@
             }
         }
 
-        // Send Update
-        async function sendUpdate() {
-            const btn = document.getElementById('btn-update');
-            const message = document.getElementById('update-text').value.trim();
-            const jobNumber = document.getElementById('job-number').value.trim();
-
-            if (!updateClient) {
-                updateStatus('Select a client', 'error');
-                return;
-            }
-            if (!jobNumber) {
-                updateStatus('Enter job number', 'error');
-                return;
-            }
-            if (!message) {
-                updateStatus('Enter a message', 'error');
+        // Main send handler
+        async function handleSend() {
+            const btn = document.getElementById('btn-send');
+            
+            if (!currentAction) {
+                updateStatus('Select an action first', 'error');
                 return;
             }
 
             btn.classList.add('sending');
-            updateStatus('Sending update...');
 
             try {
-                const response = await fetch(WEBHOOKS.update, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        message: message,
-                        ClientCode: updateClient,
-                        JobNumber: jobNumber
-                    })
-                });
-                if (response.ok) {
-                    updateStatus('✓ Update sent', 'success');
-                    // Reset form
-                    document.getElementById('update-text').value = '';
-                    document.getElementById('job-number').value = '';
-                    updateClient = null;
-                    updateClientName = null;
-                    document.getElementById('update-client-btn').innerHTML = 'Client <span class="arrow">▼</span>';
-                    document.getElementById('update-client-btn').classList.remove('selected');
-                } else {
-                    throw new Error('Failed');
+                let response;
+
+                if (currentAction === 'todo') {
+                    updateStatus('Sending To Do...');
+                    response = await fetch(WEBHOOKS.todo, { method: 'GET' });
+                    
+                } else if (currentAction === 'wip') {
+                    if (!selectedClient) {
+                        updateStatus('Select a client', 'error');
+                        btn.classList.remove('sending');
+                        return;
+                    }
+                    updateStatus('Sending WIP...');
+                    response = await fetch(WEBHOOKS.wip + '?ClientCode=' + selectedClient, { method: 'GET' });
+                    
+                } else if (currentAction === 'update') {
+                    if (!selectedClient || !jobNumber || !updateMessage) {
+                        updateStatus('Complete update details', 'error');
+                        btn.classList.remove('sending');
+                        return;
+                    }
+                    updateStatus('Sending Update...');
+                    response = await fetch(WEBHOOKS.update, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            ClientCode: selectedClient,
+                            JobNumber: jobNumber,
+                            message: updateMessage
+                        })
+                    });
                 }
-            } catch (error) {
-                updateStatus('✗ Failed', 'error');
-            }
 
-            btn.classList.remove('sending');
-        }
-
-        // Send WIP
-        async function triggerWip() {
-            const btn = document.getElementById('btn-wip-send');
-
-            if (!wipClient) {
-                updateStatus('Select a client for WIP', 'error');
-                return;
-            }
-
-            btn.classList.add('sending');
-            updateStatus('Sending WIP...');
-
-            try {
-                const response = await fetch(WEBHOOKS.wip + '?ClientCode=' + wipClient, { method: 'GET' });
-                if (response.ok) {
-                    updateStatus('✓ WIP sent', 'success');
-                    // Reset
-                    wipClient = null;
-                    wipClientName = null;
-                    document.getElementById('wip-btn').innerHTML = 'WIP <span class="arrow">▼</span>';
-                    document.getElementById('wip-btn').classList.remove('selected');
-                } else {
-                    throw new Error('Failed');
-                }
-            } catch (error) {
-                updateStatus('✗ Failed', 'error');
-            }
-
-            btn.classList.remove('sending');
-        }
-
-        // To-do trigger
-        async function triggerTodo() {
-            const btn = document.getElementById('btn-todo');
-            btn.classList.add('sending');
-            updateStatus('Sending...');
-
-            try {
-                const response = await fetch(WEBHOOKS.todo, { method: 'GET' });
                 if (response.ok) {
                     updateStatus('✓ Sent', 'success');
+                    resetForm();
                 } else {
                     throw new Error('Failed');
                 }
@@ -253,22 +259,19 @@
             btn.classList.remove('sending');
         }
 
-        // Input placeholder handling
-        document.getElementById('update-text').addEventListener('focus', function() {
-            if (this.value === '') this.placeholder = '';
-        });
-
-        document.getElementById('update-text').addEventListener('blur', function() {
-            if (this.value === '') this.placeholder = 'Message';
-        });
-
-        document.getElementById('job-number').addEventListener('focus', function() {
-            if (this.value === '') this.placeholder = '';
-        });
-
-        document.getElementById('job-number').addEventListener('blur', function() {
-            if (this.value === '') this.placeholder = 'Job #';
-        });
+        // Reset form after successful send
+        function resetForm() {
+            currentAction = null;
+            selectedClient = null;
+            selectedClientName = null;
+            jobNumber = null;
+            updateMessage = null;
+            
+            document.querySelectorAll('.action-btn').forEach(btn => btn.classList.remove('selected'));
+            document.getElementById('job-number').value = '';
+            document.getElementById('update-message').value = '';
+            document.getElementById('selected-client-display').textContent = '—';
+        }
     </script>
 </body>
 </html>
