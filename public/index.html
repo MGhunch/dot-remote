@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Dot Remote</title>
+    <style>
+        @font-face {
+            font-family: 'Bebas Neue';
+            src: url('fonts/BebasNeue-Regular.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --hunch-red: #ed1c24;
+            --black: #1a1a1a;
+            --white: #ffffff;
+            --grey-text: #999999;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--white);
+            color: var(--black);
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 3rem 2rem 2rem;
+        }
+
+        header {
+            margin-bottom: 3rem;
+        }
+
+        header img {
+            height: 44px;
+            width: auto;
+        }
+
+        .controls {
+            width: 100%;
+            max-width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            flex: 1;
+        }
+
+        /* Pill input/button base styles */
+        .pill {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.4rem;
+            letter-spacing: 0.08em;
+            background: var(--white);
+            color: var(--black);
+            border: 2.5px solid var(--hunch-red);
+            padding: 1rem 1.5rem;
+            border-radius: 999px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.15s ease;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .pill:active {
+            transform: scale(0.98);
+            background: #fff5f5;
+        }
+
+        /* UPDATE text input */
+        input.pill {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.4rem;
+            letter-spacing: 0.08em;
+            text-align: center;
+        }
+
+        input.pill::placeholder {
+            color: var(--black);
+            opacity: 1;
+        }
+
+        input.pill:focus {
+            outline: none;
+            border-color: var(--black);
+        }
+
+        input.pill:focus::placeholder {
+            color: var(--grey-text);
+        }
+
+        /* WIP dropdown */
+        select.pill {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.4rem;
+            letter-spacing: 0.08em;
+            appearance: none;
+            padding-right: 2.5rem;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='%23ed1c24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1.25rem center;
+        }
+
+        select.pill:focus {
+            outline: none;
+            border-color: var(--black);
+        }
+
+        /* SEND button - solid red */
+        .send-btn {
+            background: var(--hunch-red);
+            color: var(--white);
+            border-color: var(--hunch-red);
+            margin-top: 0.5rem;
+        }
+
+        .send-btn:active {
+            background: #c91820;
+            border-color: #c91820;
+        }
+
+        /* Status message */
+        .status {
+            text-align: center;
+            padding: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--grey-text);
+            font-weight: 500;
+            min-height: 2rem;
+        }
+
+        .status.success {
+            color: #22c55e;
+        }
+
+        .status.error {
+            color: var(--hunch-red);
+        }
+
+        /* Footer */
+        footer {
+            margin-top: auto;
+            padding-top: 2rem;
+        }
+
+        footer img {
+            height: 36px;
+            width: auto;
+        }
+
+        /* Sending animation */
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        .sending {
+            animation: pulse 0.6s ease-in-out infinite;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="images/header-logo.png" alt="Dot Remote">
+    </header>
+
+    <div class="controls">
+        <input type="text" class="pill" id="update-text" placeholder="UPDATE">
+
+        <select class="pill" id="client-select">
+            <option value="" disabled selected>WIP</option>
+            <option value="sky">SKY</option>
+            <option value="onenz">ONE NZ</option>
+            <option value="fisher">FISHER FUNDS</option>
+            <option value="tower">TOWER</option>
+        </select>
+
+        <button class="pill" onclick="triggerTodo()" id="btn-todo">TO DO</button>
+
+        <button class="pill send-btn" onclick="handleSend()" id="btn-send">SEND</button>
+
+        <div class="status" id="status"></div>
+    </div>
+
+    <footer>
+        <img src="images/ai2-logo.png" alt="ai²">
+    </footer>
+
+    <script>
+        // Replace these with your actual n8n webhook URLs
+        const WEBHOOKS = {
+            todo: 'https://your-n8n.app/webhook/dot-todo',
+            wip: 'https://your-n8n.app/webhook/dot-wip',
+            update: 'https://your-n8n.app/webhook/dot-update'
+        };
+
+        function updateStatus(message, type = '') {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = 'status' + (type ? ' ' + type : '');
+            
+            if (type) {
+                setTimeout(() => {
+                    status.textContent = '';
+                    status.className = 'status';
+                }, 2000);
+            }
+        }
+
+        async function triggerTodo() {
+            const btn = document.getElementById('btn-todo');
+            btn.classList.add('sending');
+            updateStatus('Sending...');
+
+            try {
+                const response = await fetch(WEBHOOKS.todo, { method: 'GET' });
+                if (response.ok) {
+                    updateStatus('✓ Sent', 'success');
+                } else {
+                    throw new Error('Failed');
+                }
+            } catch (error) {
+                updateStatus('✗ Failed', 'error');
+            }
+
+            btn.classList.remove('sending');
+        }
+
+        async function handleSend() {
+            const btn = document.getElementById('btn-send');
+            const updateText = document.getElementById('update-text').value.trim();
+            const client = document.getElementById('client-select').value;
+
+            // Determine what to send
+            if (updateText) {
+                // Send update
+                btn.classList.add('sending');
+                updateStatus('Sending update...');
+
+                try {
+                    const response = await fetch(WEBHOOKS.update, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: updateText })
+                    });
+                    if (response.ok) {
+                        updateStatus('✓ Update sent', 'success');
+                        document.getElementById('update-text').value = '';
+                        document.getElementById('update-text').placeholder = 'UPDATE';
+                    } else {
+                        throw new Error('Failed');
+                    }
+                } catch (error) {
+                    updateStatus('✗ Failed', 'error');
+                }
+
+                btn.classList.remove('sending');
+
+            } else if (client) {
+                // Send WIP request
+                btn.classList.add('sending');
+                updateStatus('Sending WIP...');
+
+                try {
+                    const response = await fetch(WEBHOOKS.wip + '?client=' + client, { method: 'GET' });
+                    if (response.ok) {
+                        updateStatus('✓ WIP sent', 'success');
+                        document.getElementById('client-select').selectedIndex = 0;
+                    } else {
+                        throw new Error('Failed');
+                    }
+                } catch (error) {
+                    updateStatus('✗ Failed', 'error');
+                }
+
+                btn.classList.remove('sending');
+
+            } else {
+                updateStatus('Enter update or select client', 'error');
+            }
+        }
+
+        // Clear placeholder on focus
+        document.getElementById('update-text').addEventListener('focus', function() {
+            if (this.value === '') {
+                this.placeholder = '';
+            }
+        });
+
+        document.getElementById('update-text').addEventListener('blur', function() {
+            if (this.value === '') {
+                this.placeholder = 'UPDATE';
+            }
+        });
+    </script>
+</body>
+</html>
