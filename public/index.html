@@ -326,8 +326,8 @@
                 </div>
 
                 <div class="btn-stack">
-                    <button class="pill action-btn" onclick="navigate('update-client')">GET AN UPDATE</button>
-                    <button class="pill action-btn" onclick="navigate('wip-client')">GET A WIP</button>
+                    <button class="pill action-btn" onclick="navigate('update')">GET AN UPDATE</button>
+                    <button class="pill action-btn" onclick="navigate('wip')">GET A WIP</button>
                     <button class="pill send-btn" onclick="showTodoOverlay()">GET TO DO</button>
                 </div>
 
@@ -336,51 +336,36 @@
                 </div>
             </div>
 
-            <!-- UPDATE: Client Selection -->
-            <div class="screen hidden" id="screen-update-client">
+            <!-- UPDATE: Single screen with Client, Job, Update -->
+            <div class="screen hidden" id="screen-update">
                 <button class="back-btn" onclick="navigate('main')">←</button>
                 
                 <div class="form-header">
                     <h2>GET AN UPDATE</h2>
                 </div>
 
-                <div class="form-content" id="update-client-form">
+                <div class="form-content" id="update-form">
                     <div class="form-group">
                         <label>Client</label>
-                        <select id="update-client-select">
+                        <select id="update-client-select" onchange="onUpdateClientChange()">
                             <option value="">Select a client...</option>
                         </select>
                     </div>
 
-                    <div class="form-actions">
-                        <button class="pill send-btn" onclick="goToUpdateJob()">NEXT</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- UPDATE: Job Selection + Update Text -->
-            <div class="screen hidden" id="screen-update-job">
-                <button class="back-btn" onclick="navigate('update-client')">←</button>
-                
-                <div class="form-header">
-                    <h2>GET AN UPDATE</h2>
-                </div>
-
-                <div class="form-content" id="update-job-form">
-                    <div class="form-group">
+                    <div class="form-group" id="update-job-group" style="display: none;">
                         <label>Job</label>
                         <select id="update-job-select">
                             <option value="">Select a job...</option>
                         </select>
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group" id="update-text-group" style="display: none;">
                         <label>Update</label>
                         <textarea id="update-text" placeholder="What's the latest?"></textarea>
                     </div>
 
-                    <div class="form-actions">
-                        <button class="pill send-btn" onclick="submitUpdate()">SEND</button>
+                    <div class="form-actions" id="update-actions" style="display: none;">
+                        <button class="pill send-btn" onclick="showUpdateConfirm()">SEND</button>
                     </div>
                 </div>
 
@@ -392,14 +377,14 @@
             </div>
 
             <!-- WIP: Client Selection -->
-            <div class="screen hidden" id="screen-wip-client">
+            <div class="screen hidden" id="screen-wip">
                 <button class="back-btn" onclick="navigate('main')">←</button>
                 
                 <div class="form-header">
                     <h2>GET A WIP</h2>
                 </div>
 
-                <div class="form-content" id="wip-client-form">
+                <div class="form-content" id="wip-form">
                     <div class="form-group">
                         <label>Client</label>
                         <select id="wip-client-select">
@@ -408,7 +393,7 @@
                     </div>
 
                     <div class="form-actions">
-                        <button class="pill send-btn" onclick="submitWip()">SEND</button>
+                        <button class="pill send-btn" onclick="showWipConfirm()">SEND</button>
                     </div>
                 </div>
 
@@ -438,12 +423,38 @@
             </div>
         </div>
 
+        <!-- UPDATE Confirmation Overlay -->
+        <div class="overlay" id="update-overlay">
+            <div class="overlay-content">
+                <div class="overlay-confirm" id="update-confirm">
+                    <p>Send this update?</p>
+                    <div class="overlay-buttons">
+                        <button class="pill action-btn" onclick="hideUpdateOverlay()">NO</button>
+                        <button class="pill send-btn" onclick="submitUpdate()">YES</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- WIP Confirmation Overlay -->
+        <div class="overlay" id="wip-overlay">
+            <div class="overlay-content">
+                <div class="overlay-confirm" id="wip-confirm">
+                    <p>Send this WIP request?</p>
+                    <div class="overlay-buttons">
+                        <button class="pill action-btn" onclick="hideWipOverlay()">NO</button>
+                        <button class="pill send-btn" onclick="submitWip()">YES</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="red-bar"></div>
     </div>
 
     <script>
         // Configuration - Railway endpoint for Airtable data
-        const API_BASE = 'https://dot-remote-api.up.railway.app'; // TODO: Update with actual Railway URL
+        const API_BASE = 'https://dot-remote-api.up.railway.app';
 
         // State
         let clients = [];
@@ -466,7 +477,6 @@
                 }
             } catch (error) {
                 console.log('Using fallback client data');
-                // Fallback data for testing
                 clients = [
                     { code: 'SKY', name: 'Sky TV' },
                     { code: 'ONE', name: 'One NZ' },
@@ -478,16 +488,16 @@
         }
 
         // Fetch jobs for a specific client
-        async function loadJobs(clientCode) {
-            if (jobsByClient[clientCode]) {
-                return jobsByClient[clientCode];
+        async function loadJobs(clientName) {
+            if (jobsByClient[clientName]) {
+                return jobsByClient[clientName];
             }
 
             try {
-                const response = await fetch(`${API_BASE}/jobs?client=${clientCode}`);
+                const response = await fetch(`${API_BASE}/jobs?client=${encodeURIComponent(clientName)}`);
                 if (response.ok) {
                     const jobs = await response.json();
-                    jobsByClient[clientCode] = jobs;
+                    jobsByClient[clientName] = jobs;
                     return jobs;
                 }
             } catch (error) {
@@ -495,24 +505,8 @@
             }
 
             // Fallback data for testing
-            const fallbackJobs = {
-                'SKY': [
-                    { id: 'SKY001', name: 'SKY 001 - Always On Social Content' },
-                    { id: 'SKY012', name: 'SKY 012 - Summer Campaign' }
-                ],
-                'ONE': [
-                    { id: 'ONE003', name: 'ONE 003 - Q1 Campaign Refresh' },
-                    { id: 'ONE007', name: 'ONE 007 - Simplification Comms' }
-                ],
-                'TWR': [
-                    { id: 'TWR002', name: 'TWR 002 - Policy Update EDMs' }
-                ],
-                'FSH': [
-                    { id: 'FSH001', name: 'FSH 001 - Fund Performance Report' }
-                ]
-            };
-            jobsByClient[clientCode] = fallbackJobs[clientCode] || [];
-            return jobsByClient[clientCode];
+            jobsByClient[clientName] = [];
+            return jobsByClient[clientName];
         }
 
         // Populate client dropdowns
@@ -523,7 +517,7 @@
                 select.innerHTML = '<option value="">Select a client...</option>';
                 clients.forEach(client => {
                     const option = document.createElement('option');
-                    option.value = client.name;  // Use full name for API queries
+                    option.value = client.name;
                     option.textContent = client.name;
                     select.appendChild(option);
                 });
@@ -565,19 +559,32 @@
             document.querySelectorAll('.form-content').forEach(el => el.classList.remove('hide'));
             document.querySelectorAll('select').forEach(el => el.value = '');
             document.querySelectorAll('textarea').forEach(el => el.value = '');
+            
+            // Reset UPDATE form visibility
+            document.getElementById('update-job-group').style.display = 'none';
+            document.getElementById('update-text-group').style.display = 'none';
+            document.getElementById('update-actions').style.display = 'none';
         }
 
-        // UPDATE flow
-        async function goToUpdateJob() {
-            const client = document.getElementById('update-client-select').value;
+        // UPDATE flow - client selection triggers job load
+        async function onUpdateClientChange() {
+            const clientSelect = document.getElementById('update-client-select');
+            const client = clientSelect.value;
+            
+            const jobGroup = document.getElementById('update-job-group');
+            const textGroup = document.getElementById('update-text-group');
+            const actions = document.getElementById('update-actions');
+            const jobSelect = document.getElementById('update-job-select');
             
             if (!client) {
-                alert('Please select a client');
+                jobGroup.style.display = 'none';
+                textGroup.style.display = 'none';
+                actions.style.display = 'none';
                 return;
             }
 
+            // Load jobs and show job dropdown
             const jobs = await loadJobs(client);
-            const jobSelect = document.getElementById('update-job-select');
             jobSelect.innerHTML = '<option value="">Select a job...</option>';
             
             jobs.forEach(job => {
@@ -587,10 +594,13 @@
                 jobSelect.appendChild(option);
             });
 
-            navigate('update-job');
+            jobGroup.style.display = 'block';
+            textGroup.style.display = 'block';
+            actions.style.display = 'block';
         }
 
-        async function submitUpdate() {
+        // UPDATE confirmation overlay
+        function showUpdateConfirm() {
             const job = document.getElementById('update-job-select').value;
             const update = document.getElementById('update-text').value;
 
@@ -604,15 +614,27 @@
                 return;
             }
 
+            document.getElementById('update-overlay').classList.add('show');
+        }
+
+        function hideUpdateOverlay() {
+            document.getElementById('update-overlay').classList.remove('show');
+        }
+
+        async function submitUpdate() {
+            const job = document.getElementById('update-job-select').value;
+            const update = document.getElementById('update-text').value;
+
             // TODO: Send to N8N webhook
             console.log('Sending UPDATE to Dot:', { job, update });
 
-            document.getElementById('update-job-form').classList.add('hide');
+            hideUpdateOverlay();
+            document.getElementById('update-form').classList.add('hide');
             document.getElementById('update-success').classList.add('show');
         }
 
-        // WIP flow
-        async function submitWip() {
+        // WIP confirmation overlay
+        function showWipConfirm() {
             const client = document.getElementById('wip-client-select').value;
 
             if (!client) {
@@ -620,10 +642,21 @@
                 return;
             }
 
+            document.getElementById('wip-overlay').classList.add('show');
+        }
+
+        function hideWipOverlay() {
+            document.getElementById('wip-overlay').classList.remove('show');
+        }
+
+        async function submitWip() {
+            const client = document.getElementById('wip-client-select').value;
+
             // TODO: Send to N8N webhook
             console.log('Sending WIP to Dot:', { client });
 
-            document.getElementById('wip-client-form').classList.add('hide');
+            hideWipOverlay();
+            document.getElementById('wip-form').classList.add('hide');
             document.getElementById('wip-success').classList.add('show');
         }
 
