@@ -796,12 +796,10 @@
         }
 
         async function submitTodo() {
-            // Send to proxy
+            // Send to proxy (GET request)
             try {
                 await fetch(`${PROXY_BASE}/proxy/todo`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'todo' })
+                    method: 'GET'
                 });
             } catch (error) {
                 console.error('Failed to send TO DO:', error);
