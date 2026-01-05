@@ -15,18 +15,18 @@
 
     <div class="controls">
         <button class="pill action-btn" id="btn-update" onclick="selectAction('update')">
-            MAKE UPDATE
+            Make an update
         </button>
 
         <button class="pill action-btn" id="btn-wip" onclick="selectAction('wip')">
-            SEND WIP
+            Send a WIP
         </button>
 
         <button class="pill action-btn" id="btn-todo" onclick="selectAction('todo')">
-            GET TO DO
+            Get to do list
         </button>
 
-        <button class="pill send-btn" onclick="handleSend()" id="btn-send">SEND</button>
+        <button class="pill send-btn" onclick="handleSend()" id="btn-send">Send</button>
 
         <div class="status" id="status"></div>
     </div>
@@ -99,6 +99,26 @@
         let jobNumber = null;
         let updateMessage = null;
 
+        // Check if ready to send and update button state
+        function checkReady() {
+            const btn = document.getElementById('btn-send');
+            let ready = false;
+
+            if (currentAction === 'todo') {
+                ready = true;
+            } else if (currentAction === 'wip' && selectedClient) {
+                ready = true;
+            } else if (currentAction === 'update' && selectedClient && updateMessage) {
+                ready = true;
+            }
+
+            if (ready) {
+                btn.classList.add('ready');
+            } else {
+                btn.classList.remove('ready');
+            }
+        }
+
         // Select action (TO DO, WIP, UPDATE)
         function selectAction(action) {
             // Reset previous selection
@@ -110,6 +130,7 @@
                 // Just highlight, no picker needed
                 document.getElementById('btn-todo').classList.add('selected');
                 updateStatus('Ready to send To Do');
+                checkReady();
             } else if (action === 'wip') {
                 // Open client picker for WIP
                 document.getElementById('btn-wip').classList.add('selected');
@@ -145,6 +166,7 @@
                 if (currentAction === 'wip') {
                     // WIP: client selected, ready to send
                     updateStatus(selectedClientName + ' selected');
+                    checkReady();
                 } else if (currentAction === 'update') {
                     // UPDATE: show update form
                     document.getElementById('selected-client-display').textContent = selectedClientName;
@@ -183,6 +205,7 @@
             
             closeUpdateSheet();
             updateStatus(jobNumber ? jobNumber + ' ready' : selectedClientName + ' update ready');
+            checkReady();
         }
 
         // Close overlay clicks
@@ -281,6 +304,7 @@
             document.getElementById('job-number').value = '';
             document.getElementById('update-message').value = '';
             document.getElementById('selected-client-display').textContent = '–';
+            checkReady();
         }
     </script>
 </body>

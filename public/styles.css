@@ -1,0 +1,318 @@
+/* Reset and base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f5f5f5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Red anchor bar at top */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background-color: #ED1C24;
+    z-index: 1000;
+}
+
+/* Header */
+header {
+    padding: 40px 20px 20px;
+    text-align: center;
+    background-color: #ffffff;
+    border-bottom: 1px solid #eee;
+}
+
+header img {
+    width: 180px;
+    height: auto;
+}
+
+/* Controls container */
+.controls {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 24px 20px;
+    max-width: 400px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* Pill buttons */
+.pill {
+    border: none;
+    border-radius: 25px;
+    padding: 16px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Action buttons - default state */
+.action-btn {
+    background-color: #ffffff;
+    color: #333333;
+    border: 2px solid #e0e0e0;
+}
+
+.action-btn:hover {
+    border-color: #ED1C24;
+    color: #ED1C24;
+}
+
+.action-btn.selected {
+    background-color: #ED1C24;
+    color: #ffffff;
+    border-color: #ED1C24;
+}
+
+/* Send button - grey until ready */
+.send-btn {
+    background-color: #cccccc;
+    color: #ffffff;
+    margin-top: 8px;
+}
+
+.send-btn.ready {
+    background-color: #ED1C24;
+}
+
+.send-btn:hover {
+    opacity: 0.9;
+}
+
+.send-btn.sending {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Status message */
+.status {
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+    min-height: 20px;
+    margin-top: 8px;
+}
+
+.status.success {
+    color: #22c55e;
+    font-weight: 600;
+}
+
+.status.error {
+    color: #ED1C24;
+    font-weight: 600;
+}
+
+/* Footer */
+footer {
+    padding: 20px;
+    text-align: center;
+    background-color: #ffffff;
+    border-top: 1px solid #eee;
+}
+
+footer img {
+    width: 60px;
+    height: auto;
+    opacity: 0.6;
+}
+
+/* Sheet overlay */
+.sheet-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 100;
+}
+
+.sheet-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Sheet */
+.sheet {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #ffffff;
+    border-radius: 20px 20px 0 0;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    z-index: 101;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.sheet.active {
+    transform: translateY(0);
+}
+
+.sheet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    position: sticky;
+    top: 0;
+    background-color: #ffffff;
+}
+
+.sheet-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #333;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.sheet-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #999;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+/* Sheet list (client picker) */
+.sheet-list {
+    padding: 10px 0;
+}
+
+.sheet-item {
+    display: block;
+    width: 100%;
+    padding: 16px 20px;
+    background: none;
+    border: none;
+    text-align: left;
+    font-size: 16px;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.sheet-item:hover {
+    background-color: #f5f5f5;
+}
+
+.sheet-item:active {
+    background-color: #eee;
+}
+
+/* Sheet form (update form) */
+.sheet-form {
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.form-value {
+    font-size: 16px;
+    color: #333;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fafafa;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #ED1C24;
+    background-color: #ffffff;
+}
+
+.form-textarea {
+    min-height: 100px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+/* Sheet form send button */
+.sheet-form .send-btn {
+    width: 100%;
+    margin-top: 10px;
+    background-color: #ED1C24;
+}
+
+/* Mobile optimizations */
+@media (max-width: 480px) {
+    header {
+        padding: 30px 16px 16px;
+    }
+    
+    header img {
+        width: 160px;
+    }
+    
+    .controls {
+        padding: 20px 16px;
+    }
+    
+    .pill {
+        padding: 14px 20px;
+        font-size: 14px;
+    }
+}
+
+/* Safe area for notched phones */
+@supports (padding-top: env(safe-area-inset-top)) {
+    body::before {
+        top: env(safe-area-inset-top);
+    }
+    
+    header {
+        padding-top: calc(40px + env(safe-area-inset-top));
+    }
+    
+    footer {
+        padding-bottom: calc(20px + env(safe-area-inset-bottom));
+    }
+}
