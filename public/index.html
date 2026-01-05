@@ -198,8 +198,8 @@
                 return;
             }
             
-            // Build full job number if provided
-            if (jobNumber) {
+            // Build full job number if provided (but don't double-prepend client code)
+            if (jobNumber && !jobNumber.toUpperCase().startsWith(selectedClient)) {
                 jobNumber = selectedClient + ' ' + jobNumber;
             }
             
