@@ -4,25 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>DOT REMOTE</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/png" href="https://michaelwilson4.github.io/hunch-images/hunch-favicon.png">
+    <link rel="stylesheet" href="css/styles.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html, body {
-            height: 100%;
-        }
-
+        /* App structure */
         body {
-            font-family: 'Nunito Sans', sans-serif;
-            background: white;
-            min-height: 100%;
+            padding: 0;
+            min-height: 100dvh;
             display: flex;
             flex-direction: column;
         }
@@ -31,16 +18,16 @@
             flex: 1;
             display: flex;
             flex-direction: column;
+            width: 100%;
             max-width: 500px;
             margin: 0 auto;
-            width: 100%;
             position: relative;
             overflow: hidden;
         }
 
         .red-bar {
             height: 6px;
-            background: #ED1C24;
+            background: var(--hunch-red);
             width: 100%;
             flex-shrink: 0;
         }
@@ -51,17 +38,18 @@
             overflow: hidden;
         }
 
+        /* Screens */
         .screen {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            padding: 30px 25px;
+            padding: 2.5rem 2rem 2rem;
             display: flex;
             flex-direction: column;
             transition: transform 0.3s ease-in-out;
-            background: white;
+            background: var(--white);
         }
 
         .screen.hidden {
@@ -81,174 +69,138 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
-            margin-bottom: 40px;
+            margin-bottom: 2.5rem;
         }
 
         .header img {
-            height: 45px;
-        }
-
-        .header h1 {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 36px;
-            letter-spacing: 2px;
-        }
-
-        .header h1 span {
-            color: #ED1C24;
+            height: 48px;
+            width: auto;
         }
 
         /* Back button */
         .back-btn {
             position: absolute;
-            top: 25px;
-            left: 20px;
+            top: 2rem;
+            left: 1.5rem;
             background: none;
             border: none;
-            font-size: 28px;
-            color: #ED1C24;
+            font-size: 1.75rem;
+            color: var(--hunch-red);
             cursor: pointer;
-            padding: 5px;
+            padding: 0.25rem;
             z-index: 10;
+            line-height: 1;
         }
 
         /* Form header */
         .form-header {
             text-align: center;
-            margin-bottom: 30px;
-            padding-top: 10px;
+            margin-bottom: 2rem;
+            padding-top: 0.5rem;
         }
 
         .form-header h2 {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 28px;
-            color: #333;
-            letter-spacing: 1px;
+            font-family: var(--font-heading);
+            font-size: 1.75rem;
+            color: var(--black);
+            letter-spacing: 0.05em;
+            font-weight: normal;
         }
 
-        /* Buttons */
+        /* Button stack */
         .btn-stack {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 0.75rem;
             flex: 1;
             justify-content: flex-start;
-            padding-top: 20px;
         }
 
-        .btn {
-            font-family: 'Nunito Sans', sans-serif;
-            font-weight: 700;
-            font-size: 16px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            padding: 18px 30px;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .btn-outline {
-            background: white;
-            border: 2.5px solid #ED1C24;
-            color: #333;
-        }
-
-        .btn-outline:hover {
-            background: #fef2f2;
-        }
-
-        .btn-outline:active {
-            transform: scale(0.98);
-        }
-
-        .btn-filled {
-            background: #ED1C24;
-            border: 2.5px solid #ED1C24;
-            color: white;
-        }
-
-        .btn-filled:hover {
-            background: #d91920;
-        }
-
-        .btn-filled:active {
-            transform: scale(0.98);
-        }
-
-        /* Form elements */
+        /* Form content */
         .form-content {
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            padding-top: 20px;
+            gap: 1.25rem;
         }
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .form-group label {
+        .form-content .form-group label {
+            font-size: 0.75rem;
             font-weight: 600;
-            color: #666;
-            font-size: 13px;
+            letter-spacing: 0.05em;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            color: var(--grey-text);
+            margin-bottom: 0.5rem;
+            display: block;
         }
 
-        .form-group select,
-        .form-group textarea {
-            font-family: 'Nunito Sans', sans-serif;
-            font-size: 16px;
-            padding: 15px;
-            border: 2px solid #ddd;
+        .form-content select {
+            font-family: var(--font-body);
+            font-size: 1rem;
+            padding: 0.875rem 1rem;
+            border: 2px solid var(--grey-border);
             border-radius: 12px;
-            background: white;
-            transition: border-color 0.2s;
-        }
-
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #ED1C24;
-        }
-
-        .form-group select {
+            background: var(--white);
+            width: 100%;
             cursor: pointer;
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right 12px center;
-            background-size: 20px;
+            background-position: right 0.75rem center;
+            background-size: 1.25rem;
+            transition: border-color 0.15s ease;
         }
 
-        .form-group textarea {
+        .form-content select:focus {
+            outline: none;
+            border-color: var(--hunch-red);
+        }
+
+        .form-content textarea {
+            font-family: var(--font-body);
+            font-size: 1rem;
+            padding: 0.875rem 1rem;
+            border: 2px solid var(--grey-border);
+            border-radius: 12px;
+            background: var(--white);
+            width: 100%;
+            min-height: 120px;
             resize: none;
-            height: 120px;
+            transition: border-color 0.15s ease;
+        }
+
+        .form-content textarea:focus {
+            outline: none;
+            border-color: var(--hunch-red);
+        }
+
+        .form-content textarea::placeholder {
+            color: var(--grey-text);
         }
 
         .form-actions {
             margin-top: auto;
-            padding-bottom: 20px;
+            padding-bottom: 1rem;
         }
 
-        .form-actions .btn {
+        .form-actions .pill {
             width: 100%;
+        }
+
+        .form-content.hide {
+            display: none;
         }
 
         /* Footer */
         .footer {
             margin-top: auto;
             text-align: center;
-            padding-top: 30px;
+            padding-top: 2rem;
         }
 
         .footer img {
             height: 40px;
+            width: auto;
         }
 
         /* Overlay */
@@ -274,13 +226,15 @@
         }
 
         .overlay-content {
-            background: white;
+            background: var(--white);
             border-radius: 20px;
-            padding: 40px 30px;
-            margin: 20px;
+            padding: 2.5rem 2rem;
+            margin: 1.5rem;
             text-align: center;
             transform: scale(0.9);
             transition: transform 0.2s ease;
+            width: 100%;
+            max-width: 320px;
         }
 
         .overlay.show .overlay-content {
@@ -288,23 +242,23 @@
         }
 
         .overlay-content p {
-            font-size: 20px;
-            color: #333;
-            margin-bottom: 30px;
+            font-size: 1.25rem;
+            color: var(--black);
+            margin-bottom: 2rem;
             line-height: 1.4;
         }
 
         .overlay-buttons {
             display: flex;
-            gap: 15px;
+            gap: 1rem;
             justify-content: center;
         }
 
-        .overlay-buttons .btn {
+        .overlay-buttons .pill {
             min-width: 100px;
+            flex: 1;
         }
 
-        /* Success states */
         .overlay-success {
             display: none;
         }
@@ -317,28 +271,29 @@
             display: none;
         }
 
+        /* Success state */
         .success-icon {
             width: 60px;
             height: 60px;
-            background: #ED1C24;
+            background: var(--hunch-red);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 30px;
-            margin: 0 auto 20px;
+            color: var(--white);
+            font-size: 1.75rem;
+            margin: 0 auto 1.25rem;
         }
 
         .success-message {
             display: none;
             text-align: center;
-            padding: 40px 20px;
+            padding: 2.5rem 1.5rem;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             flex: 1;
-            gap: 20px;
+            gap: 1.5rem;
         }
 
         .success-message.show {
@@ -347,18 +302,15 @@
 
         .success-message h3,
         .overlay-success h3 {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 28px;
-            color: #333;
-            letter-spacing: 1px;
+            font-family: var(--font-heading);
+            font-size: 1.75rem;
+            color: var(--black);
+            letter-spacing: 0.05em;
+            font-weight: normal;
         }
 
         .overlay-success h3 {
-            margin-bottom: 25px;
-        }
-
-        .form-content.hide {
-            display: none;
+            margin-bottom: 1.5rem;
         }
     </style>
 </head>
@@ -370,18 +322,17 @@
             <!-- Main Menu Screen -->
             <div class="screen active" id="screen-main">
                 <div class="header">
-                    <img src="https://michaelwilson4.github.io/hunch-images/hunch-logo-red.png" alt="Hunch" onerror="this.style.display='none'">
-                    <h1>DOT <span>REMOTE</span></h1>
+                    <img src="images/header-logo.png" alt="DOT REMOTE">
                 </div>
 
                 <div class="btn-stack">
-                    <button class="btn btn-outline" onclick="navigate('update-client')">GET AN UPDATE</button>
-                    <button class="btn btn-outline" onclick="navigate('wip-client')">GET A WIP</button>
-                    <button class="btn btn-filled" onclick="showTodoOverlay()">GET TO DO</button>
+                    <button class="pill action-btn" onclick="navigate('update-client')">GET AN UPDATE</button>
+                    <button class="pill action-btn" onclick="navigate('wip-client')">GET A WIP</button>
+                    <button class="pill send-btn" onclick="showTodoOverlay()">GET TO DO</button>
                 </div>
 
                 <div class="footer">
-                    <img src="https://michaelwilson4.github.io/hunch-images/ai2-logo.png" alt="ai²" onerror="this.innerHTML='<span style=\"font-family: Bebas Neue; font-size: 24px;\">🤖 ai²</span>'">
+                    <img src="images/ai2-logo.png" alt="ai²">
                 </div>
             </div>
 
@@ -398,15 +349,11 @@
                         <label>Client</label>
                         <select id="update-client-select">
                             <option value="">Select a client...</option>
-                            <option value="SKY">Sky TV</option>
-                            <option value="ONE">One NZ</option>
-                            <option value="TWR">Tower Insurance</option>
-                            <option value="FSH">Fisher Funds</option>
                         </select>
                     </div>
 
                     <div class="form-actions">
-                        <button class="btn btn-filled" onclick="goToUpdateJob()">NEXT</button>
+                        <button class="pill send-btn" onclick="goToUpdateJob()">NEXT</button>
                     </div>
                 </div>
             </div>
@@ -433,14 +380,14 @@
                     </div>
 
                     <div class="form-actions">
-                        <button class="btn btn-filled" onclick="submitUpdate()">SEND</button>
+                        <button class="pill send-btn" onclick="submitUpdate()">SEND</button>
                     </div>
                 </div>
 
                 <div class="success-message" id="update-success">
                     <div class="success-icon">✓</div>
                     <h3>SENT TO DOT</h3>
-                    <button class="btn btn-outline" onclick="navigate('main')">DONE</button>
+                    <button class="pill action-btn" onclick="navigate('main')">DONE</button>
                 </div>
             </div>
 
@@ -457,22 +404,18 @@
                         <label>Client</label>
                         <select id="wip-client-select">
                             <option value="">Select a client...</option>
-                            <option value="SKY">Sky TV</option>
-                            <option value="ONE">One NZ</option>
-                            <option value="TWR">Tower Insurance</option>
-                            <option value="FSH">Fisher Funds</option>
                         </select>
                     </div>
 
                     <div class="form-actions">
-                        <button class="btn btn-filled" onclick="submitWip()">SEND</button>
+                        <button class="pill send-btn" onclick="submitWip()">SEND</button>
                     </div>
                 </div>
 
                 <div class="success-message" id="wip-success">
                     <div class="success-icon">✓</div>
                     <h3>SENT TO DOT</h3>
-                    <button class="btn btn-outline" onclick="navigate('main')">DONE</button>
+                    <button class="pill action-btn" onclick="navigate('main')">DONE</button>
                 </div>
             </div>
         </div>
@@ -483,14 +426,14 @@
                 <div class="overlay-confirm" id="todo-confirm">
                     <p>Want the latest<br>to do list?</p>
                     <div class="overlay-buttons">
-                        <button class="btn btn-outline" onclick="hideTodoOverlay()">NO</button>
-                        <button class="btn btn-filled" onclick="submitTodo()">YES</button>
+                        <button class="pill action-btn" onclick="hideTodoOverlay()">NO</button>
+                        <button class="pill send-btn" onclick="submitTodo()">YES</button>
                     </div>
                 </div>
                 <div class="overlay-success" id="todo-success">
                     <div class="success-icon">✓</div>
                     <h3>SENT TO DOT</h3>
-                    <button class="btn btn-outline" onclick="hideTodoOverlay()">DONE</button>
+                    <button class="pill action-btn" onclick="hideTodoOverlay()">DONE</button>
                 </div>
             </div>
         </div>
@@ -499,31 +442,95 @@
     </div>
 
     <script>
-        // Job data by client - this will be replaced with Airtable data
-        const jobsByClient = {
-            'SKY': [
-                { id: 'SKY001', name: 'SKY 001 - Always On Social Content' },
-                { id: 'SKY012', name: 'SKY 012 - The Job About The Thing' },
-                { id: 'SKY015', name: 'SKY 015 - Summer Campaign' }
-            ],
-            'ONE': [
-                { id: 'ONE003', name: 'ONE 003 - Q1 Campaign Refresh' },
-                { id: 'ONE007', name: 'ONE 007 - Simplification Comms' },
-                { id: 'ONE012', name: 'ONE 012 - Business Rebrand' }
-            ],
-            'TWR': [
-                { id: 'TWR002', name: 'TWR 002 - Policy Update EDMs' },
-                { id: 'TWR005', name: 'TWR 005 - Claims Process Refresh' }
-            ],
-            'FSH': [
-                { id: 'FSH001', name: 'FSH 001 - Fund Performance Report' },
-                { id: 'FSH003', name: 'FSH 003 - Investor Communications' }
-            ]
-        };
+        // Configuration - Railway endpoint for Airtable data
+        const API_BASE = 'https://dot-remote-api.up.railway.app'; // TODO: Update with actual Railway URL
 
+        // State
+        let clients = [];
+        let jobsByClient = {};
         let currentScreen = 'main';
         let screenHistory = ['main'];
 
+        // Initialize - fetch clients on load
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadClients();
+        });
+
+        // Fetch clients from Railway/Airtable
+        async function loadClients() {
+            try {
+                const response = await fetch(`${API_BASE}/clients`);
+                if (response.ok) {
+                    clients = await response.json();
+                    populateClientDropdowns();
+                }
+            } catch (error) {
+                console.log('Using fallback client data');
+                // Fallback data for testing
+                clients = [
+                    { code: 'SKY', name: 'Sky TV' },
+                    { code: 'ONE', name: 'One NZ' },
+                    { code: 'TWR', name: 'Tower Insurance' },
+                    { code: 'FSH', name: 'Fisher Funds' }
+                ];
+                populateClientDropdowns();
+            }
+        }
+
+        // Fetch jobs for a specific client
+        async function loadJobs(clientCode) {
+            if (jobsByClient[clientCode]) {
+                return jobsByClient[clientCode];
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/jobs?client=${clientCode}`);
+                if (response.ok) {
+                    const jobs = await response.json();
+                    jobsByClient[clientCode] = jobs;
+                    return jobs;
+                }
+            } catch (error) {
+                console.log('Using fallback job data');
+            }
+
+            // Fallback data for testing
+            const fallbackJobs = {
+                'SKY': [
+                    { id: 'SKY001', name: 'SKY 001 - Always On Social Content' },
+                    { id: 'SKY012', name: 'SKY 012 - Summer Campaign' }
+                ],
+                'ONE': [
+                    { id: 'ONE003', name: 'ONE 003 - Q1 Campaign Refresh' },
+                    { id: 'ONE007', name: 'ONE 007 - Simplification Comms' }
+                ],
+                'TWR': [
+                    { id: 'TWR002', name: 'TWR 002 - Policy Update EDMs' }
+                ],
+                'FSH': [
+                    { id: 'FSH001', name: 'FSH 001 - Fund Performance Report' }
+                ]
+            };
+            jobsByClient[clientCode] = fallbackJobs[clientCode] || [];
+            return jobsByClient[clientCode];
+        }
+
+        // Populate client dropdowns
+        function populateClientDropdowns() {
+            const dropdowns = ['update-client-select', 'wip-client-select'];
+            dropdowns.forEach(id => {
+                const select = document.getElementById(id);
+                select.innerHTML = '<option value="">Select a client...</option>';
+                clients.forEach(client => {
+                    const option = document.createElement('option');
+                    option.value = client.code;
+                    option.textContent = client.name;
+                    select.appendChild(option);
+                });
+            });
+        }
+
+        // Navigation
         function navigate(screenId) {
             const currentEl = document.getElementById('screen-' + currentScreen);
             const targetEl = document.getElementById('screen-' + screenId);
@@ -560,7 +567,8 @@
             document.querySelectorAll('textarea').forEach(el => el.value = '');
         }
 
-        function goToUpdateJob() {
+        // UPDATE flow
+        async function goToUpdateJob() {
             const client = document.getElementById('update-client-select').value;
             
             if (!client) {
@@ -568,10 +576,11 @@
                 return;
             }
 
+            const jobs = await loadJobs(client);
             const jobSelect = document.getElementById('update-job-select');
             jobSelect.innerHTML = '<option value="">Select a job...</option>';
             
-            jobsByClient[client].forEach(job => {
+            jobs.forEach(job => {
                 const option = document.createElement('option');
                 option.value = job.id;
                 option.textContent = job.name;
@@ -581,7 +590,7 @@
             navigate('update-job');
         }
 
-        function submitUpdate() {
+        async function submitUpdate() {
             const job = document.getElementById('update-job-select').value;
             const update = document.getElementById('update-text').value;
 
@@ -595,14 +604,15 @@
                 return;
             }
 
-            document.getElementById('update-job-form').classList.add('hide');
-            document.getElementById('update-success').classList.add('show');
-
             // TODO: Send to N8N webhook
             console.log('Sending UPDATE to Dot:', { job, update });
+
+            document.getElementById('update-job-form').classList.add('hide');
+            document.getElementById('update-success').classList.add('show');
         }
 
-        function submitWip() {
+        // WIP flow
+        async function submitWip() {
             const client = document.getElementById('wip-client-select').value;
 
             if (!client) {
@@ -610,13 +620,14 @@
                 return;
             }
 
-            document.getElementById('wip-client-form').classList.add('hide');
-            document.getElementById('wip-success').classList.add('show');
-
             // TODO: Send to N8N webhook
             console.log('Sending WIP to Dot:', { client });
+
+            document.getElementById('wip-client-form').classList.add('hide');
+            document.getElementById('wip-success').classList.add('show');
         }
 
+        // TO DO overlay
         function showTodoOverlay() {
             document.getElementById('todo-overlay').classList.add('show');
             document.getElementById('todo-confirm').classList.remove('hide');
@@ -627,12 +638,12 @@
             document.getElementById('todo-overlay').classList.remove('show');
         }
 
-        function submitTodo() {
-            document.getElementById('todo-confirm').classList.add('hide');
-            document.getElementById('todo-success').classList.add('show');
-
+        async function submitTodo() {
             // TODO: Send to N8N webhook
             console.log('Sending TO DO request to Dot');
+
+            document.getElementById('todo-confirm').classList.add('hide');
+            document.getElementById('todo-success').classList.add('show');
         }
     </script>
 </body>
