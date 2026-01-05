@@ -513,12 +513,6 @@
                         </select>
                     </div>
                 </div>
-
-                <div class="success-message" id="wip-success">
-                    <div class="success-icon">✓</div>
-                    <h3>SENT TO DOT</h3>
-                    <button class="pill action-btn" onclick="navigate('main')">DONE</button>
-                </div>
             </div>
         </div>
 
@@ -623,7 +617,7 @@
             const dropdowns = ['update-client-select', 'wip-client-select'];
             dropdowns.forEach(id => {
                 const select = document.getElementById(id);
-                select.innerHTML = '<option value="">Select a client...</option>';
+                select.innerHTML = '<option value="">Choose a client...</option>';
                 clients.forEach(client => {
                     const option = document.createElement('option');
                     option.value = client.name;
@@ -698,7 +692,7 @@
 
             // Load jobs and show job dropdown
             const jobs = await loadJobs(client);
-            jobSelect.innerHTML = '<option value="">Select a job...</option>';
+            jobSelect.innerHTML = '<option value="">Choose a job...</option>';
             
             jobs.forEach(job => {
                 const option = document.createElement('option');
@@ -768,13 +762,19 @@
 
         async function submitWip() {
             const client = document.getElementById('wip-client-select').value;
+            
+            // Extract client code from client name (first 3 letters)
+            const clientCode = client.split(' ')[0].substring(0, 3).toUpperCase();
 
             // Send to proxy
             try {
                 await fetch(`${PROXY_BASE}/proxy/wip`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ client })
+                    body: JSON.stringify({ 
+                        client: client,
+                        ClientCode: clientCode 
+                    })
                 });
             } catch (error) {
                 console.error('Failed to send WIP:', error);
