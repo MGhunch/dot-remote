@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Dot Remote</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <img src="images/header-logo.png" alt="Dot Remote">
+    </header>
+
+    <div class="controls">
+        <button class="pill action-btn" id="btn-update" onclick="selectAction('update')">
+            MAKE UPDATE
+        </button>
+
+        <button class="pill action-btn" id="btn-wip" onclick="selectAction('wip')">
+            SEND WIP
+        </button>
+
+        <button class="pill action-btn" id="btn-todo" onclick="selectAction('todo')">
+            GET TO DO
+        </button>
+
+        <button class="pill send-btn" onclick="handleSend()" id="btn-send">SEND</button>
+
+        <div class="status" id="status"></div>
+    </div>
+
+    <footer>
+        <img src="images/ai2-logo.png" alt="ai²">
+    </footer>
+
+    <!-- Client Picker Sheet -->
+    <div class="sheet-overlay" id="sheet-overlay" onclick="closeSheet()"></div>
+    <div class="sheet" id="client-sheet">
+        <div class="sheet-header">
+            <span class="sheet-title">SELECT CLIENT</span>
+            <button class="sheet-close" onclick="closeSheet()">×</button>
+        </div>
+        <div class="sheet-list">
+            <button class="sheet-item" data-value="ONE">One NZ – Marketing</button>
+            <button class="sheet-item" data-value="ONS">One NZ – Simplification</button>
+            <button class="sheet-item" data-value="ONB">One NZ – Business</button>
+            <button class="sheet-item" data-value="SKY">Sky</button>
+            <button class="sheet-item" data-value="TOW">Tower</button>
+            <button class="sheet-item" data-value="FIS">Fisher Funds</button>
+            <button class="sheet-item" data-value="HUN">Hunch</button>
+            <button class="sheet-item" data-value="FST">Firestop</button>
+            <button class="sheet-item" data-value="WKA">Whakarongorau</button>
+            <button class="sheet-item" data-value="N4L">N4L</button>
+            <button class="sheet-item" data-value="EON">Eon Fibre</button>
+            <button class="sheet-item" data-value="LAB">Labour</button>
+            <button class="sheet-item" data-value="OTH">Other</button>
+        </div>
+    </div>
+
+    <!-- Update Form Sheet -->
+    <div class="sheet" id="update-sheet">
+        <div class="sheet-header">
+            <span class="sheet-title">UPDATE DETAILS</span>
+            <button class="sheet-close" onclick="closeUpdateSheet()">×</button>
+        </div>
+        <div class="sheet-form">
+            <div class="form-group">
+                <label>Client</label>
+                <div class="form-value" id="selected-client-display">–</div>
+            </div>
+            <div class="form-group">
+                <label>Job #</label>
+                <input type="text" class="form-input" id="job-number" placeholder="e.g. 017">
+            </div>
+            <div class="form-group">
+                <label>Message</label>
+                <textarea class="form-input form-textarea" id="update-message" placeholder="What's the update?"></textarea>
+            </div>
+            <button class="pill send-btn" onclick="confirmUpdate()">DONE</button>
+        </div>
+    </div>
+
+    <script>
+        // Proxy URL - routes through Railway to avoid CORS
+        const PROXY_BASE = 'https://dot-proxy-production.up.railway.app';
+        
+        const WEBHOOKS = {
+            todo: PROXY_BASE + '/proxy/todo',
+            wip: PROXY_BASE + '/proxy/wip',
+            update: PROXY_BASE + '/proxy/update'
+        };
+
+        // State
+        let currentAction = null;
+        let selectedClient = null;
+        let selectedClientName = null;
+        let jobNumber = null;
+        let updateMessage = null;
+
+        // Select action (TO DO, WIP, UPDATE)
+        function selectAction(action) {
+            // Reset previous selection
+            document.querySelectorAll('.action-btn').forEach(btn => btn.classList.remove('selected'));
+            
+            currentAction = action;
+            
+            if (action === 'todo') {
+                // Just highlight, no picker needed
+                document.getElementById('btn-todo').classList.add('selected');
+                updateStatus('Ready to send To Do');
+            } else if (action === 'wip') {
+                // Open client picker for WIP
+                document.getElementById('btn-wip').classList.add('selected');
+                openClientSheet();
+            } else if (action === 'update') {
+                // Open client picker, then update form
+                document.getElementById('btn-update').classList.add('selected');
+                openClientSheet();
+            }
+        }
+
+        // Client sheet
+        function openClientSheet() {
+            document.getElementById('sheet-overlay').classList.add('active');
+            document.getElementById('client-sheet').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSheet() {
+            document.getElementById('sheet-overlay').classList.remove('active');
+            document.getElementById('client-sheet').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Client selection
+        document.querySelectorAll('.sheet-item').forEach(item => {
+            item.addEventListener('click', function() {
+                selectedClient = this.dataset.value;
+                selectedClientName = this.textContent;
+                
+                closeSheet();
+                
+                if (currentAction === 'wip') {
+                    // WIP: client selected, ready to send
+                    updateStatus(selectedClientName + ' selected');
+                } else if (currentAction === 'update') {
+                    // UPDATE: show update form
+                    document.getElementById('selected-client-display').textContent = selectedClientName;
+                    openUpdateSheet();
+                }
+            });
+        });
+
+        // Update form sheet
+        function openUpdateSheet() {
+            document.getElementById('sheet-overlay').classList.add('active');
+            document.getElementById('update-sheet').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeUpdateSheet() {
+            document.getElementById('sheet-overlay').classList.remove('active');
+            document.getElementById('update-sheet').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function confirmUpdate() {
+            jobNumber = document.getElementById('job-number').value.trim();
+            updateMessage = document.getElementById('update-message').value.trim();
+            
+            // Job number is optional - Dot will try to figure it out
+            if (!updateMessage) {
+                alert('Enter a message');
+                return;
+            }
+            
+            // Build full job number if provided
+            if (jobNumber) {
+                jobNumber = selectedClient + ' ' + jobNumber;
+            }
+            
+            closeUpdateSheet();
+            updateStatus(jobNumber ? jobNumber + ' ready' : selectedClientName + ' update ready');
+        }
+
+        // Close overlay clicks
+        document.getElementById('sheet-overlay').addEventListener('click', function() {
+            closeSheet();
+            closeUpdateSheet();
+        });
+
+        // Status updates
+        function updateStatus(message, type = '') {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = 'status' + (type ? ' ' + type : '');
+            
+            if (type) {
+                setTimeout(() => {
+                    status.textContent = '';
+                    status.className = 'status';
+                }, 2000);
+            }
+        }
+
+        // Main send handler
+        async function handleSend() {
+            const btn = document.getElementById('btn-send');
+            
+            if (!currentAction) {
+                updateStatus('Select an action first', 'error');
+                return;
+            }
+
+            btn.classList.add('sending');
+
+            try {
+                let response;
+
+                if (currentAction === 'todo') {
+                    updateStatus('Sending To Do...');
+                    response = await fetch(WEBHOOKS.todo, { method: 'GET' });
+                    
+                } else if (currentAction === 'wip') {
+                    if (!selectedClient) {
+                        updateStatus('Select a client', 'error');
+                        btn.classList.remove('sending');
+                        return;
+                    }
+                    updateStatus('Sending WIP...');
+                    response = await fetch(WEBHOOKS.wip, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            ClientCode: selectedClient
+                        })
+                    });
+                    
+                } else if (currentAction === 'update') {
+                    if (!selectedClient || !updateMessage) {
+                        updateStatus('Complete update details', 'error');
+                        btn.classList.remove('sending');
+                        return;
+                    }
+                    updateStatus('Sending Update...');
+                    response = await fetch(WEBHOOKS.update, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            ClientCode: selectedClient,
+                            JobNumber: jobNumber || '',
+                            message: updateMessage
+                        })
+                    });
+                }
+
+                if (response.ok) {
+                    updateStatus('✓ Sent', 'success');
+                    resetForm();
+                } else {
+                    throw new Error('Failed');
+                }
+            } catch (error) {
+                updateStatus('✗ Failed', 'error');
+            }
+
+            btn.classList.remove('sending');
+        }
+
+        // Reset form after successful send
+        function resetForm() {
+            currentAction = null;
+            selectedClient = null;
+            selectedClientName = null;
+            jobNumber = null;
+            updateMessage = null;
+            
+            document.querySelectorAll('.action-btn').forEach(btn => btn.classList.remove('selected'));
+            document.getElementById('job-number').value = '';
+            document.getElementById('update-message').value = '';
+            document.getElementById('selected-client-display').textContent = '–';
+        }
+    </script>
+</body>
+</html>
