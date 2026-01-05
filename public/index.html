@@ -523,7 +523,7 @@
                 select.innerHTML = '<option value="">Select a client...</option>';
                 clients.forEach(client => {
                     const option = document.createElement('option');
-                    option.value = client.code;
+                    option.value = client.name;  // Use full name for API queries
                     option.textContent = client.name;
                     select.appendChild(option);
                 });
