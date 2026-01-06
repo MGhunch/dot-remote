@@ -1,13 +1,10 @@
-const CACHE_NAME = 'dot-remote-v1';
+const CACHE_NAME = 'dot-remote-v2';
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/css/styles.css',
-  '/images/icon-192.png',
-  '/images/icon-512.png',
-  '/images/app-icon.png',
-  '/images/dot-robot.png',
-  '/images/hunch-logo.png'
+  './',
+  './index.html',
+  './css/styles.css',
+  './images/icon-192.png',
+  './images/icon-512.png'
 ];
 
 // Install - cache assets
@@ -43,7 +40,6 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     fetch(event.request)
       .then(response => {
-        // Clone and cache successful responses
         if (response.ok) {
           const clone = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
