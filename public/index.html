@@ -534,8 +534,15 @@
 
                 <div class="form-content" id="incoming-form">
                     <div class="form-group">
+                        <label>Client</label>
+                        <select id="incoming-client-select">
+                            <option value="">Choose a client...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
                         <label>What's coming?</label>
-                        <textarea id="incoming-text" placeholder="e.g. New job for Sky - Box Colours"></textarea>
+                        <textarea id="incoming-text" placeholder="e.g. Box Colours refresh, need by Feb"></textarea>
                     </div>
 
                     <div class="form-actions">
@@ -662,14 +669,15 @@
 
         // Populate client dropdowns
         function populateClientDropdowns() {
-            const dropdowns = ['update-client-select', 'wip-client-select'];
+            const dropdowns = ['update-client-select', 'wip-client-select', 'incoming-client-select'];
             dropdowns.forEach(id => {
                 const select = document.getElementById(id);
                 select.innerHTML = '<option value="">Choose a client...</option>';
                 clients.forEach(client => {
                     const option = document.createElement('option');
-                    option.value = client.name;
+                    option.value = client.code;
                     option.textContent = client.name;
+                    option.dataset.name = client.name;
                     select.appendChild(option);
                 });
             });
@@ -864,8 +872,16 @@
 
         // INCOMING functions
         async function submitIncoming() {
+            const clientSelect = document.getElementById('incoming-client-select');
+            const clientCode = clientSelect.value;
+            const clientName = clientSelect.options[clientSelect.selectedIndex]?.dataset?.name || '';
             const text = document.getElementById('incoming-text').value.trim();
             
+            if (!clientCode) {
+                alert('Please select a client');
+                return;
+            }
+
             if (!text) {
                 alert('Please describe the incoming job');
                 return;
@@ -875,7 +891,11 @@
                 const response = await fetch(`${PROXY_BASE}/proxy/incoming`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: text })
+                    body: JSON.stringify({ 
+                        message: text,
+                        clientCode: clientCode,
+                        clientName: clientName
+                    })
                 });
 
                 const result = await response.json();
