@@ -475,9 +475,142 @@
         .overlay-success h3 {
             margin-bottom: 1.5rem;
         }
+
+        /* PIN Screen */
+        .pin-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--white, #fff);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .pin-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .pin-logo {
+            width: 80px;
+            margin-bottom: 2rem;
+        }
+
+        .pin-title {
+            font-size: 14px;
+            color: var(--grey-text, #999);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+        }
+
+        .pin-dots {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .pin-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid var(--grey-border, #e5e5e5);
+            background: transparent;
+            transition: all 0.15s ease;
+        }
+
+        .pin-dot.filled {
+            background: var(--hunch-red, #ED1C24);
+            border-color: var(--hunch-red, #ED1C24);
+        }
+
+        .pin-dot.error {
+            border-color: var(--hunch-red, #ED1C24);
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        .pin-keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            max-width: 280px;
+        }
+
+        .pin-key {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            border: 1.5px solid var(--grey-border, #e5e5e5);
+            background: var(--white, #fff);
+            font-size: 1.75rem;
+            font-weight: 500;
+            color: var(--black, #000);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .pin-key:hover {
+            border-color: var(--hunch-red, #ED1C24);
+        }
+
+        .pin-key:active {
+            background: var(--grey-light, #f5f5f5);
+        }
+
+        .pin-key.empty {
+            border: none;
+            background: transparent;
+            cursor: default;
+        }
+
+        .pin-key.delete {
+            font-size: 1.25rem;
+        }
     </style>
 </head>
 <body>
+    <!-- PIN Screen -->
+    <div class="pin-screen" id="pin-screen">
+        <img src="images/Robot.png" alt="Dot" class="pin-logo">
+        <p class="pin-title">Enter PIN</p>
+        <div class="pin-dots">
+            <div class="pin-dot" id="dot-0"></div>
+            <div class="pin-dot" id="dot-1"></div>
+            <div class="pin-dot" id="dot-2"></div>
+            <div class="pin-dot" id="dot-3"></div>
+        </div>
+        <div class="pin-keypad">
+            <button class="pin-key" onclick="enterPin(1)">1</button>
+            <button class="pin-key" onclick="enterPin(2)">2</button>
+            <button class="pin-key" onclick="enterPin(3)">3</button>
+            <button class="pin-key" onclick="enterPin(4)">4</button>
+            <button class="pin-key" onclick="enterPin(5)">5</button>
+            <button class="pin-key" onclick="enterPin(6)">6</button>
+            <button class="pin-key" onclick="enterPin(7)">7</button>
+            <button class="pin-key" onclick="enterPin(8)">8</button>
+            <button class="pin-key" onclick="enterPin(9)">9</button>
+            <button class="pin-key empty"></button>
+            <button class="pin-key" onclick="enterPin(0)">0</button>
+            <button class="pin-key delete" onclick="deletePin()">⌫</button>
+        </div>
+    </div>
+
     <div class="app-container">
         <div class="red-bar"></div>
         
@@ -704,6 +837,57 @@
     </div>
 
     <script>
+        // PIN Configuration
+        const CORRECT_PIN = '1919';
+        let enteredPin = '';
+
+        // Check if already unlocked this session
+        if (sessionStorage.getItem('dotUnlocked') === 'true') {
+            document.getElementById('pin-screen').classList.add('hidden');
+        }
+
+        function enterPin(digit) {
+            if (enteredPin.length >= 4) return;
+            
+            enteredPin += digit;
+            updatePinDots();
+            
+            if (enteredPin.length === 4) {
+                setTimeout(checkPin, 150);
+            }
+        }
+
+        function deletePin() {
+            enteredPin = enteredPin.slice(0, -1);
+            updatePinDots();
+        }
+
+        function updatePinDots() {
+            for (let i = 0; i < 4; i++) {
+                const dot = document.getElementById('dot-' + i);
+                dot.classList.remove('filled', 'error');
+                if (i < enteredPin.length) {
+                    dot.classList.add('filled');
+                }
+            }
+        }
+
+        function checkPin() {
+            if (enteredPin === CORRECT_PIN) {
+                sessionStorage.setItem('dotUnlocked', 'true');
+                document.getElementById('pin-screen').classList.add('hidden');
+            } else {
+                // Wrong PIN - shake and reset
+                const dots = document.querySelectorAll('.pin-dot');
+                dots.forEach(dot => dot.classList.add('error'));
+                
+                setTimeout(() => {
+                    enteredPin = '';
+                    updatePinDots();
+                }, 400);
+            }
+        }
+
         // Configuration
         const API_BASE = 'https://dot-remote-api.up.railway.app';
         const PROXY_BASE = 'https://dot-proxy.up.railway.app';
