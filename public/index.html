@@ -966,7 +966,7 @@
                 select.innerHTML = '<option value="">Choose a client...</option>';
                 clients.forEach(client => {
                     const option = document.createElement('option');
-                    option.value = client.code;
+                    option.value = client.name;
                     option.textContent = client.name;
                     option.dataset.name = client.name;
                     select.appendChild(option);
