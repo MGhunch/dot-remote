@@ -969,6 +969,7 @@
                     option.value = client.name;
                     option.textContent = client.name;
                     option.dataset.name = client.name;
+                    option.dataset.code = client.code;
                     select.appendChild(option);
                 });
             });
@@ -1058,7 +1059,8 @@
         async function submitUpdate() {
             const job = document.getElementById('update-job-select').value;
             const update = document.getElementById('update-text').value;
-            const client = document.getElementById('update-client-select').value;
+            const clientSelect = document.getElementById('update-client-select');
+            const clientCode = clientSelect.options[clientSelect.selectedIndex]?.dataset?.code || '';
 
             if (!job) {
                 alert('Please select a job');
@@ -1069,9 +1071,6 @@
                 alert('Please enter an update');
                 return;
             }
-
-            // Extract client code from client name (first 3 letters)
-            const clientCode = client.split(' ')[0].substring(0, 3).toUpperCase();
 
             // Send to proxy
             try {
@@ -1113,10 +1112,9 @@
         }
 
         async function submitWip() {
-            const client = document.getElementById('wip-client-select').value;
-            
-            // Extract client code from client name (first 3 letters)
-            const clientCode = client.split(' ')[0].substring(0, 3).toUpperCase();
+            const clientSelect = document.getElementById('wip-client-select');
+            const client = clientSelect.value;
+            const clientCode = clientSelect.options[clientSelect.selectedIndex]?.dataset?.code || '';
 
             // Send to proxy
             try {
@@ -1164,11 +1162,11 @@
         // INCOMING functions
         async function submitIncoming() {
             const clientSelect = document.getElementById('incoming-client-select');
-            const clientCode = clientSelect.value;
-            const clientName = clientSelect.options[clientSelect.selectedIndex]?.dataset?.name || '';
+            const clientName = clientSelect.value;
+            const clientCode = clientSelect.options[clientSelect.selectedIndex]?.dataset?.code || '';
             const text = document.getElementById('incoming-text').value.trim();
             
-            if (!clientCode) {
+            if (!clientName) {
                 alert('Please select a client');
                 return;
             }
