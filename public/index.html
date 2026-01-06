@@ -16,6 +16,67 @@
             flex-direction: column;
         }
 
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
+        }
+
+        .loading-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .loading-robot {
+            width: 80px;
+            height: auto;
+            position: relative;
+        }
+
+        .loading-robot img {
+            width: 100%;
+            height: auto;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            25% { transform: scale(1.15); opacity: 0.9; }
+            50% { transform: scale(1); opacity: 1; }
+            75% { transform: scale(1.1); opacity: 0.95; }
+        }
+
+        .loading-robot::after {
+            content: '';
+            position: absolute;
+            top: 52%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 18px;
+            height: 16px;
+            background: var(--hunch-red, #ED1C24);
+            clip-path: path('M9 2.5C6.5 -0.5 2 0.5 2 4c0 3 7 8 7 8s7-5 7-8c0-3.5-4.5-4.5-7-1.5z');
+            animation: heartbeat 1s ease-in-out infinite;
+        }
+
+        .loading-text {
+            margin-top: 16px;
+            font-size: 14px;
+            color: var(--grey-text, #999);
+            font-weight: 500;
+        }
+
         .app-container {
             flex: 1;
             display: flex;
@@ -612,6 +673,14 @@
         <div class="red-bar"></div>
     </div>
 
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-robot">
+            <img src="images/Robot.png" alt="Dot thinking...">
+        </div>
+        <p class="loading-text" id="loading-text">Dot is thinking...</p>
+    </div>
+
     <script>
         // Configuration
         const API_BASE = 'https://dot-remote-api.up.railway.app';
@@ -622,6 +691,16 @@
         let jobsByClient = {};
         let currentScreen = 'main';
         let screenHistory = ['main'];
+
+        // Loading helpers
+        function showLoading(text = 'Dot is thinking...') {
+            document.getElementById('loading-text').textContent = text;
+            document.getElementById('loading-overlay').classList.add('show');
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-overlay').classList.remove('show');
+        }
 
         // Initialize - fetch clients on load
         document.addEventListener('DOMContentLoaded', async () => {
@@ -654,17 +733,21 @@
                 return jobsByClient[clientName];
             }
 
+            showLoading('Finding jobs...');
+            
             try {
                 const response = await fetch(`${API_BASE}/jobs?client=${encodeURIComponent(clientName)}`);
                 if (response.ok) {
                     const jobs = await response.json();
                     jobsByClient[clientName] = jobs;
+                    hideLoading();
                     return jobs;
                 }
             } catch (error) {
                 console.log('Using fallback job data');
             }
 
+            hideLoading();
             jobsByClient[clientName] = [];
             return jobsByClient[clientName];
         }
@@ -889,6 +972,8 @@
                 return;
             }
 
+            showLoading('Creating job...');
+
             try {
                 const response = await fetch(`${PROXY_BASE}/proxy/incoming`, {
                     method: 'POST',
@@ -901,6 +986,7 @@
                 });
 
                 const result = await response.json();
+                hideLoading();
 
                 if (result.success) {
                     document.getElementById('incoming-job-number').textContent = result.jobNumber;
@@ -913,6 +999,7 @@
                     alert('Failed to create job: ' + (result.error || 'Unknown error'));
                 }
             } catch (error) {
+                hideLoading();
                 console.error('Failed to create incoming job:', error);
                 alert('Failed to connect to Dot');
             }
