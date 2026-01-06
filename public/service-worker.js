@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dot-remote-v3';
+const CACHE_NAME = 'dot-remote-v4';
 const ASSETS = [
   './',
   './index.html',
@@ -30,19 +30,21 @@ self.addEventListener('activate', event => {
 
 // Fetch - network first, fall back to cache
 self.addEventListener('fetch', event => {
-  // Skip non-GET requests, API calls, and chrome extensions
-  if (event.request.method !== 'GET' || 
-      event.request.url.includes('/proxy/') ||
+  // Skip non-GET requests
+  if (event.request.method !== 'GET') {
+    return;
+  }
+
+  // Let API calls and external requests go straight to network (don't cache)
+  if (event.request.url.includes('/proxy/') ||
       event.request.url.includes('railway.app') ||
-      event.request.url.startsWith('chrome-extension://')) {
+      event.request.url.startsWith('chrome-extension://') ||
+      !event.request.url.startsWith(self.location.origin)) {
+    event.respondWith(fetch(event.request));
     return;
   }
 
-  // Only cache same-origin requests
-  if (!event.request.url.startsWith(self.location.origin)) {
-    return;
-  }
-
+  // Same-origin requests: network first, fall back to cache
   event.respondWith(
     fetch(event.request)
       .then(response => {
