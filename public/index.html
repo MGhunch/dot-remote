@@ -447,6 +447,19 @@
                         </div>
                     </button>
 
+                    <button class="card-btn" onclick="navigate('incoming')">
+                        <div class="card-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 5v14"/>
+                                <path d="m19 12-7 7-7-7"/>
+                            </svg>
+                        </div>
+                        <div class="card-text">
+                            <span class="card-label">Incoming</span>
+                            <span class="card-action">New job on radar</span>
+                        </div>
+                    </button>
+
                     <div class="spacer"></div>
                 </div>
 
@@ -509,6 +522,27 @@
                     </div>
                 </div>
             </div>
+
+            <!-- INCOMING Screen -->
+            <div class="screen hidden form-screen" id="screen-incoming">
+                <div class="header-section">
+                    <button class="back-btn" onclick="navigate('main')">←</button>
+                    <div class="header">
+                        <h1 class="form-title">INCOMING</h1>
+                    </div>
+                </div>
+
+                <div class="form-content" id="incoming-form">
+                    <div class="form-group">
+                        <label>What's coming?</label>
+                        <textarea id="incoming-text" placeholder="e.g. New job for Sky - Box Colours"></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="pill send-btn" onclick="submitIncoming()">CREATE</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- TO DO Overlay -->
@@ -553,6 +587,16 @@
                 <div class="success-icon">✓</div>
                 <h3>SENT TO DOT</h3>
                 <button class="pill action-btn" onclick="hideUpdateOverlay()">DONE</button>
+            </div>
+        </div>
+
+        <!-- Incoming Success Overlay -->
+        <div class="overlay" id="incoming-overlay">
+            <div class="overlay-content">
+                <div class="success-icon">✓</div>
+                <h3 id="incoming-job-number">SKY 046</h3>
+                <p id="incoming-project-name" style="color: var(--grey-text); margin-top: 0.5rem;">Project Name</p>
+                <button class="pill action-btn" onclick="hideIncomingOverlay()" style="margin-top: 1.5rem;">DONE</button>
             </div>
         </div>
 
@@ -816,6 +860,46 @@
 
             document.getElementById('todo-confirm').classList.add('hide');
             document.getElementById('todo-success').classList.add('show');
+        }
+
+        // INCOMING functions
+        async function submitIncoming() {
+            const text = document.getElementById('incoming-text').value.trim();
+            
+            if (!text) {
+                alert('Please describe the incoming job');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${PROXY_BASE}/proxy/incoming`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    document.getElementById('incoming-job-number').textContent = result.jobNumber;
+                    document.getElementById('incoming-project-name').textContent = result.projectName;
+                    document.getElementById('incoming-overlay').classList.add('show');
+                } else if (result.message) {
+                    // Claude couldn't identify client
+                    alert(result.message);
+                } else {
+                    alert('Failed to create job: ' + (result.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Failed to create incoming job:', error);
+                alert('Failed to connect to Dot');
+            }
+        }
+
+        function hideIncomingOverlay() {
+            document.getElementById('incoming-overlay').classList.remove('show');
+            document.getElementById('incoming-text').value = '';
+            navigate('main');
         }
     </script>
 </body>
