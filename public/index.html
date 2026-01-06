@@ -6,7 +6,7 @@
     <title>DOT REMOTE</title>
     
     <!-- PWA -->
-    <!-- <link rel="manifest" href="manifest.json"> -->
+    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ED1C24">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -18,6 +18,16 @@
     <link rel="icon" type="image/png" href="images/icon-192.png">
     <link rel="stylesheet" href="css/styles.css">
     <style>
+        /* Fix iOS blue styling */
+        a, button, select, input, textarea {
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        select, input, textarea {
+            color: var(--black, #000);
+            -webkit-text-fill-color: var(--black, #000);
+        }
+        
         /* App structure */
         body {
             padding: 0;
@@ -210,14 +220,14 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            border: 1.5px solid var(--grey-border, #e5e5e5);
-            background: var(--white);
+            border: none;
+            background: var(--hunch-red, #ED1C24);
         }
 
         .card-icon svg {
             width: 22px;
             height: 22px;
-            stroke: var(--hunch-red);
+            stroke: white;
             stroke-width: 1.5;
             fill: none;
         }
@@ -241,6 +251,8 @@
             font-size: 16px;
             font-weight: 600;
             color: var(--black);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         /* Spacer */
@@ -501,7 +513,7 @@
                         </div>
                         <div class="card-text">
                             <span class="card-label">To Do</span>
-                            <span class="card-action">What's on?</span>
+                            <span class="card-action">What's due?</span>
                         </div>
                     </button>
 
@@ -516,7 +528,7 @@
                         </div>
                         <div class="card-text">
                             <span class="card-label">WIP</span>
-                            <span class="card-action">Which client?</span>
+                            <span class="card-action">What's on?</span>
                         </div>
                     </button>
 
@@ -546,7 +558,7 @@
                 <div class="header-section">
                     <button class="back-btn" onclick="navigate('main')">←</button>
                     <div class="header">
-                        <h1 class="form-title">UPDATE</h1>
+                        <img src="images/Updates-header.png" alt="UPDATES" style="height: 40px; width: auto;">
                     </div>
                 </div>
 
@@ -582,7 +594,7 @@
                 <div class="header-section">
                     <button class="back-btn" onclick="navigate('main')">←</button>
                     <div class="header">
-                        <h1 class="form-title">WIP</h1>
+                        <img src="images/WIP-header.png" alt="CLIENT WIP" style="height: 40px; width: auto;">
                     </div>
                 </div>
 
@@ -601,7 +613,7 @@
                 <div class="header-section">
                     <button class="back-btn" onclick="navigate('main')">←</button>
                     <div class="header">
-                        <h1 class="form-title">INCOMING</h1>
+                        <img src="images/Incoming-header.png" alt="NEW JOBS" style="height: 40px; width: auto;">
                     </div>
                 </div>
 
