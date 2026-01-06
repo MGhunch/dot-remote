@@ -489,11 +489,6 @@
                     </div>
                 </div>
 
-                <div class="success-message" id="update-success">
-                    <div class="success-icon">✓</div>
-                    <h3>SENT TO DOT</h3>
-                    <button class="pill action-btn" onclick="navigate('main')">DONE</button>
-                </div>
             </div>
 
             <!-- WIP Screen -->
@@ -549,6 +544,15 @@
                     <h3>SENT TO DOT</h3>
                     <button class="pill action-btn" onclick="hideWipOverlay(); navigate('main');">DONE</button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Update Success Overlay -->
+        <div class="overlay" id="update-overlay">
+            <div class="overlay-content">
+                <div class="success-icon">✓</div>
+                <h3>SENT TO DOT</h3>
+                <button class="pill action-btn" onclick="hideUpdateOverlay()">DONE</button>
             </div>
         </div>
 
@@ -667,6 +671,7 @@
             document.getElementById('update-job-group').style.display = 'none';
             document.getElementById('update-text-group').style.display = 'none';
             document.getElementById('update-actions').style.display = 'none';
+            document.getElementById('update-overlay').classList.remove('show');
             
             // Reset overlay states
             document.getElementById('wip-confirm').classList.remove('hide');
@@ -740,8 +745,12 @@
                 console.error('Failed to send update:', error);
             }
 
-            document.getElementById('update-form').classList.add('hide');
-            document.getElementById('update-success').classList.add('show');
+            document.getElementById('update-overlay').classList.add('show');
+        }
+
+        function hideUpdateOverlay() {
+            document.getElementById('update-overlay').classList.remove('show');
+            navigate('main');
         }
 
         // WIP flow - client selection auto-triggers confirmation
