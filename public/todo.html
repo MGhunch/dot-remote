@@ -614,7 +614,7 @@
                 <div class="header-top">
                     <div class="header-left">
                         <a href="hub.html" title="Home">
-                            <div class="client-logo" id="header-client-logo" style="background: #ED1C24;">H</div>
+                            <div class="client-logo" id="header-client-logo"><img src="images/logos/HUN.png" alt="H" onerror="handleLogoError(this)"></div>
                         </a>
                         <img src="" alt="" class="header-logo" id="header-logo-img">
                     </div>
@@ -778,18 +778,10 @@
             const content = document.getElementById('content');
             
             if (currentClient === 'all') {
-                logo.innerHTML = 'H';
-                logo.style.background = '#ED1C24';
+                logo.innerHTML = `<img src="images/logos/HUN.png" alt="H" onerror="handleLogoError(this)">`;
                 content.classList.remove('single-client');
             } else {
-                const client = clients.find(c => c.code === currentClient);
-                if (client && client.logoUrl) {
-                    logo.innerHTML = `<img src="${client.logoUrl}" alt="${client.code}">`;
-                    logo.style.background = 'transparent';
-                } else {
-                    logo.innerHTML = currentClient;
-                    logo.style.background = logoColors[currentClient] || '#999';
-                }
+                logo.innerHTML = `<img src="${getLogoUrl(currentClient)}" alt="${currentClient}" onerror="handleLogoError(this)">`;
                 content.classList.add('single-client');
             }
         }
@@ -880,22 +872,25 @@
             };
         }
 
-        // Get logo HTML for a job
-        function getJobLogoHtml(job) {
-            const client = clients.find(c => c.code === job.clientCode);
-            if (client && client.logoUrl) {
-                return `<img src="${client.logoUrl}" alt="${job.clientCode}">`;
-            }
-            return job.clientCode;
+        // Get logo URL for a client code
+        function getLogoUrl(clientCode) {
+            return `images/logos/${clientCode}.png`;
         }
 
-        // Get logo background style
+        // Handle logo load error - fallback to unknown
+        function handleLogoError(img) {
+            img.onerror = null; // prevent infinite loop
+            img.src = 'images/logos/unknown.png';
+        }
+
+        // Get logo HTML for a job
+        function getJobLogoHtml(job) {
+            return `<img src="${getLogoUrl(job.clientCode)}" alt="${job.clientCode}" onerror="handleLogoError(this)">`;
+        }
+
+        // Get logo background style (transparent for images)
         function getJobLogoStyle(job) {
-            const client = clients.find(c => c.code === job.clientCode);
-            if (client && client.logoUrl) {
-                return 'background: transparent;';
-            }
-            return `background: ${logoColors[job.clientCode] || '#999'};`;
+            return 'background: #f0f0f0;';
         }
 
         // Create full job card HTML
@@ -1013,8 +1008,8 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        ClientCode: jobNumber.split(' ')[0],
-                        JobNumber: jobNumber,
+                        clientCode: jobNumber.split(' ')[0],
+                        jobNumber: jobNumber,
                         message: message
                     })
                 });
