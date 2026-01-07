@@ -5,11 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dot To Do</title>
     
-    <!-- PWA -->
-    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ED1C24">
-    
-    <!-- Icons -->
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="192x192" href="images/icon-192.png">
     <link rel="stylesheet" href="css/styles.css">
@@ -130,10 +126,17 @@
             color: white;
             cursor: pointer;
             transition: opacity 0.15s ease;
+            overflow: hidden;
         }
         
         .client-logo:hover {
             opacity: 0.85;
+        }
+        
+        .client-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         
         .header-logo {
@@ -198,10 +201,6 @@
             gap: 24px;
         }
         
-        .section {
-            /* No margin needed, gap handles it */
-        }
-        
         .section-title {
             font-size: 11px;
             font-weight: 600;
@@ -237,7 +236,7 @@
         .job-logo {
             width: 36px;
             height: 36px;
-            border-radius: 8px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -245,6 +244,13 @@
             font-size: 10px;
             color: white;
             flex-shrink: 0;
+            overflow: hidden;
+        }
+        
+        .job-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         
         .job-content {
@@ -607,10 +613,10 @@
             <header>
                 <div class="header-top">
                     <div class="header-left">
-                        <a href="index.html" title="Home">
+                        <a href="hub.html" title="Home">
                             <div class="client-logo" id="header-client-logo" style="background: #ED1C24;">H</div>
                         </a>
-                        <img src="images/Hub-Todo-Header.png" alt="TO DO" class="header-logo" id="header-logo-img">
+                        <img src="" alt="" class="header-logo" id="header-logo-img">
                     </div>
                     <div class="header-right">
                         <img src="images/ai2-logo.png" alt="ai²">
@@ -638,16 +644,16 @@
         const API_BASE = 'https://dot-remote-api.up.railway.app';
         const PROXY_BASE = 'https://dot-proxy.up.railway.app';
         
-        // Get page mode from URL
-        const pagePath = window.location.pathname;
-        const isWipPage = pagePath.includes('wip');
+        // Detect mode from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const isWipMode = urlParams.get('mode') === 'wip';
         
         // State
         let currentClient = 'all';
         let allJobs = [];
         let clients = [];
         
-        // Logo colors by client code
+        // Logo colors by client code (fallback)
         const logoColors = {
             'SKY': '#0072CE',
             'ONE': '#00B140',
@@ -704,6 +710,21 @@
             }
         }
         
+        // Set header image based on mode
+        function setHeaderImage() {
+            const img = document.getElementById('header-logo-img');
+            if (isWipMode) {
+                img.src = 'images/Hub-Wip-Header.png';
+                img.alt = 'WIP';
+                document.title = 'Dot WIP';
+            } else {
+                img.src = 'images/Hub-Todo-Header.png';
+                img.alt = 'TO DO';
+                document.title = 'Dot To Do';
+            }
+        }
+        setHeaderImage();
+        
         // Format today's date
         const today = new Date();
         document.getElementById('today-date').textContent = today.toLocaleDateString('en-NZ', { 
@@ -757,12 +778,18 @@
             const content = document.getElementById('content');
             
             if (currentClient === 'all') {
-                logo.textContent = 'H';
+                logo.innerHTML = 'H';
                 logo.style.background = '#ED1C24';
                 content.classList.remove('single-client');
             } else {
-                logo.textContent = currentClient;
-                logo.style.background = logoColors[currentClient] || '#999';
+                const client = clients.find(c => c.code === currentClient);
+                if (client && client.logoUrl) {
+                    logo.innerHTML = `<img src="${client.logoUrl}" alt="${client.code}">`;
+                    logo.style.background = 'transparent';
+                } else {
+                    logo.innerHTML = currentClient;
+                    logo.style.background = logoColors[currentClient] || '#999';
+                }
                 content.classList.add('single-client');
             }
         }
@@ -853,17 +880,34 @@
             };
         }
 
+        // Get logo HTML for a job
+        function getJobLogoHtml(job) {
+            const client = clients.find(c => c.code === job.clientCode);
+            if (client && client.logoUrl) {
+                return `<img src="${client.logoUrl}" alt="${job.clientCode}">`;
+            }
+            return job.clientCode;
+        }
+
+        // Get logo background style
+        function getJobLogoStyle(job) {
+            const client = clients.find(c => c.code === job.clientCode);
+            if (client && client.logoUrl) {
+                return 'background: transparent;';
+            }
+            return `background: ${logoColors[job.clientCode] || '#999'};`;
+        }
+
         // Create full job card HTML
         function createJobCard(job) {
             const dueDate = formatDueDate(job.updateDue);
             const daysAgo = getDaysSinceUpdate(job.lastUpdated);
             const daysClass = getDaysAgoClass(daysAgo);
-            const bgColor = logoColors[job.clientCode] || '#999';
             
             return `
                 <div class="job-card" data-job="${job.jobNumber}">
                     <div class="job-header">
-                        <div class="job-logo" style="background: ${bgColor}">${job.clientCode}</div>
+                        <div class="job-logo" style="${getJobLogoStyle(job)}">${getJobLogoHtml(job)}</div>
                         <div class="job-content">
                             <div class="job-title-row">
                                 <span class="job-title">${job.jobNumber} — ${job.jobName}</span>
@@ -892,12 +936,11 @@
             const dueDate = formatDueDate(job.updateDue);
             const daysAgo = getDaysSinceUpdate(job.lastUpdated);
             const daysClass = getDaysAgoClass(daysAgo);
-            const bgColor = logoColors[job.clientCode] || '#999';
             
             return `
                 <div class="job-row" data-job="${job.jobNumber}">
                     <div class="job-header">
-                        <div class="job-logo" style="background: ${bgColor}">${job.clientCode}</div>
+                        <div class="job-logo" style="${getJobLogoStyle(job)}">${getJobLogoHtml(job)}</div>
                         <div class="job-content">
                             <span class="job-title">${job.jobNumber} — ${job.jobName}</span>
                             <span class="job-meta-inline">
@@ -938,7 +981,7 @@
         // Render
         function render() {
             const jobs = getFilteredJobs();
-            const sections = isWipPage ? groupByWip(jobs) : groupByTodo(jobs);
+            const sections = isWipMode ? groupByWip(jobs) : groupByTodo(jobs);
             
             const html = `
                 <div class="column">
@@ -1010,11 +1053,11 @@
             } catch (error) {
                 console.log('Using fallback client data');
                 clients = [
-                    { code: 'SKY', name: 'Sky TV' },
-                    { code: 'ONE', name: 'One NZ' },
-                    { code: 'HUN', name: 'Hunch' },
-                    { code: 'FIS', name: 'Fisher Funds' },
-                    { code: 'TOW', name: 'Tower Insurance' }
+                    { code: 'SKY', name: 'Sky TV', logoUrl: null },
+                    { code: 'ONE', name: 'One NZ', logoUrl: null },
+                    { code: 'HUN', name: 'Hunch', logoUrl: null },
+                    { code: 'FIS', name: 'Fisher Funds', logoUrl: null },
+                    { code: 'TOW', name: 'Tower Insurance', logoUrl: null }
                 ];
                 populateClientDropdown();
             }
