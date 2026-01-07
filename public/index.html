@@ -239,125 +239,148 @@
             gap: 3px;
         }
 
-        .card-title {
+        .card-label {
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: var(--hunch-red, #ED1C24);
+        }
+
+        .card-action {
             font-size: 16px;
             font-weight: 600;
             color: var(--black);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .card-subtitle {
-            font-size: 13px;
-            color: var(--grey-text, #999);
+        /* Spacer */
+        .spacer {
+            flex: 1;
         }
 
-        /* Form elements */
-        .form-group {
+        /* Footer */
+        .footer {
+            padding: 20px 24px 32px;
+            text-align: center;
+            border-top: 1px solid var(--grey-border, #e5e5e5);
+        }
+
+        .footer img {
+            height: 36px;
+            width: auto;
+            opacity: 0.7;
+        }
+
+        /* Form screens */
+        .form-screen {
+            padding: 0;
+        }
+
+        .form-screen .header-section {
+            padding-top: 48px;
+        }
+
+        .form-content {
+            flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 1.25rem;
+            padding: 24px;
         }
 
-        .form-group label {
-            font-size: 14px;
+        .form-content .form-group label {
+            font-size: 11px;
             font-weight: 500;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
             color: var(--grey-text, #999);
+            margin-bottom: 0.5rem;
+            display: block;
         }
 
-        .form-group select,
-        .form-group textarea {
+        .form-content select {
             font-family: var(--font-body);
-            padding: 14px 16px;
-            border-radius: 10px;
+            font-size: 1rem;
+            padding: 0.875rem 1rem;
             border: 1.5px solid var(--grey-border, #e5e5e5);
-            font-size: 16px;
+            border-radius: 12px;
             background: var(--white);
-            color: var(--black);
-            -webkit-appearance: none;
+            width: 100%;
+            cursor: pointer;
             appearance: none;
-        }
-
-        .form-group select {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right 12px center;
-            background-size: 18px;
-            padding-right: 40px;
+            background-position: right 0.75rem center;
+            background-size: 1.25rem;
+            transition: border-color 0.15s ease;
         }
 
-        .form-group textarea {
-            min-height: 120px;
-            resize: none;
-            line-height: 1.4;
-        }
-
-        .form-group select:focus,
-        .form-group textarea:focus {
+        .form-content select:focus {
             outline: none;
             border-color: var(--hunch-red);
         }
 
-        /* Footer actions */
-        .footer-actions {
-            padding: 24px;
-            border-top: 1px solid var(--grey-border, #e5e5e5);
-        }
-
-        .btn-primary {
+        .form-content textarea {
             font-family: var(--font-body);
-            width: 100%;
-            padding: 16px 24px;
-            border-radius: 10px;
-            border: none;
-            background: var(--hunch-red);
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: opacity 0.15s ease;
-        }
-
-        .btn-primary:hover {
-            opacity: 0.9;
-        }
-
-        .btn-primary:active {
-            opacity: 0.8;
-        }
-
-        .btn-secondary {
-            font-family: var(--font-body);
-            width: 100%;
-            padding: 16px 24px;
-            border-radius: 10px;
+            font-size: 1rem;
+            padding: 0.875rem 1rem;
             border: 1.5px solid var(--grey-border, #e5e5e5);
+            border-radius: 12px;
             background: var(--white);
-            color: var(--black);
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.15s ease;
+            width: 100%;
+            min-height: 120px;
+            resize: none;
+            transition: border-color 0.15s ease;
         }
 
-        .btn-secondary:hover {
+        .form-content textarea:focus {
+            outline: none;
             border-color: var(--hunch-red);
+        }
+
+        .form-content textarea::placeholder {
+            color: var(--grey-text, #999);
+        }
+
+        .form-actions {
+            margin-top: 1.5rem;
+        }
+
+        .form-actions .pill {
+            width: 100%;
+        }
+
+        .form-content.hide {
+            display: none;
+        }
+
+        /* Form header */
+        .form-title {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            color: var(--black);
+            letter-spacing: 0.02em;
+            font-weight: normal;
+            text-align: center;
         }
 
         /* Overlay */
         .overlay {
-            position: fixed;
+            position: absolute;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
+            width: 100%;
+            height: 100%;
             background: rgba(0, 0, 0, 0.5);
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 100;
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.2s ease, visibility 0.2s ease;
-            padding: 24px;
+            z-index: 100;
         }
 
         .overlay.show {
@@ -367,222 +390,321 @@
 
         .overlay-content {
             background: var(--white);
-            border-radius: 16px;
-            padding: 32px 24px;
-            max-width: 320px;
-            width: 100%;
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            margin: 1.5rem;
             text-align: center;
+            transform: scale(0.9);
+            transition: transform 0.2s ease;
+            width: 100%;
+            max-width: 320px;
         }
 
-        .overlay-icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: var(--hunch-red);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 16px;
+        .overlay.show .overlay-content {
+            transform: scale(1);
         }
 
-        .overlay-icon svg {
-            width: 28px;
-            height: 28px;
-            stroke: white;
-            stroke-width: 2;
-            fill: none;
-        }
-
-        .overlay-title {
-            font-size: 20px;
-            font-weight: 600;
+        .overlay-content p {
+            font-size: 1.25rem;
             color: var(--black);
-            margin: 0 0 8px 0;
-        }
-
-        .overlay-text {
-            font-size: 14px;
-            color: var(--grey-text, #999);
-            margin: 0 0 24px 0;
+            margin-bottom: 2rem;
             line-height: 1.4;
         }
 
-        .overlay-actions {
+        .overlay-buttons {
             display: flex;
-            flex-direction: column;
-            gap: 12px;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .overlay-buttons .pill {
+            min-width: 100px;
+            flex: 1;
+        }
+
+        .overlay-success {
+            display: none;
+        }
+
+        .overlay-success.show {
+            display: block;
+        }
+
+        .overlay-confirm.hide {
+            display: none;
         }
 
         /* Success state */
-        .success-overlay {
+        .success-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--hunch-red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 1.75rem;
+            margin: 0 auto 1.25rem;
+        }
+
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 2.5rem 1.5rem;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            gap: 1.5rem;
+        }
+
+        .success-message.show {
+            display: flex;
+        }
+
+        .success-message h3,
+        .overlay-success h3 {
+            font-family: var(--font-heading);
+            font-size: 1.75rem;
+            color: var(--black);
+            letter-spacing: 0.02em;
+            font-weight: normal;
+        }
+
+        .overlay-success h3 {
+            margin-bottom: 1.5rem;
+        }
+
+        /* PIN Screen */
+        .pin-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--white, #fff);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            z-index: 2000;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .pin-screen.hidden {
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.2s ease, visibility 0.2s ease;
         }
 
-        .success-overlay.show {
-            opacity: 1;
-            visibility: visible;
+        .pin-logo {
+            width: 80px;
+            margin-bottom: 2rem;
         }
 
-        .confirm-content {
-            transition: opacity 0.2s ease, visibility 0.2s ease;
-        }
-
-        .confirm-content.hide {
-            opacity: 0;
-            visibility: hidden;
-            position: absolute;
-        }
-
-        /* Incoming job result */
-        .job-result {
-            background: var(--grey-light, #f5f5f5);
-            border-radius: 10px;
-            padding: 16px;
-            margin-bottom: 8px;
-        }
-
-        .job-number {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--hunch-red);
-            margin: 0 0 4px 0;
-        }
-
-        .job-name {
+        .pin-title {
             font-size: 14px;
-            color: var(--black);
-            margin: 0;
+            color: var(--grey-text, #999);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+        }
+
+        .pin-dots {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .pin-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid var(--grey-border, #e5e5e5);
+            background: transparent;
+            transition: all 0.15s ease;
+        }
+
+        .pin-dot.filled {
+            background: var(--hunch-red, #ED1C24);
+            border-color: var(--hunch-red, #ED1C24);
+        }
+
+        .pin-dot.error {
+            border-color: var(--hunch-red, #ED1C24);
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        .pin-keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            max-width: 280px;
+        }
+
+        .pin-key {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            border: 1.5px solid var(--grey-border, #e5e5e5);
+            background: var(--white, #fff);
+            font-size: 1.75rem;
+            font-weight: 500;
+            color: var(--black, #000);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .pin-key:hover {
+            border-color: var(--hunch-red, #ED1C24);
+        }
+
+        .pin-key:active {
+            background: var(--grey-light, #f5f5f5);
+        }
+
+        .pin-key.empty {
+            border: none;
+            background: transparent;
+            cursor: default;
+        }
+
+        .pin-key.delete {
+            font-size: 1.25rem;
         }
     </style>
 </head>
 <body>
-    <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loading-overlay">
-        <div class="loading-robot">
-            <img src="images/robot.svg" alt="Dot">
+    <!-- PIN Screen -->
+    <div class="pin-screen" id="pin-screen">
+        <img src="images/Robot.png" alt="Dot" class="pin-logo">
+        <p class="pin-title">Enter PIN</p>
+        <div class="pin-dots">
+            <div class="pin-dot" id="dot-0"></div>
+            <div class="pin-dot" id="dot-1"></div>
+            <div class="pin-dot" id="dot-2"></div>
+            <div class="pin-dot" id="dot-3"></div>
         </div>
-        <div class="loading-text" id="loading-text">Thinking...</div>
+        <div class="pin-keypad">
+            <button class="pin-key" onclick="enterPin(1)">1</button>
+            <button class="pin-key" onclick="enterPin(2)">2</button>
+            <button class="pin-key" onclick="enterPin(3)">3</button>
+            <button class="pin-key" onclick="enterPin(4)">4</button>
+            <button class="pin-key" onclick="enterPin(5)">5</button>
+            <button class="pin-key" onclick="enterPin(6)">6</button>
+            <button class="pin-key" onclick="enterPin(7)">7</button>
+            <button class="pin-key" onclick="enterPin(8)">8</button>
+            <button class="pin-key" onclick="enterPin(9)">9</button>
+            <button class="pin-key empty"></button>
+            <button class="pin-key" onclick="enterPin(0)">0</button>
+            <button class="pin-key delete" onclick="deletePin()">⌫</button>
+        </div>
     </div>
 
     <div class="app-container">
         <div class="red-bar"></div>
         
         <div class="screen-container">
-            <!-- MAIN SCREEN -->
-            <div id="screen-main" class="screen active">
+            <!-- Main Menu Screen -->
+            <div class="screen active" id="screen-main">
                 <div class="header-section">
                     <div class="header">
-                        <img src="images/dot-logo.svg" alt="Dot">
+                        <img src="images/header-logo.png" alt="DOT REMOTE">
                     </div>
                 </div>
 
                 <div class="main-content">
-                    <button class="card-btn" onclick="navigate('wip')">
+                    <button class="card-btn" onclick="navigate('update')">
                         <div class="card-icon">
-                            <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                            <svg viewBox="0 0 24 24">
+                                <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+                                <path d="m15 5 4 4"/>
+                            </svg>
                         </div>
                         <div class="card-text">
-                            <span class="card-title">WIP</span>
-                            <span class="card-subtitle">Send a status report</span>
+                            <span class="card-label">Update</span>
+                            <span class="card-action">What's next?</span>
                         </div>
                     </button>
 
                     <button class="card-btn" onclick="showTodoOverlay()">
                         <div class="card-icon">
-                            <svg viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <svg viewBox="0 0 24 24">
+                                <path d="M9 11l3 3L22 4"/>
+                                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                            </svg>
                         </div>
                         <div class="card-text">
-                            <span class="card-title">TO DO</span>
-                            <span class="card-subtitle">Get your daily priorities</span>
+                            <span class="card-label">To Do</span>
+                            <span class="card-action">What's due?</span>
                         </div>
                     </button>
 
-                    <button class="card-btn" onclick="navigate('update')">
+                    <button class="card-btn" onclick="navigate('wip')">
                         <div class="card-icon">
-                            <svg viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                            <svg viewBox="0 0 24 24">
+                                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+                                <path d="M9 12h6"/>
+                                <path d="M9 16h6"/>
+                            </svg>
                         </div>
                         <div class="card-text">
-                            <span class="card-title">UPDATE</span>
-                            <span class="card-subtitle">Log progress on a job</span>
+                            <span class="card-label">WIP</span>
+                            <span class="card-action">What's on?</span>
                         </div>
                     </button>
 
                     <button class="card-btn" onclick="navigate('incoming')">
                         <div class="card-icon">
-                            <svg viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 5v14"/>
+                                <path d="m19 12-7 7-7-7"/>
+                            </svg>
                         </div>
                         <div class="card-text">
-                            <span class="card-title">INCOMING</span>
-                            <span class="card-subtitle">Create a new job</span>
+                            <span class="card-label">Incoming</span>
+                            <span class="card-action">What's new?</span>
                         </div>
                     </button>
+
+                    <div class="spacer"></div>
+                </div>
+
+                <div class="footer">
+                    <img src="images/ai2-logo.png" alt="ai²">
                 </div>
             </div>
 
-            <!-- WIP SCREEN -->
-            <div id="screen-wip" class="screen hidden">
-                <button class="back-btn" onclick="navigate('main')">←</button>
-                
+            <!-- UPDATE Screen -->
+            <div class="screen hidden form-screen" id="screen-update">
                 <div class="header-section">
+                    <button class="back-btn" onclick="navigate('main')">←</button>
                     <div class="header">
-                        <img src="images/dot-logo.svg" alt="Dot">
+                        <img src="images/Updates-header.png" alt="UPDATES" style="height: 52px; width: auto;">
                     </div>
                 </div>
 
-                <div class="main-content">
+                <div class="form-content" id="update-form">
                     <div class="form-group">
-                        <label>Select client</label>
-                        <select id="wip-client-select" onchange="onWipClientChange()">
-                            <option value="">Choose a client...</option>
-                            <option value="Eon Fibre" data-code="EON">Eon Fibre</option>
-                            <option value="Fisher Funds" data-code="FIS">Fisher Funds</option>
-                            <option value="Firestop" data-code="FST">Firestop</option>
-                            <option value="Hunch" data-code="HUN">Hunch</option>
-                            <option value="One NZ" data-code="ONE">One NZ</option>
-                            <option value="One NZ Business" data-code="ONB">One NZ Business</option>
-                            <option value="One NZ Simplification" data-code="ONS">One NZ Simplification</option>
-                            <option value="Sky" data-code="SKY">Sky</option>
-                            <option value="Tower" data-code="TOW">Tower</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- UPDATE SCREEN -->
-            <div id="screen-update" class="screen hidden">
-                <button class="back-btn" onclick="navigate('main')">←</button>
-                
-                <div class="header-section">
-                    <div class="header">
-                        <img src="images/dot-logo.svg" alt="Dot">
-                    </div>
-                </div>
-
-                <div class="main-content">
-                    <div class="form-group">
-                        <label>Select client</label>
+                        <label>Client</label>
                         <select id="update-client-select" onchange="onUpdateClientChange()">
                             <option value="">Choose a client...</option>
-                            <option value="Eon Fibre" data-code="EON">Eon Fibre</option>
-                            <option value="Fisher Funds" data-code="FIS">Fisher Funds</option>
-                            <option value="Firestop" data-code="FST">Firestop</option>
-                            <option value="Hunch" data-code="HUN">Hunch</option>
-                            <option value="One NZ" data-code="ONE">One NZ</option>
-                            <option value="One NZ Business" data-code="ONB">One NZ Business</option>
-                            <option value="One NZ Simplification" data-code="ONS">One NZ Simplification</option>
-                            <option value="Sky" data-code="SKY">Sky</option>
-                            <option value="Tower" data-code="TOW">Tower</option>
                         </select>
                     </div>
 
                     <div class="form-group" id="update-job-group" style="display: none;">
-                        <label>Select job</label>
+                        <label>Job</label>
                         <select id="update-job-select">
                             <option value="">Choose a job...</option>
                         </select>
@@ -592,149 +714,193 @@
                         <label>Update</label>
                         <textarea id="update-text" placeholder="What's the latest?"></textarea>
                     </div>
-                </div>
 
-                <div class="footer-actions" id="update-actions" style="display: none;">
-                    <button class="btn-primary" onclick="submitUpdate()">Send Update</button>
-                </div>
-            </div>
-
-            <!-- INCOMING SCREEN -->
-            <div id="screen-incoming" class="screen hidden">
-                <button class="back-btn" onclick="navigate('main')">←</button>
-                
-                <div class="header-section">
-                    <div class="header">
-                        <img src="images/dot-logo.svg" alt="Dot">
+                    <div class="form-actions" id="update-actions" style="display: none;">
+                        <button class="pill send-btn" onclick="submitUpdate()">SEND</button>
                     </div>
                 </div>
 
-                <div class="main-content">
+            </div>
+
+            <!-- WIP Screen -->
+            <div class="screen hidden form-screen" id="screen-wip">
+                <div class="header-section">
+                    <button class="back-btn" onclick="navigate('main')">←</button>
+                    <div class="header">
+                        <img src="images/WIP-header.png" alt="CLIENT WIP" style="height: 52px; width: auto;">
+                    </div>
+                </div>
+
+                <div class="form-content" id="wip-form">
                     <div class="form-group">
-                        <label>Select client</label>
+                        <label>Client</label>
+                        <select id="wip-client-select" onchange="onWipClientChange()">
+                            <option value="">Choose a client...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INCOMING Screen -->
+            <div class="screen hidden form-screen" id="screen-incoming">
+                <div class="header-section">
+                    <button class="back-btn" onclick="navigate('main')">←</button>
+                    <div class="header">
+                        <img src="images/Incoming-header.png" alt="NEW JOBS" style="height: 52px; width: auto;">
+                    </div>
+                </div>
+
+                <div class="form-content" id="incoming-form">
+                    <div class="form-group">
+                        <label>Client</label>
                         <select id="incoming-client-select">
                             <option value="">Choose a client...</option>
-                            <option value="Eon Fibre" data-code="EON">Eon Fibre</option>
-                            <option value="Fisher Funds" data-code="FIS">Fisher Funds</option>
-                            <option value="Firestop" data-code="FST">Firestop</option>
-                            <option value="Hunch" data-code="HUN">Hunch</option>
-                            <option value="One NZ" data-code="ONE">One NZ</option>
-                            <option value="One NZ Business" data-code="ONB">One NZ Business</option>
-                            <option value="One NZ Simplification" data-code="ONS">One NZ Simplification</option>
-                            <option value="Sky" data-code="SKY">Sky</option>
-                            <option value="Tower" data-code="TOW">Tower</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label>What's coming in?</label>
-                        <textarea id="incoming-text" placeholder="Describe the job..."></textarea>
+                        <label>What's coming?</label>
+                        <textarea id="incoming-text" placeholder="e.g. Box Colours refresh, need by Feb"></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="pill send-btn" onclick="submitIncoming()">CREATE</button>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <div class="footer-actions">
-                    <button class="btn-primary" onclick="submitIncoming()">Create Job</button>
+        <!-- TO DO Overlay -->
+        <div class="overlay" id="todo-overlay">
+            <div class="overlay-content">
+                <div class="overlay-confirm" id="todo-confirm">
+                    <p>Want the latest<br>to do list?</p>
+                    <div class="overlay-buttons">
+                        <button class="pill action-btn" onclick="hideTodoOverlay()">NO</button>
+                        <button class="pill send-btn" onclick="submitTodo()">YES</button>
+                    </div>
+                </div>
+                <div class="overlay-success" id="todo-success">
+                    <div class="success-icon">✓</div>
+                    <h3>SENT TO DOT</h3>
+                    <button class="pill action-btn" onclick="hideTodoOverlay()">DONE</button>
                 </div>
             </div>
         </div>
+
+        <!-- WIP Confirmation Overlay -->
+        <div class="overlay" id="wip-overlay">
+            <div class="overlay-content">
+                <div class="overlay-confirm" id="wip-confirm">
+                    <p>Get the WIP?</p>
+                    <div class="overlay-buttons">
+                        <button class="pill action-btn" onclick="hideWipOverlay()">NO</button>
+                        <button class="pill send-btn" onclick="submitWip()">YES</button>
+                    </div>
+                </div>
+                <div class="overlay-success" id="wip-success-overlay">
+                    <div class="success-icon">✓</div>
+                    <h3>SENT TO DOT</h3>
+                    <button class="pill action-btn" onclick="hideWipOverlay(); navigate('main');">DONE</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Update Success Overlay -->
+        <div class="overlay" id="update-overlay">
+            <div class="overlay-content">
+                <div class="success-icon">✓</div>
+                <h3>SENT TO DOT</h3>
+                <button class="pill action-btn" onclick="hideUpdateOverlay()">DONE</button>
+            </div>
+        </div>
+
+        <!-- Incoming Success Overlay -->
+        <div class="overlay" id="incoming-overlay">
+            <div class="overlay-content">
+                <div class="success-icon">✓</div>
+                <h3 id="incoming-job-number">SKY 046</h3>
+                <p id="incoming-project-name" style="color: var(--grey-text); margin-top: 0.5rem;">Project Name</p>
+                <button class="pill action-btn" onclick="hideIncomingOverlay()" style="margin-top: 1.5rem;">DONE</button>
+            </div>
+        </div>
+
+        <div class="red-bar"></div>
     </div>
 
-    <!-- WIP Overlay -->
-    <div class="overlay" id="wip-overlay">
-        <div class="overlay-content">
-            <div id="wip-confirm" class="confirm-content">
-                <div class="overlay-icon">
-                    <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
-                </div>
-                <h2 class="overlay-title">Send WIP?</h2>
-                <p class="overlay-text">This will email the current status report for this client.</p>
-                <div class="overlay-actions">
-                    <button class="btn-primary" onclick="submitWip()">Send it</button>
-                    <button class="btn-secondary" onclick="hideWipOverlay()">Cancel</button>
-                </div>
-            </div>
-            <div id="wip-success-overlay" class="success-overlay">
-                <div class="overlay-icon">
-                    <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
-                </div>
-                <h2 class="overlay-title">On its way!</h2>
-                <p class="overlay-text">Check your inbox in a moment.</p>
-                <div class="overlay-actions">
-                    <button class="btn-primary" onclick="hideWipOverlay()">Done</button>
-                </div>
-            </div>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-robot">
+            <img src="images/Robot.png" alt="Dot thinking...">
         </div>
-    </div>
-
-    <!-- TO DO Overlay -->
-    <div class="overlay" id="todo-overlay">
-        <div class="overlay-content">
-            <div id="todo-confirm" class="confirm-content">
-                <div class="overlay-icon">
-                    <svg viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                </div>
-                <h2 class="overlay-title">Get TO DO?</h2>
-                <p class="overlay-text">This will email your prioritised task list for today.</p>
-                <div class="overlay-actions">
-                    <button class="btn-primary" onclick="submitTodo()">Send it</button>
-                    <button class="btn-secondary" onclick="hideTodoOverlay()">Cancel</button>
-                </div>
-            </div>
-            <div id="todo-success" class="success-overlay">
-                <div class="overlay-icon">
-                    <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
-                </div>
-                <h2 class="overlay-title">On its way!</h2>
-                <p class="overlay-text">Check your inbox in a moment.</p>
-                <div class="overlay-actions">
-                    <button class="btn-primary" onclick="hideTodoOverlay()">Done</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- UPDATE Overlay -->
-    <div class="overlay" id="update-overlay">
-        <div class="overlay-content">
-            <div class="overlay-icon">
-                <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
-            </div>
-            <h2 class="overlay-title">Update logged!</h2>
-            <p class="overlay-text">The job has been updated.</p>
-            <div class="overlay-actions">
-                <button class="btn-primary" onclick="hideUpdateOverlay()">Done</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- INCOMING Overlay -->
-    <div class="overlay" id="incoming-overlay">
-        <div class="overlay-content">
-            <div class="overlay-icon">
-                <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
-            </div>
-            <h2 class="overlay-title">Job created!</h2>
-            <div class="job-result">
-                <p class="job-number" id="incoming-job-number">SKY 024</p>
-                <p class="job-name" id="incoming-project-name">Project Name</p>
-            </div>
-            <p class="overlay-text">Teams channel and SharePoint folder ready.</p>
-            <div class="overlay-actions">
-                <button class="btn-primary" onclick="hideIncomingOverlay()">Done</button>
-            </div>
-        </div>
+        <p class="loading-text" id="loading-text">Dot is thinking...</p>
     </div>
 
     <script>
-        const PROXY_BASE = 'https://dot-proxy.up.railway.app';
-        const API_BASE = 'https://dot-remote-api.up.railway.app';
+        // PIN Configuration
+        const CORRECT_PIN = '1919';
+        let enteredPin = '';
 
+        // Check if already unlocked this session
+        if (sessionStorage.getItem('dotUnlocked') === 'true') {
+            document.getElementById('pin-screen').classList.add('hidden');
+        }
+
+        function enterPin(digit) {
+            if (enteredPin.length >= 4) return;
+            
+            enteredPin += digit;
+            updatePinDots();
+            
+            if (enteredPin.length === 4) {
+                setTimeout(checkPin, 150);
+            }
+        }
+
+        function deletePin() {
+            enteredPin = enteredPin.slice(0, -1);
+            updatePinDots();
+        }
+
+        function updatePinDots() {
+            for (let i = 0; i < 4; i++) {
+                const dot = document.getElementById('dot-' + i);
+                dot.classList.remove('filled', 'error');
+                if (i < enteredPin.length) {
+                    dot.classList.add('filled');
+                }
+            }
+        }
+
+        function checkPin() {
+            if (enteredPin === CORRECT_PIN) {
+                sessionStorage.setItem('dotUnlocked', 'true');
+                document.getElementById('pin-screen').classList.add('hidden');
+            } else {
+                // Wrong PIN - shake and reset
+                const dots = document.querySelectorAll('.pin-dot');
+                dots.forEach(dot => dot.classList.add('error'));
+                
+                setTimeout(() => {
+                    enteredPin = '';
+                    updatePinDots();
+                }, 400);
+            }
+        }
+
+        // Configuration
+        const API_BASE = 'https://dot-remote-api.up.railway.app';
+        const PROXY_BASE = 'https://dot-proxy.up.railway.app';
+
+        // State
+        let clients = [];
+        let jobsByClient = {};
         let currentScreen = 'main';
         let screenHistory = ['main'];
 
-        // Loading functions
-        function showLoading(message = 'Thinking...') {
-            document.getElementById('loading-text').textContent = message;
+        // Loading helpers
+        function showLoading(text = 'Dot is thinking...') {
+            document.getElementById('loading-text').textContent = text;
             document.getElementById('loading-overlay').classList.add('show');
         }
 
@@ -742,28 +908,75 @@
             document.getElementById('loading-overlay').classList.remove('show');
         }
 
-        // Load clients (currently hardcoded in HTML, but API ready)
+        // Initialize - fetch clients on load
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadClients();
+        });
+
+        // Fetch clients from Railway/Airtable
         async function loadClients() {
-            // Clients are hardcoded for now
-            return [];
+            try {
+                const response = await fetch(`${API_BASE}/clients`);
+                if (response.ok) {
+                    clients = await response.json();
+                    populateClientDropdowns();
+                }
+            } catch (error) {
+                console.log('Using fallback client data');
+                clients = [
+                    { code: 'SKY', name: 'Sky TV' },
+                    { code: 'ONE', name: 'One NZ' },
+                    { code: 'TWR', name: 'Tower Insurance' },
+                    { code: 'FSH', name: 'Fisher Funds' }
+                ];
+                populateClientDropdowns();
+            }
         }
 
-        // Load jobs for a client
+        // Fetch jobs for a specific client
         async function loadJobs(clientName) {
+            if (jobsByClient[clientName]) {
+                return jobsByClient[clientName];
+            }
+
+            showLoading('Finding jobs...');
+            
             try {
                 const response = await fetch(`${API_BASE}/jobs?client=${encodeURIComponent(clientName)}`);
-                const data = await response.json();
-                return data.jobs || [];
+                if (response.ok) {
+                    const jobs = await response.json();
+                    jobsByClient[clientName] = jobs;
+                    hideLoading();
+                    return jobs;
+                }
             } catch (error) {
-                console.error('Failed to load jobs:', error);
-                return [];
+                console.log('Using fallback job data');
             }
+
+            hideLoading();
+            jobsByClient[clientName] = [];
+            return jobsByClient[clientName];
+        }
+
+        // Populate client dropdowns
+        function populateClientDropdowns() {
+            const dropdowns = ['update-client-select', 'wip-client-select', 'incoming-client-select'];
+            dropdowns.forEach(id => {
+                const select = document.getElementById(id);
+                select.innerHTML = '<option value="">Choose a client...</option>';
+                clients.forEach(client => {
+                    const option = document.createElement('option');
+                    option.value = client.name;
+                    option.textContent = client.name;
+                    option.dataset.name = client.name;
+                    option.dataset.code = client.code;
+                    select.appendChild(option);
+                });
+            });
         }
 
         // Navigation
         function navigate(screenId) {
-            if (screenId === currentScreen) return;
-            
             const currentEl = document.getElementById('screen-' + currentScreen);
             const targetEl = document.getElementById('screen-' + screenId);
 
@@ -865,8 +1078,8 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        clientCode: clientCode,
-                        jobNumber: job,
+                        ClientCode: clientCode,
+                        JobNumber: job,
                         message: update 
                     })
                 });
@@ -909,8 +1122,8 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        clientName: client,
-                        clientCode: clientCode 
+                        client: client,
+                        ClientCode: clientCode 
                     })
                 });
             } catch (error) {
