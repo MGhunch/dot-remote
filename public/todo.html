@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dot To Do</title>
+    
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ED1C24">
+    
+    <!-- Icons -->
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="images/icon-192.png">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        /* Header */
+        header {
+            background: white;
+            border-bottom: 3px solid #ED1C24;
+            padding: 20px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+        
+        .header-left {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .header-logo {
+            height: 48px;
+            width: auto;
+        }
+        
+        .header-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+        
+        .client-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            object-fit: contain;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 12px;
+            color: white;
+        }
+        
+        .date {
+            font-size: 13px;
+            color: #999;
+        }
+        
+        .mode-toggle {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .mode-btn {
+            padding: 8px 20px;
+            border: 1.5px solid #e5e5e5;
+            background: white;
+            color: #666;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.15s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .mode-btn:hover {
+            border-color: #ED1C24;
+        }
+        
+        .mode-btn.active {
+            background: #ED1C24;
+            border-color: #ED1C24;
+            color: white;
+        }
+        
+        .header-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .filter-select {
+            padding: 10px 14px;
+            border: 1.5px solid #e5e5e5;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            min-width: 180px;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 18px;
+        }
+        
+        .filter-select:focus {
+            outline: none;
+            border-color: #ED1C24;
+        }
+        
+        .home-link {
+            color: #ED1C24;
+            text-decoration: none;
+            font-size: 20px;
+            padding: 8px;
+            border-radius: 6px;
+            transition: background 0.15s ease;
+        }
+        
+        .home-link:hover {
+            background: #fee;
+        }
+        
+        /* Main content */
+        main {
+            padding: 24px;
+        }
+        
+        .section {
+            margin-bottom: 32px;
+        }
+        
+        .section-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: white;
+            background: #ED1C24;
+            padding: 10px 14px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+        }
+        
+        .section-title.muted {
+            background: #999;
+        }
+        
+        /* Job cards (full) */
+        .job-card {
+            background: white;
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        
+        .job-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+        }
+        
+        .job-logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 11px;
+            color: white;
+            flex-shrink: 0;
+        }
+        
+        .job-content {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .job-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 2px;
+        }
+        
+        .job-title:hover {
+            color: #ED1C24;
+        }
+        
+        .job-channel {
+            font-size: 12px;
+            color: #0066cc;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .job-channel:hover {
+            text-decoration: underline;
+        }
+        
+        .job-channel::before {
+            content: '↳';
+            color: #999;
+        }
+        
+        .job-update {
+            font-size: 14px;
+            color: #666;
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+        
+        .job-meta {
+            font-size: 13px;
+            color: #999;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .job-meta .dot {
+            color: #ddd;
+        }
+        
+        .stage-tag {
+            background: #f0f0f0;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            color: #666;
+        }
+        
+        .days-ago {
+            color: #999;
+        }
+        
+        .days-ago.stale {
+            color: #ED1C24;
+            font-weight: 500;
+        }
+        
+        .update-form {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        
+        .update-input {
+            flex: 1;
+            padding: 12px 14px;
+            border: 1.5px solid #e5e5e5;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.15s ease;
+        }
+        
+        .update-input:focus {
+            outline: none;
+            border-color: #ED1C24;
+        }
+        
+        .update-input::placeholder {
+            color: #bbb;
+        }
+        
+        .update-btn {
+            padding: 12px 24px;
+            background: #ED1C24;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .update-btn:hover {
+            background: #c41820;
+        }
+        
+        .update-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .update-btn.success {
+            background: #22a822;
+        }
+        
+        /* Compact job rows */
+        .job-row {
+            background: white;
+            border-radius: 10px;
+            padding: 14px 20px;
+            margin-bottom: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        
+        .job-row .job-header {
+            align-items: center;
+        }
+        
+        .job-row .job-content {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 10px;
+        }
+        
+        .job-row .job-title {
+            font-size: 15px;
+            margin-bottom: 0;
+        }
+        
+        .job-row .job-meta-inline {
+            font-size: 13px;
+            color: #999;
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .job-row .job-channel {
+            width: 100%;
+            margin-top: 6px;
+        }
+        
+        /* Empty state */
+        .empty-section {
+            color: #999;
+            font-size: 14px;
+            padding: 24px;
+            text-align: center;
+            background: white;
+            border-radius: 10px;
+            border: 2px dashed #e5e5e5;
+        }
+        
+        /* Hide logo on rows when single client */
+        .single-client .job-logo {
+            display: none;
+        }
+        
+        /* Loading state */
+        .loading {
+            text-align: center;
+            padding: 60px 24px;
+            color: #999;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e5e5e5;
+            border-top-color: #ED1C24;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* PIN Screen */
+        .pin-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .pin-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .pin-logo {
+            width: 80px;
+            margin-bottom: 2rem;
+        }
+
+        .pin-title {
+            font-size: 14px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+        }
+
+        .pin-dots {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .pin-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid #e5e5e5;
+            background: transparent;
+            transition: all 0.15s ease;
+        }
+
+        .pin-dot.filled {
+            background: #ED1C24;
+            border-color: #ED1C24;
+        }
+
+        .pin-dot.error {
+            border-color: #ED1C24;
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        .pin-keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            max-width: 280px;
+        }
+
+        .pin-key {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            border: 1.5px solid #e5e5e5;
+            background: #fff;
+            font-size: 1.75rem;
+            font-weight: 500;
+            color: #000;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .pin-key:hover {
+            border-color: #ED1C24;
+        }
+
+        .pin-key:active {
+            background: #f5f5f5;
+        }
+
+        .pin-key.empty {
+            border: none;
+            background: transparent;
+            cursor: default;
+        }
+
+        .pin-key.delete {
+            font-size: 1.25rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 600px) {
+            .header-top {
+                flex-direction: column;
+                gap: 16px;
+            }
+            
+            .header-right {
+                align-items: flex-start;
+            }
+            
+            .update-form {
+                flex-direction: column;
+            }
+            
+            .update-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- PIN Screen -->
+    <div class="pin-screen" id="pin-screen">
+        <img src="images/Robot.png" alt="Dot" class="pin-logo">
+        <p class="pin-title">Enter PIN</p>
+        <div class="pin-dots">
+            <div class="pin-dot" id="dot-0"></div>
+            <div class="pin-dot" id="dot-1"></div>
+            <div class="pin-dot" id="dot-2"></div>
+            <div class="pin-dot" id="dot-3"></div>
+        </div>
+        <div class="pin-keypad">
+            <button class="pin-key" onclick="enterPin(1)">1</button>
+            <button class="pin-key" onclick="enterPin(2)">2</button>
+            <button class="pin-key" onclick="enterPin(3)">3</button>
+            <button class="pin-key" onclick="enterPin(4)">4</button>
+            <button class="pin-key" onclick="enterPin(5)">5</button>
+            <button class="pin-key" onclick="enterPin(6)">6</button>
+            <button class="pin-key" onclick="enterPin(7)">7</button>
+            <button class="pin-key" onclick="enterPin(8)">8</button>
+            <button class="pin-key" onclick="enterPin(9)">9</button>
+            <button class="pin-key empty"></button>
+            <button class="pin-key" onclick="enterPin(0)">0</button>
+            <button class="pin-key delete" onclick="deletePin()">⌫</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="header-top">
+                <div class="header-left">
+                    <img src="images/Todo-header.png" alt="DOT TODO" class="header-logo" id="header-logo-img">
+                    <div class="mode-toggle">
+                        <button class="mode-btn active" id="btn-todo" onclick="setMode('todo')">To Do</button>
+                        <button class="mode-btn" id="btn-wip" onclick="setMode('wip')">WIP</button>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="client-logo" id="header-logo" style="background: #ED1C24;">H</div>
+                    <span class="date" id="today-date"></span>
+                </div>
+            </div>
+            <div class="header-controls">
+                <select class="filter-select" id="client-filter" onchange="applyFilters()">
+                    <option value="all">All Clients</option>
+                </select>
+                <a href="index.html" class="home-link" title="Home">⌂</a>
+            </div>
+        </header>
+        
+        <main id="content">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <p>Loading jobs...</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Config
+        const API_BASE = 'https://dot-remote-api.up.railway.app';
+        const PROXY_BASE = 'https://dot-proxy.up.railway.app';
+        
+        // State
+        let currentMode = 'todo';
+        let currentClient = 'all';
+        let allJobs = [];
+        let clients = [];
+        
+        // Logo colors by client code
+        const logoColors = {
+            'SKY': '#0072CE',
+            'ONE': '#00B140',
+            'HUN': '#ED1C24',
+            'FIS': '#1E3A5F',
+            'TOW': '#FF6B00',
+            'FIR': '#FF4500'
+        };
+
+        // PIN Configuration
+        const CORRECT_PIN = '1919';
+        let enteredPin = '';
+
+        // Check if already unlocked this session
+        if (sessionStorage.getItem('dotUnlocked') === 'true') {
+            document.getElementById('pin-screen').classList.add('hidden');
+        }
+
+        function enterPin(digit) {
+            if (enteredPin.length >= 4) return;
+            enteredPin += digit;
+            updatePinDots();
+            if (enteredPin.length === 4) {
+                setTimeout(checkPin, 150);
+            }
+        }
+
+        function deletePin() {
+            enteredPin = enteredPin.slice(0, -1);
+            updatePinDots();
+        }
+
+        function updatePinDots() {
+            for (let i = 0; i < 4; i++) {
+                const dot = document.getElementById('dot-' + i);
+                dot.classList.remove('filled', 'error');
+                if (i < enteredPin.length) {
+                    dot.classList.add('filled');
+                }
+            }
+        }
+
+        function checkPin() {
+            if (enteredPin === CORRECT_PIN) {
+                sessionStorage.setItem('dotUnlocked', 'true');
+                document.getElementById('pin-screen').classList.add('hidden');
+            } else {
+                const dots = document.querySelectorAll('.pin-dot');
+                dots.forEach(dot => dot.classList.add('error'));
+                setTimeout(() => {
+                    enteredPin = '';
+                    updatePinDots();
+                }, 400);
+            }
+        }
+        
+        // Format today's date
+        const today = new Date();
+        document.getElementById('today-date').textContent = today.toLocaleDateString('en-NZ', { 
+            weekday: 'short', 
+            day: 'numeric', 
+            month: 'short' 
+        });
+
+        // Check URL params for mode
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('mode') === 'wip') {
+            currentMode = 'wip';
+            document.getElementById('btn-todo').classList.remove('active');
+            document.getElementById('btn-wip').classList.add('active');
+            updateHeaderImage();
+        }
+
+        // Format date as "Mon 13"
+        function formatDueDate(dateStr) {
+            if (!dateStr) return 'TBC';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-NZ', { weekday: 'short', day: 'numeric' });
+        }
+
+        // Calculate days until due
+        function getDaysUntilDue(dateStr) {
+            if (!dateStr) return 999;
+            const due = new Date(dateStr);
+            const now = new Date();
+            const diffTime = due - now;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays;
+        }
+
+        // Calculate days since last update
+        function getDaysSinceUpdate(dateStr) {
+            if (!dateStr) return 999;
+            const updated = new Date(dateStr);
+            const now = new Date();
+            const diffTime = now - updated;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays;
+        }
+
+        // Get days ago class
+        function getDaysAgoClass(days) {
+            return days > 7 ? 'days-ago stale' : 'days-ago';
+        }
+
+        // Set mode
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('btn-todo').classList.toggle('active', mode === 'todo');
+            document.getElementById('btn-wip').classList.toggle('active', mode === 'wip');
+            updateHeaderImage();
+            render();
+            
+            // Update URL without reload
+            const url = new URL(window.location);
+            if (mode === 'wip') {
+                url.searchParams.set('mode', 'wip');
+            } else {
+                url.searchParams.delete('mode');
+            }
+            window.history.replaceState({}, '', url);
+        }
+
+        // Update header image based on mode
+        function updateHeaderImage() {
+            const img = document.getElementById('header-logo-img');
+            if (currentMode === 'wip') {
+                img.src = 'images/WIP-header.png';
+                img.alt = 'DOT WIP';
+            } else {
+                img.src = 'images/Todo-header.png';
+                img.alt = 'DOT TODO';
+            }
+        }
+
+        // Apply filters
+        function applyFilters() {
+            currentClient = document.getElementById('client-filter').value;
+            updateHeaderLogo();
+            render();
+        }
+
+        // Update header logo based on client filter
+        function updateHeaderLogo() {
+            const logo = document.getElementById('header-logo');
+            const content = document.getElementById('content');
+            
+            if (currentClient === 'all') {
+                logo.textContent = 'H';
+                logo.style.background = '#ED1C24';
+                content.classList.remove('single-client');
+            } else {
+                logo.textContent = currentClient;
+                logo.style.background = logoColors[currentClient] || '#999';
+                content.classList.add('single-client');
+            }
+        }
+
+        // Filter jobs
+        function getFilteredJobs() {
+            let jobs = [...allJobs];
+            
+            if (currentClient !== 'all') {
+                jobs = jobs.filter(j => j.clientCode === currentClient);
+            }
+            
+            return jobs;
+        }
+
+        // Group jobs for To Do mode
+        function groupByTodo(jobs) {
+            const groups = {
+                doNow: [],
+                doSoon: [],
+                other: [],
+                incoming: []
+            };
+            
+            jobs.forEach(job => {
+                if (job.status === 'Incoming') {
+                    groups.incoming.push(job);
+                } else if (job.status === 'On Hold') {
+                    // Skip on hold in To Do
+                } else {
+                    const daysUntil = getDaysUntilDue(job.updateDue);
+                    if (daysUntil <= 1) {
+                        groups.doNow.push(job);
+                    } else if (daysUntil <= 7) {
+                        groups.doSoon.push(job);
+                    } else {
+                        groups.other.push(job);
+                    }
+                }
+            });
+
+            // Sort each group by due date
+            const sortByDue = (a, b) => getDaysUntilDue(a.updateDue) - getDaysUntilDue(b.updateDue);
+            groups.doNow.sort(sortByDue);
+            groups.doSoon.sort(sortByDue);
+            groups.other.sort(sortByDue);
+            
+            return [
+                { title: 'DO IT NOW', jobs: groups.doNow, compact: false },
+                { title: 'DO IT SOON', jobs: groups.doSoon, compact: false },
+                { title: 'OTHER', jobs: groups.other, compact: true, muted: true },
+                { title: 'INCOMING', jobs: groups.incoming, compact: true, muted: true }
+            ];
+        }
+
+        // Group jobs for WIP mode
+        function groupByWip(jobs) {
+            const groups = {
+                inProgress: [],
+                withClient: [],
+                onHold: [],
+                incoming: []
+            };
+            
+            jobs.forEach(job => {
+                if (job.status === 'Incoming') {
+                    groups.incoming.push(job);
+                } else if (job.status === 'On Hold') {
+                    groups.onHold.push(job);
+                } else if (job.withClient) {
+                    groups.withClient.push(job);
+                } else {
+                    groups.inProgress.push(job);
+                }
+            });
+
+            // Sort each group by due date
+            const sortByDue = (a, b) => getDaysUntilDue(a.updateDue) - getDaysUntilDue(b.updateDue);
+            groups.inProgress.sort(sortByDue);
+            groups.withClient.sort(sortByDue);
+            groups.onHold.sort(sortByDue);
+            
+            return [
+                { title: 'IN PROGRESS', jobs: groups.inProgress, compact: false },
+                { title: 'WITH CLIENT', jobs: groups.withClient, compact: false },
+                { title: 'ON HOLD', jobs: groups.onHold, compact: true, muted: true },
+                { title: 'INCOMING', jobs: groups.incoming, compact: true, muted: true }
+            ];
+        }
+
+        // Create full job card HTML
+        function createJobCard(job) {
+            const dueDate = formatDueDate(job.updateDue);
+            const daysAgo = getDaysSinceUpdate(job.lastUpdated);
+            const daysClass = getDaysAgoClass(daysAgo);
+            const bgColor = logoColors[job.clientCode] || '#999';
+            
+            return `
+                <div class="job-card" data-job="${job.jobNumber}">
+                    <div class="job-header">
+                        <div class="job-logo" style="background: ${bgColor}">${job.clientCode}</div>
+                        <div class="job-content">
+                            <span class="job-title">${job.jobNumber} — ${job.jobName}</span>
+                            <a href="${job.channelUrl || '#'}" class="job-channel" target="_blank">View in Teams</a>
+                        </div>
+                    </div>
+                    <div class="job-update">${job.update || 'No updates yet'}</div>
+                    <div class="job-meta">
+                        🕐 ${dueDate}
+                        <span class="dot">·</span>
+                        <span class="stage-tag">${job.stage}</span>
+                        <span class="dot">·</span>
+                        <span class="${daysClass}">${daysAgo} days ago</span>
+                    </div>
+                    <div class="update-form">
+                        <input type="text" class="update-input" placeholder="Add update..." data-job="${job.jobNumber}">
+                        <button class="update-btn" onclick="submitUpdate('${job.jobNumber}', this)">Update</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Create compact job row HTML
+        function createJobRow(job) {
+            const dueDate = formatDueDate(job.updateDue);
+            const daysAgo = getDaysSinceUpdate(job.lastUpdated);
+            const daysClass = getDaysAgoClass(daysAgo);
+            const bgColor = logoColors[job.clientCode] || '#999';
+            
+            return `
+                <div class="job-row" data-job="${job.jobNumber}">
+                    <div class="job-header">
+                        <div class="job-logo" style="background: ${bgColor}">${job.clientCode}</div>
+                        <div class="job-content">
+                            <a href="${job.channelUrl || '#'}" class="job-title" target="_blank">${job.jobNumber} — ${job.jobName}</a>
+                            <span class="job-meta-inline">
+                                🕐 ${dueDate}
+                                <span class="dot">·</span>
+                                <span class="${daysClass}">${daysAgo} days ago</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render
+        function render() {
+            const jobs = getFilteredJobs();
+            const sections = currentMode === 'todo' ? groupByTodo(jobs) : groupByWip(jobs);
+            
+            let html = '';
+            
+            sections.forEach(section => {
+                if (section.jobs.length === 0) return; // Hide empty sections
+                
+                const titleClass = section.muted ? 'section-title muted' : 'section-title';
+                
+                html += `
+                    <div class="section">
+                        <div class="${titleClass}">${section.title}</div>
+                        ${section.jobs.map(job => 
+                            section.compact ? createJobRow(job) : createJobCard(job)
+                        ).join('')}
+                    </div>
+                `;
+            });
+            
+            if (html === '') {
+                html = '<div class="empty-section">No jobs found</div>';
+            }
+            
+            document.getElementById('content').innerHTML = html;
+        }
+
+        // Submit update
+        async function submitUpdate(jobNumber, btn) {
+            const card = btn.closest('.job-card');
+            const input = card.querySelector('.update-input');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            btn.disabled = true;
+            btn.textContent = 'Sending...';
+            
+            try {
+                const response = await fetch(`${PROXY_BASE}/proxy/update`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        ClientCode: jobNumber.split(' ')[0],
+                        JobNumber: jobNumber,
+                        message: message
+                    })
+                });
+                
+                if (response.ok) {
+                    btn.textContent = '✓ Done';
+                    btn.classList.add('success');
+                    input.value = '';
+                    card.querySelector('.job-update').textContent = message;
+                    
+                    setTimeout(() => {
+                        btn.textContent = 'Update';
+                        btn.classList.remove('success');
+                        btn.disabled = false;
+                    }, 2000);
+                } else {
+                    throw new Error('Update failed');
+                }
+            } catch (error) {
+                btn.textContent = 'Error';
+                setTimeout(() => {
+                    btn.textContent = 'Update';
+                    btn.disabled = false;
+                }, 2000);
+            }
+        }
+
+        // Load clients for dropdown
+        async function loadClients() {
+            try {
+                const response = await fetch(`${API_BASE}/clients`);
+                if (response.ok) {
+                    clients = await response.json();
+                    populateClientDropdown();
+                }
+            } catch (error) {
+                console.log('Using fallback client data');
+                clients = [
+                    { code: 'SKY', name: 'Sky TV' },
+                    { code: 'ONE', name: 'One NZ' },
+                    { code: 'HUN', name: 'Hunch' },
+                    { code: 'FIS', name: 'Fisher Funds' },
+                    { code: 'TOW', name: 'Tower Insurance' }
+                ];
+                populateClientDropdown();
+            }
+        }
+
+        // Populate client dropdown
+        function populateClientDropdown() {
+            const select = document.getElementById('client-filter');
+            select.innerHTML = '<option value="all">All Clients</option>';
+            clients.forEach(client => {
+                const option = document.createElement('option');
+                option.value = client.code;
+                option.textContent = client.name;
+                select.appendChild(option);
+            });
+        }
+
+        // Load all jobs
+        async function loadJobs() {
+            try {
+                const response = await fetch(`${API_BASE}/jobs/all`);
+                if (response.ok) {
+                    allJobs = await response.json();
+                    render();
+                    return;
+                }
+            } catch (error) {
+                console.log('Using sample data');
+            }
+            
+            // Fallback sample data
+            allJobs = [
+                {
+                    jobNumber: 'SKY 017',
+                    jobName: 'Faulty Swap/Upgrade',
+                    clientCode: 'SKY',
+                    update: 'Copy feedback with us for tweaks',
+                    updateDue: '2026-01-09',
+                    lastUpdated: '2026-01-06',
+                    stage: 'Refine',
+                    status: 'In Progress',
+                    withClient: false,
+                    channelUrl: 'https://teams.microsoft.com/l/channel/xxx'
+                },
+                {
+                    jobNumber: 'SKY 018',
+                    jobName: 'Offboarding Journey',
+                    clientCode: 'SKY',
+                    update: 'With Mikaila for feedback',
+                    updateDue: '2026-01-07',
+                    lastUpdated: '2025-12-31',
+                    stage: 'Simplify',
+                    status: 'In Progress',
+                    withClient: true,
+                    channelUrl: 'https://teams.microsoft.com/l/channel/xxx'
+                },
+                {
+                    jobNumber: 'HUN 057',
+                    jobName: 'Hunch Fix for 26',
+                    clientCode: 'HUN',
+                    update: 'Debugging and attachments work in progress',
+                    updateDue: '2026-01-13',
+                    lastUpdated: '2026-01-05',
+                    stage: 'Craft',
+                    status: 'In Progress',
+                    withClient: false,
+                    channelUrl: 'https://teams.microsoft.com/l/channel/xxx'
+                },
+                {
+                    jobNumber: 'HUN 056',
+                    jobName: 'Grrow Logo',
+                    clientCode: 'HUN',
+                    update: 'Review and feedback on logos',
+                    updateDue: '2026-01-05',
+                    lastUpdated: '2025-12-31',
+                    stage: 'Refine',
+                    status: 'In Progress',
+                    withClient: false,
+                    channelUrl: 'https://teams.microsoft.com/l/channel/xxx'
+                },
+                {
+                    jobNumber: 'ONE 090',
+                    jobName: 'April Price Increase',
+                    clientCode: 'ONE',
+                    update: 'Feedback from Jess/Anita to turn around',
+                    updateDue: '2026-01-20',
+                    lastUpdated: '2026-01-01',
+                    stage: 'Refine',
+                    status: 'In Progress',
+                    withClient: false,
+                    channelUrl: 'https://teams.microsoft.com/l/channel/xxx'
+                },
+                {
+                    jobNumber: 'SKY 010',
+                    jobName: 'Level Up',
+                    clientCode: 'SKY',
+                    update: 'With Sky for next steps',
+                    updateDue: '2026-01-23',
+                    lastUpdated: '2025-12-31',
+                    stage: 'Simplify',
+                    status: 'On Hold',
+                    withClient: true,
+                    channelUrl: 'https://teams.microsoft.com/l/channel/xxx'
+                },
+                {
+                    jobNumber: 'FIS 022',
+                    jobName: 'Nest Evolution',
+                    clientCode: 'FIS',
+                    update: 'Initial brief received',
+                    updateDue: null,
+                    lastUpdated: '2026-01-07',
+                    stage: 'Triage',
+                    status: 'Incoming',
+                    withClient: false,
+                    channelUrl: 'https://teams.microsoft.com/l/channel/xxx'
+                },
+                {
+                    jobNumber: 'TOW 015',
+                    jobName: 'Brand Refresh Phase 2',
+                    clientCode: 'TOW',
+                    update: 'Waiting on budget approval',
+                    updateDue: null,
+                    lastUpdated: '2025-12-25',
+                    stage: 'Clarify',
+                    status: 'On Hold',
+                    withClient: true,
+                    channelUrl: 'https://teams.microsoft.com/l/channel/xxx'
+                }
+            ];
+            render();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadClients();
+            await loadJobs();
+        });
+    </script>
+</body>
+</html>
