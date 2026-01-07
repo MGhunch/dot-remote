@@ -1078,8 +1078,8 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        ClientCode: clientCode,
-                        JobNumber: job,
+                        clientCode: clientCode,
+                        jobNumber: job,
                         message: update 
                     })
                 });
@@ -1123,7 +1123,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         client: client,
-                        ClientCode: clientCode 
+                        clientCode: clientCode 
                     })
                 });
             } catch (error) {
