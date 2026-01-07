@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dot Hub</title>
+    
+    <meta name="theme-color" content="#ED1C24">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="images/icon-192.png">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* PIN Screen */
+        .pin-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .pin-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .pin-logo {
+            width: 80px;
+            margin-bottom: 2rem;
+        }
+
+        .pin-title {
+            font-size: 14px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+        }
+
+        .pin-dots {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .pin-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid #e5e5e5;
+            background: transparent;
+            transition: all 0.15s ease;
+        }
+
+        .pin-dot.filled {
+            background: #ED1C24;
+            border-color: #ED1C24;
+        }
+
+        .pin-dot.error {
+            border-color: #ED1C24;
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        .pin-keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            max-width: 280px;
+        }
+
+        .pin-key {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            border: 1.5px solid #e5e5e5;
+            background: #fff;
+            font-size: 1.75rem;
+            font-weight: 500;
+            color: #000;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .pin-key:hover {
+            border-color: #ED1C24;
+        }
+
+        .pin-key:active {
+            background: #f5f5f5;
+        }
+
+        .pin-key.empty {
+            border: none;
+            background: transparent;
+            cursor: default;
+        }
+
+        .pin-key.delete {
+            font-size: 1.25rem;
+        }
+        
+        /* App Container */
+        .app-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .red-bar {
+            height: 4px;
+            background: #ED1C24;
+            width: 100%;
+        }
+        
+        /* Header */
+        header {
+            background: white;
+            padding: 32px 32px 24px;
+            text-align: center;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        
+        header img {
+            height: 60px;
+            width: auto;
+        }
+        
+        .header-date {
+            margin-top: 8px;
+            font-size: 14px;
+            color: #999;
+        }
+        
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 32px;
+        }
+        
+        .section-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #999;
+            margin-bottom: 16px;
+        }
+        
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+        
+        .nav-card {
+            background: white;
+            border: 1.5px solid #e5e5e5;
+            border-radius: 12px;
+            padding: 24px;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.15s ease;
+            text-align: center;
+        }
+        
+        .nav-card:hover {
+            border-color: #ED1C24;
+            box-shadow: 0 4px 12px rgba(237, 28, 36, 0.1);
+        }
+        
+        .nav-card:active {
+            background: #fafafa;
+        }
+        
+        .nav-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            background: #ED1C24;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .nav-icon svg {
+            width: 28px;
+            height: 28px;
+            stroke: white;
+            stroke-width: 1.5;
+            fill: none;
+        }
+        
+        .nav-icon.muted {
+            background: #ccc;
+        }
+        
+        .nav-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .nav-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #ED1C24;
+        }
+        
+        .nav-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .nav-card.muted .nav-label {
+            color: #999;
+        }
+        
+        .nav-card.muted .nav-title {
+            color: #999;
+        }
+        
+        .nav-card.muted:hover {
+            border-color: #e5e5e5;
+            box-shadow: none;
+            cursor: default;
+        }
+        
+        /* Quick actions - smaller, horizontal */
+        .quick-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+        
+        .quick-card {
+            background: white;
+            border: 1.5px solid #e5e5e5;
+            border-radius: 12px;
+            padding: 20px 24px;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.15s ease;
+        }
+        
+        .quick-card:hover {
+            border-color: #ED1C24;
+        }
+        
+        .quick-card .nav-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+        }
+        
+        .quick-card .nav-icon svg {
+            width: 22px;
+            height: 22px;
+        }
+        
+        .quick-card .nav-text {
+            text-align: left;
+        }
+        
+        .quick-card .nav-title {
+            font-size: 15px;
+        }
+        
+        /* Footer */
+        footer {
+            padding: 24px 32px 32px;
+            text-align: center;
+            border-top: 1px solid #e5e5e5;
+            background: white;
+        }
+        
+        footer img {
+            height: 36px;
+            width: auto;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <!-- PIN Screen -->
+    <div class="pin-screen" id="pin-screen">
+        <img src="images/Robot.png" alt="Dot" class="pin-logo">
+        <p class="pin-title">Enter PIN</p>
+        <div class="pin-dots">
+            <div class="pin-dot" id="dot-0"></div>
+            <div class="pin-dot" id="dot-1"></div>
+            <div class="pin-dot" id="dot-2"></div>
+            <div class="pin-dot" id="dot-3"></div>
+        </div>
+        <div class="pin-keypad">
+            <button class="pin-key" onclick="enterPin(1)">1</button>
+            <button class="pin-key" onclick="enterPin(2)">2</button>
+            <button class="pin-key" onclick="enterPin(3)">3</button>
+            <button class="pin-key" onclick="enterPin(4)">4</button>
+            <button class="pin-key" onclick="enterPin(5)">5</button>
+            <button class="pin-key" onclick="enterPin(6)">6</button>
+            <button class="pin-key" onclick="enterPin(7)">7</button>
+            <button class="pin-key" onclick="enterPin(8)">8</button>
+            <button class="pin-key" onclick="enterPin(9)">9</button>
+            <button class="pin-key empty"></button>
+            <button class="pin-key" onclick="enterPin(0)">0</button>
+            <button class="pin-key delete" onclick="deletePin()">⌫</button>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <div class="red-bar"></div>
+        
+        <header>
+            <img src="images/Robot.png" alt="Dot">
+            <p class="header-date" id="header-date"></p>
+        </header>
+        
+        <main>
+            <p class="section-title">Work</p>
+            <div class="nav-grid">
+                <a href="todo.html" class="nav-card">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M9 11l3 3L22 4"/>
+                            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                        </svg>
+                    </div>
+                    <div class="nav-text">
+                        <span class="nav-label">To Do</span>
+                        <span class="nav-title">What's due?</span>
+                    </div>
+                </a>
+                
+                <a href="wip.html" class="nav-card">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+                            <path d="M9 12h6"/>
+                            <path d="M9 16h6"/>
+                        </svg>
+                    </div>
+                    <div class="nav-text">
+                        <span class="nav-label">WIP</span>
+                        <span class="nav-title">What's on?</span>
+                    </div>
+                </a>
+                
+                <span class="nav-card muted">
+                    <div class="nav-icon muted">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M3 3v18h18"/>
+                            <path d="m19 9-5 5-4-4-3 3"/>
+                        </svg>
+                    </div>
+                    <div class="nav-text">
+                        <span class="nav-label">Tracker</span>
+                        <span class="nav-title">Coming soon</span>
+                    </div>
+                </span>
+            </div>
+            
+            <p class="section-title">Quick Actions</p>
+            <div class="quick-grid">
+                <a href="remote.html#update" class="quick-card">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+                            <path d="m15 5 4 4"/>
+                        </svg>
+                    </div>
+                    <div class="nav-text">
+                        <span class="nav-label">Update</span>
+                        <span class="nav-title">Quick update</span>
+                    </div>
+                </a>
+                
+                <a href="remote.html#incoming" class="quick-card">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 5v14"/>
+                            <path d="m19 12-7 7-7-7"/>
+                        </svg>
+                    </div>
+                    <div class="nav-text">
+                        <span class="nav-label">Incoming</span>
+                        <span class="nav-title">New job</span>
+                    </div>
+                </a>
+            </div>
+        </main>
+        
+        <footer>
+            <img src="images/ai2-logo.png" alt="ai²">
+        </footer>
+        
+        <div class="red-bar"></div>
+    </div>
+
+    <script>
+        // PIN Configuration
+        const CORRECT_PIN = '1919';
+        let enteredPin = '';
+
+        // Check if already unlocked this session
+        if (sessionStorage.getItem('dotUnlocked') === 'true') {
+            document.getElementById('pin-screen').classList.add('hidden');
+        }
+
+        function enterPin(digit) {
+            if (enteredPin.length >= 4) return;
+            
+            enteredPin += digit;
+            updatePinDots();
+            
+            if (enteredPin.length === 4) {
+                setTimeout(checkPin, 150);
+            }
+        }
+
+        function deletePin() {
+            enteredPin = enteredPin.slice(0, -1);
+            updatePinDots();
+        }
+
+        function updatePinDots() {
+            for (let i = 0; i < 4; i++) {
+                const dot = document.getElementById('dot-' + i);
+                dot.classList.remove('filled', 'error');
+                if (i < enteredPin.length) {
+                    dot.classList.add('filled');
+                }
+            }
+        }
+
+        function checkPin() {
+            if (enteredPin === CORRECT_PIN) {
+                sessionStorage.setItem('dotUnlocked', 'true');
+                document.getElementById('pin-screen').classList.add('hidden');
+            } else {
+                const dots = document.querySelectorAll('.pin-dot');
+                dots.forEach(dot => dot.classList.add('error'));
+                
+                setTimeout(() => {
+                    enteredPin = '';
+                    updatePinDots();
+                }, 400);
+            }
+        }
+
+        // Set date
+        const today = new Date();
+        document.getElementById('header-date').textContent = today.toLocaleDateString('en-NZ', { 
+            weekday: 'long', 
+            day: 'numeric', 
+            month: 'long',
+            year: 'numeric'
+        });
+    </script>
+</body>
+</html>
