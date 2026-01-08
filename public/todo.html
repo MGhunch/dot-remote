@@ -22,20 +22,21 @@
         .container { max-width: 1200px; margin: 0 auto; }
         
         /* Header - top section with logo */
-        .header-top { background: white; border-bottom: 3px solid #ED1C24; padding: 20px 32px; display: flex; justify-content: space-between; align-items: center; }
-        .header-left { display: flex; align-items: center; gap: 16px; }
+        .header-top { background: white; border-bottom: 3px solid #ED1C24; padding: 24px 32px; display: flex; justify-content: space-between; align-items: center; }
+        .header-left { display: flex; align-items: center; gap: 20px; }
         .header-left a { display: flex; align-items: center; text-decoration: none; }
-        .client-logo { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: white; cursor: pointer; overflow: hidden; background: #f0f0f0; transition: opacity 0.15s ease; }
+        .client-logo { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: white; cursor: pointer; overflow: hidden; background: #f0f0f0; transition: opacity 0.15s ease; }
         .client-logo:hover { opacity: 0.85; }
         .client-logo img { width: 100%; height: 100%; object-fit: cover; }
-        .header-logo { height: 44px; width: auto; }
+        .header-logo { height: 48px; width: auto; }
         .header-right { display: flex; align-items: center; gap: 12px; }
-        .header-right img { height: 40px; width: auto; }
+        .header-right img { height: 48px; width: auto; }
         
         /* Controls bar */
-        .controls-bar { background: white; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e5e5; position: sticky; top: 0; z-index: 100; }
-        .filter-select { padding: 10px 40px 10px 14px; border: 1.5px solid #e5e5e5; border-radius: 24px; font-size: 14px; color: #666; background: white; cursor: pointer; min-width: 180px; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; background-size: 18px; }
-        .filter-select:focus { outline: none; border-color: #ED1C24; }
+        .controls-bar { background: white; padding: 20px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e5e5; position: sticky; top: 0; z-index: 100; }
+        .filter-select { padding: 8px 36px 8px 14px; border: none; border-radius: 24px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #999; background: white; cursor: pointer; min-width: 140px; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; background-size: 16px; transition: color 0.15s ease; }
+        .filter-select:hover { color: #ED1C24; }
+        .filter-select:focus { outline: none; color: #ED1C24; }
         
         /* Mode toggle */
         .mode-toggle { display: flex; align-items: center; gap: 12px; }
@@ -185,7 +186,7 @@
                             <img src="images/logos/HUN.png" alt="H" onerror="handleLogoError(this)">
                         </div>
                     </a>
-                    <img src="images/Hub-WhatsWhat-Header.png" alt="What's What" class="header-logo">
+                    <img src="images/Hub-whatswhat-header.png" alt="What's What" class="header-logo">
                 </div>
                 <div class="header-right">
                     <img src="images/ai2-logo.png" alt="ai²">
