@@ -1,4 +1,4 @@
- await fetch(`${PROXY_BASE}/proxy/update`, {
+ const res = await fetch(`${PROXY_BASE}/proxy/update`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ clientCode: jobNumber.split(' ')[0], jobNumber, message })
