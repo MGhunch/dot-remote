@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dot To Do</title>
+    <title>Dot What's What</title>
     <meta name="theme-color" content="#ED1C24">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="192x192" href="images/icon-192.png">
@@ -20,8 +20,9 @@
         @media (max-width: 768px) { .mobile-message { display: flex; } .desktop-app { display: none; } }
         
         .container { max-width: 1200px; margin: 0 auto; }
-        header { background: white; border-bottom: 3px solid #ED1C24; padding: 20px 32px; position: sticky; top: 0; z-index: 100; }
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        
+        /* Header - top section with logo */
+        .header-top { background: white; border-bottom: 3px solid #ED1C24; padding: 20px 32px; display: flex; justify-content: space-between; align-items: center; }
         .header-left { display: flex; align-items: center; gap: 16px; }
         .header-left a { display: flex; align-items: center; text-decoration: none; }
         .client-logo { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: white; cursor: pointer; overflow: hidden; background: #f0f0f0; transition: opacity 0.15s ease; }
@@ -30,13 +31,26 @@
         .header-logo { height: 44px; width: auto; }
         .header-right { display: flex; align-items: center; gap: 12px; }
         .header-right img { height: 40px; width: auto; }
-        .header-controls { display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Controls bar */
+        .controls-bar { background: white; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e5e5; position: sticky; top: 0; z-index: 100; }
         .filter-select { padding: 10px 40px 10px 14px; border: 1.5px solid #e5e5e5; border-radius: 24px; font-size: 14px; color: #666; background: white; cursor: pointer; min-width: 180px; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; background-size: 18px; }
         .filter-select:focus { outline: none; border-color: #ED1C24; }
-        .date { font-size: 13px; color: #999; font-weight: 500; }
+        
+        /* Mode toggle */
+        .mode-toggle { display: flex; align-items: center; gap: 12px; }
+        .mode-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #999; cursor: pointer; transition: color 0.15s ease; }
+        .mode-label.active { color: #ED1C24; }
+        .mode-switch { position: relative; width: 44px; height: 24px; cursor: pointer; }
+        .mode-switch input { opacity: 0; width: 0; height: 0; }
+        .mode-switch-slider { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: #ED1C24; border-radius: 24px; transition: 0.2s; }
+        .mode-switch-slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .mode-switch input:checked + .mode-switch-slider:before { transform: translateX(20px); }
         
         main { padding: 24px 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
         .column { display: flex; flex-direction: column; gap: 24px; }
+        .section { }
+        .section.hidden { display: none; }
         .section-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: #999; padding: 10px 0; margin-bottom: 8px; }
         
         .job-card { background: white; border-radius: 12px; padding: 16px 18px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); cursor: pointer; transition: all 0.2s ease; }
@@ -83,11 +97,10 @@
         .date-input { padding: 8px 12px; border: 1.5px solid #e5e5e5; border-radius: 20px; font-size: 13px; font-family: inherit; color: #666; cursor: pointer; }
         .date-input:focus { outline: none; border-color: #ED1C24; }
         
-        .job-actions { display: flex; gap: 10px; align-items: center; margin-top: 6px; }
         .update-input { flex: 1; padding: 10px 14px; border: 1.5px solid #e5e5e5; border-radius: 24px; font-size: 13px; font-family: inherit; }
         .update-input:focus { outline: none; border-color: #ED1C24; }
         .update-input::placeholder { color: #bbb; }
-        .update-input.full-width { width: 100%; margin-bottom: 12px; }
+        .update-input.full-width { width: 66%; margin-bottom: 12px; display: block; }
         .update-btn-row { text-align: left; margin-bottom: 16px; }
         .update-btn-row .pill-btn { width: 66%; }
         .pill-btn { padding: 10px 24px; background: #ED1C24; color: white; border: none; border-radius: 24px; font-size: 11px; font-weight: 600; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: background 0.15s ease; }
@@ -101,19 +114,15 @@
         .with-client-toggle { display: flex; align-items: center; gap: 8px; }
         .with-client-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #999; }
         
-        .job-row { background: white; border-radius: 12px; padding: 12px 16px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); cursor: pointer; transition: all 0.2s ease; }
-        .job-row:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
-        .job-row .job-header { align-items: center; }
-        .job-row .job-logo { width: 28px; height: 28px; font-size: 8px; margin-top: 0; }
-        .job-row .job-main { display: flex; align-items: center; gap: 12px; }
-        .job-row .job-title { font-size: 14px; flex: 1; }
-        .job-row .job-meta-inline { font-size: 12px; color: #999; display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-        
         .empty-section { color: #999; font-size: 13px; padding: 20px; text-align: center; background: white; border-radius: 12px; border: 2px dashed #e5e5e5; }
-        .single-client .job-logo { display: none; }
         .loading { grid-column: 1 / -1; text-align: center; padding: 60px 24px; color: #999; }
         .loading-spinner { width: 40px; height: 40px; border: 3px solid #e5e5e5; border-top-color: #ED1C24; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 24px; font-size: 14px; font-weight: 500; z-index: 3000; opacity: 0; transition: opacity 0.2s ease; pointer-events: none; }
+        .toast.visible { opacity: 1; }
+        .toast.error { background: #333; color: white; }
+        .toast.success { background: #22a822; color: white; }
         
         .pin-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; transition: opacity 0.3s ease, visibility 0.3s ease; }
         .pin-screen.hidden { opacity: 0; visibility: hidden; }
@@ -130,11 +139,6 @@
         .pin-key:active { background: #f5f5f5; }
         .pin-key.empty { border: none; background: transparent; cursor: default; }
         .pin-key.delete { font-size: 1.25rem; }
-        
-        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 24px; font-size: 14px; font-weight: 500; z-index: 3000; opacity: 0; transition: opacity 0.2s ease; pointer-events: none; }
-        .toast.visible { opacity: 1; }
-        .toast.error { background: #333; color: white; }
-        .toast.success { background: #22a822; color: white; }
     </style>
 </head>
 <body>
@@ -174,27 +178,32 @@
 
     <div class="desktop-app">
         <div class="container">
-            <header>
-                <div class="header-top">
-                    <div class="header-left">
-                        <a href="hub.html" title="Home">
-                            <div class="client-logo" id="header-client-logo">
-                                <img src="images/logos/HUN.png" alt="H" onerror="handleLogoError(this)">
-                            </div>
-                        </a>
-                        <img src="" alt="" class="header-logo" id="header-logo-img">
-                    </div>
-                    <div class="header-right">
-                        <img src="images/ai2-logo.png" alt="ai²">
-                    </div>
+            <div class="header-top">
+                <div class="header-left">
+                    <a href="hub.html" title="Home">
+                        <div class="client-logo" id="header-client-logo">
+                            <img src="images/logos/HUN.png" alt="H" onerror="handleLogoError(this)">
+                        </div>
+                    </a>
+                    <img src="images/Hub-WhatsWhat-Header.png" alt="What's What" class="header-logo">
                 </div>
-                <div class="header-controls">
-                    <select class="filter-select" id="client-filter" onchange="applyFilters()">
-                        <option value="all">All Clients</option>
-                    </select>
-                    <span class="date" id="today-date"></span>
+                <div class="header-right">
+                    <img src="images/ai2-logo.png" alt="ai²">
                 </div>
-            </header>
+            </div>
+            <div class="controls-bar">
+                <select class="filter-select" id="client-filter" onchange="applyFilters()">
+                    <option value="all">All Clients</option>
+                </select>
+                <div class="mode-toggle">
+                    <span class="mode-label" id="mode-todo" onclick="setMode('todo')">TO DO</span>
+                    <label class="mode-switch">
+                        <input type="checkbox" id="mode-switch" onchange="toggleMode()">
+                        <span class="mode-switch-slider"></span>
+                    </label>
+                    <span class="mode-label" id="mode-wip" onclick="setMode('wip')">WIP</span>
+                </div>
+            </div>
             <main id="content">
                 <div class="loading">
                     <div class="loading-spinner"></div>
@@ -207,15 +216,15 @@
     <script>
         const API_BASE = 'https://dot-remote-api.up.railway.app';
         const PROXY_BASE = 'https://dot-proxy.up.railway.app';
-        const urlParams = new URLSearchParams(window.location.search);
-        const isWipMode = urlParams.get('mode') === 'wip';
         
+        let currentMode = 'todo'; // 'todo' or 'wip'
         let currentClient = 'all';
         let allJobs = [];
         let clients = [];
         const CORRECT_PIN = '1919';
         let enteredPin = '';
 
+        // PIN screen
         if (sessionStorage.getItem('dotUnlocked') === 'true') {
             document.getElementById('pin-screen').classList.add('hidden');
         }
@@ -250,30 +259,33 @@
             }
         }
 
-        function setHeaderImage() {
-            const img = document.getElementById('header-logo-img');
-            if (isWipMode) {
-                img.src = 'images/Hub-Wip-Header.png';
-                img.alt = 'WIP';
-                document.title = 'Dot WIP';
-            } else {
-                img.src = 'images/Hub-Todo-Header.png';
-                img.alt = 'TO DO';
-                document.title = 'Dot To Do';
-            }
+        // Mode toggle
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('mode-switch').checked = (mode === 'wip');
+            updateModeLabels();
+            render();
         }
-        setHeaderImage();
 
-        const today = new Date();
-        document.getElementById('today-date').textContent = today.toLocaleDateString('en-NZ', { weekday: 'short', day: 'numeric', month: 'short' });
+        function toggleMode() {
+            currentMode = document.getElementById('mode-switch').checked ? 'wip' : 'todo';
+            updateModeLabels();
+            render();
+        }
 
+        function updateModeLabels() {
+            document.getElementById('mode-todo').classList.toggle('active', currentMode === 'todo');
+            document.getElementById('mode-wip').classList.toggle('active', currentMode === 'wip');
+        }
+        updateModeLabels();
+
+        // Helpers
         function formatDueDate(d) { if (!d) return 'TBC'; return new Date(d).toLocaleDateString('en-NZ', { weekday: 'short', day: 'numeric' }); }
         function formatDateForInput(d) { if (!d) return ''; return new Date(d).toISOString().split('T')[0]; }
         function getDaysUntilDue(d) { if (!d) return 999; return Math.ceil((new Date(d) - new Date()) / 86400000); }
         function getDaysSinceUpdate(d) { if (!d) return 999; return Math.floor((new Date() - new Date(d)) / 86400000); }
         function getDaysAgoClass(days) { return days > 7 ? 'days-ago stale' : 'days-ago'; }
         function getLogoUrl(code) {
-            // Map ONB and ONS to ONE logo
             var logoCode = (code === 'ONB' || code === 'ONS') ? 'ONE' : code;
             return 'images/logos/' + logoCode + '.png';
         }
@@ -287,13 +299,10 @@
 
         function updateHeaderLogo() {
             const logo = document.getElementById('header-client-logo');
-            const content = document.getElementById('content');
             if (currentClient === 'all') {
                 logo.innerHTML = '<img src="images/logos/HUN.png" alt="H" onerror="handleLogoError(this)">';
-                content.classList.remove('single-client');
             } else {
                 logo.innerHTML = '<img src="' + getLogoUrl(currentClient) + '" alt="' + currentClient + '" onerror="handleLogoError(this)">';
-                content.classList.add('single-client');
             }
         }
 
@@ -301,44 +310,46 @@
             return currentClient === 'all' ? allJobs.slice() : allJobs.filter(function(j) { return j.clientCode === currentClient; });
         }
 
+        // TO DO grouping
         function groupByTodo(jobs) {
-            var g = { doNow: [], doSoon: [], other: [], incoming: [] };
+            var g = { doNow: [], doSoon: [], withClient: [], onHold: [] };
             jobs.forEach(function(j) {
-                if (j.status === 'Incoming') g.incoming.push(j);
-                else if (j.status === 'On Hold' || j.status === 'Completed') {}
+                if (j.status === 'On Hold') g.onHold.push(j);
+                else if (j.withClient) g.withClient.push(j);
+                else if (j.status === 'Completed' || j.status === 'Archived') {}
                 else {
                     var d = getDaysUntilDue(j.updateDue);
-                    if (d <= 1) g.doNow.push(j);
-                    else if (d <= 7) g.doSoon.push(j);
-                    else g.other.push(j);
+                    if (d <= 4) g.doNow.push(j);
+                    else g.doSoon.push(j);
                 }
             });
             var s = function(a, b) { return getDaysUntilDue(a.updateDue) - getDaysUntilDue(b.updateDue); };
             Object.values(g).forEach(function(arr) { arr.sort(s); });
             return {
-                leftTop: { title: 'Do It Now', jobs: g.doNow, compact: false },
-                rightTop: { title: 'Do It Soon', jobs: g.doSoon, compact: false },
-                leftBottom: { title: 'Incoming', jobs: g.incoming, compact: true },
-                rightBottom: { title: 'Other', jobs: g.other, compact: true }
+                leftTop: { title: 'DO IT NOW', jobs: g.doNow, compact: false },
+                rightTop: { title: 'DO IT SOON', jobs: g.doSoon, compact: false },
+                leftBottom: { title: 'WITH CLIENT', jobs: g.withClient, compact: true },
+                rightBottom: { title: 'ON HOLD', jobs: g.onHold, compact: true }
             };
         }
 
+        // WIP grouping
         function groupByWip(jobs) {
-            var g = { inProgress: [], withClient: [], onHold: [], incoming: [] };
+            var g = { withUs: [], withYou: [], incoming: [], onHold: [] };
             jobs.forEach(function(j) {
                 if (j.status === 'Incoming') g.incoming.push(j);
                 else if (j.status === 'On Hold') g.onHold.push(j);
-                else if (j.status === 'Completed') {}
-                else if (j.withClient) g.withClient.push(j);
-                else g.inProgress.push(j);
+                else if (j.status === 'Completed' || j.status === 'Archived') {}
+                else if (j.withClient) g.withYou.push(j);
+                else g.withUs.push(j);
             });
             var s = function(a, b) { return getDaysUntilDue(a.updateDue) - getDaysUntilDue(b.updateDue); };
             Object.values(g).forEach(function(arr) { arr.sort(s); });
             return {
-                leftTop: { title: 'In Progress', jobs: g.inProgress, compact: false },
-                rightTop: { title: 'With Client', jobs: g.withClient, compact: false },
-                leftBottom: { title: 'Incoming', jobs: g.incoming, compact: true },
-                rightBottom: { title: 'On Hold', jobs: g.onHold, compact: true }
+                leftTop: { title: "WE'RE ON IT", jobs: g.withUs, compact: false },
+                rightTop: { title: 'WITH YOU', jobs: g.withYou, compact: false },
+                leftBottom: { title: 'INCOMING', jobs: g.incoming, compact: true },
+                rightBottom: { title: 'ON HOLD', jobs: g.onHold, compact: true }
             };
         }
 
@@ -492,8 +503,9 @@
         }
 
         function renderSection(section) {
+            // Hide empty sections
             if (section.jobs.length === 0) {
-                return '<div class="section"><div class="section-title">' + section.title + '</div><div class="empty-section">No jobs</div></div>';
+                return '';
             }
             var html = '<div class="section"><div class="section-title">' + section.title + '</div>';
             section.jobs.forEach(function(j) {
@@ -505,10 +517,18 @@
 
         function render() {
             var jobs = getFilteredJobs();
-            var sections = isWipMode ? groupByWip(jobs) : groupByTodo(jobs);
+            var sections = currentMode === 'wip' ? groupByWip(jobs) : groupByTodo(jobs);
+            
+            var leftHtml = renderSection(sections.leftTop) + renderSection(sections.leftBottom);
+            var rightHtml = renderSection(sections.rightTop) + renderSection(sections.rightBottom);
+            
+            // Handle empty columns
+            if (!leftHtml) leftHtml = '<div class="empty-section">No jobs</div>';
+            if (!rightHtml) rightHtml = '<div class="empty-section">No jobs</div>';
+            
             document.getElementById('content').innerHTML =
-                '<div class="column">' + renderSection(sections.leftTop) + renderSection(sections.leftBottom) + '</div>' +
-                '<div class="column">' + renderSection(sections.rightTop) + renderSection(sections.rightBottom) + '</div>';
+                '<div class="column">' + leftHtml + '</div>' +
+                '<div class="column">' + rightHtml + '</div>';
         }
 
         function toggleCard(card) { card.classList.toggle('expanded'); }
@@ -516,7 +536,6 @@
         function submitJobUpdate(jobNumber, btn) {
             var card = btn.closest('.job-card');
             
-            // Gather all field values from the card
             var stage = card.querySelector('[data-field="stage"]').value;
             var status = card.querySelector('[data-field="status"]').value;
             var updateDue = card.querySelector('[data-field="updateDue"]').value;
@@ -526,7 +545,6 @@
             btn.disabled = true;
             btn.textContent = 'SAVING...';
             
-            // Build payload for Airtable fields
             var airtablePayload = {
                 stage: stage,
                 status: status
@@ -534,10 +552,8 @@
             if (updateDue) airtablePayload.updateDue = updateDue;
             if (liveDate) airtablePayload.liveDate = liveDate;
             
-            // Two parallel requests: Airtable fields + N8N update message (if provided)
             var promises = [];
             
-            // Always save field changes to Airtable
             promises.push(
                 fetch(API_BASE + '/job/' + encodeURIComponent(jobNumber) + '/update', {
                     method: 'POST',
@@ -546,7 +562,6 @@
                 })
             );
             
-            // If there's a message, also send to N8N for update processing
             if (message) {
                 promises.push(
                     fetch(PROXY_BASE + '/proxy/update', {
@@ -566,7 +581,6 @@
                 var allOk = responses.every(function(r) { return r.ok; });
                 if (!allOk) throw new Error('Update failed');
                 
-                // Update local data
                 var job = allJobs.find(function(j) { return j.jobNumber === jobNumber; });
                 if (job) {
                     job.stage = stage;
@@ -586,16 +600,12 @@
                 
                 showToast('On it.', 'success');
                 
-                // Re-render if status changed (affects grouping)
-                if (job && job.status !== status) {
-                    render();
-                }
-                
                 setTimeout(function() { 
                     btn.textContent = 'UPDATE'; 
                     btn.classList.remove('success'); 
-                    btn.disabled = false; 
-                }, 2000);
+                    btn.disabled = false;
+                    render();
+                }, 1500);
             })
             .catch(function(e) {
                 btn.textContent = 'ERROR';
@@ -605,7 +615,6 @@
         }
 
         function toggleWithClient(jobNumber, isWithClient) {
-            // Optimistic UI: update and re-render immediately
             var job = allJobs.find(function(j) { return j.jobNumber === jobNumber; });
             var oldValue = job ? job.withClient : null;
             
@@ -624,7 +633,6 @@
                 showToast('On it.', 'success');
             })
             .catch(function(e) {
-                // Revert on failure
                 if (job) {
                     job.withClient = oldValue;
                     render();
@@ -645,7 +653,7 @@
             .then(function(res) { return res.json(); })
             .then(function(data) { clients = data; populateClientDropdown(); })
             .catch(function() {
-                clients = [{code:'SKY',name:'Sky TV'},{code:'ONE',name:'One NZ'},{code:'HUN',name:'Hunch'},{code:'FIS',name:'Fisher Funds'},{code:'TOW',name:'Tower Insurance'}];
+                clients = [{code:'SKY',name:'Sky'},{code:'ONE',name:'One NZ'},{code:'HUN',name:'Hunch'},{code:'FIS',name:'Fisher Funds'},{code:'TOW',name:'Tower'}];
                 populateClientDropdown();
             });
         }
@@ -666,16 +674,7 @@
             .then(function(res) { return res.json(); })
             .then(function(data) { allJobs = data; render(); })
             .catch(function() {
-                allJobs = [
-                    {jobNumber:'SKY 017',jobName:'Faulty Swap/Upgrade',clientCode:'SKY',description:'Refresh the Faulty/Swap email journey',projectOwner:'Mikaila Chen',update:'Copy feedback with us',updateDue:'2026-01-09',liveDate:'2026-01-15',lastUpdated:'2026-01-06',stage:'Refine',status:'In Progress',withClient:false,channelUrl:'https://teams.microsoft.com'},
-                    {jobNumber:'SKY 018',jobName:'Offboarding Journey',clientCode:'SKY',description:'Customer offboarding sequence',projectOwner:'Mikaila Chen',update:'With Mikaila for feedback',updateDue:'2026-01-07',liveDate:'2026-01-20',lastUpdated:'2025-12-31',stage:'Simplify',status:'In Progress',withClient:true,channelUrl:'https://teams.microsoft.com'},
-                    {jobNumber:'HUN 057',jobName:'Hunch Fix for 26',clientCode:'HUN',description:'Develop Dot World',projectOwner:'Michael Goldthorpe',update:'Debugging in progress',updateDue:'2026-01-13',liveDate:'2026-01-31',lastUpdated:'2026-01-05',stage:'Craft',status:'In Progress',withClient:false,channelUrl:'https://teams.microsoft.com'},
-                    {jobNumber:'HUN 056',jobName:'Grrow Logo',clientCode:'HUN',description:'Simple logo for Grrow',projectOwner:'Michael Goldthorpe',update:'Review and feedback on logos',updateDue:'2026-01-08',liveDate:'2026-01-05',lastUpdated:'2025-12-31',stage:'Refine',status:'In Progress',withClient:true,channelUrl:'https://teams.microsoft.com'},
-                    {jobNumber:'ONE 090',jobName:'April Price Increase',clientCode:'ONE',description:'Price increase communications',projectOwner:'Sarah Chen',update:'Feedback from Jess/Anita',updateDue:'2026-01-20',liveDate:'2026-04-01',lastUpdated:'2026-01-01',stage:'Refine',status:'In Progress',withClient:false,channelUrl:'https://teams.microsoft.com'},
-                    {jobNumber:'FIS 022',jobName:'Nest Evolution',clientCode:'FIS',description:'Initial brief received',projectOwner:'Jade Jordan',update:'Initial brief received',updateDue:null,liveDate:null,lastUpdated:'2026-01-07',stage:'Triage',status:'Incoming',withClient:false,channelUrl:'https://teams.microsoft.com'},
-                    {jobNumber:'TOW 087',jobName:'8-Month Health Check',clientCode:'TOW',description:'Know your numbers',projectOwner:'Paige Buckland',update:'Concept developed',updateDue:'2026-01-06',liveDate:'2026-02-02',lastUpdated:'2026-01-06',stage:'Simplify',status:'In Progress',withClient:false,channelUrl:'https://teams.microsoft.com'},
-                    {jobNumber:'SKY 010',jobName:'Level Up',clientCode:'SKY',description:'Sky Level Up programme',projectOwner:'Glennis Chan',update:'With Sky for next steps',updateDue:'2026-01-23',liveDate:null,lastUpdated:'2025-12-31',stage:'Simplify',status:'On Hold',withClient:true,channelUrl:'https://teams.microsoft.com'}
-                ];
+                allJobs = [];
                 render();
             });
         }
