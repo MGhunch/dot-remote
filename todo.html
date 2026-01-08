@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dot What's What</title>
+    <meta name="theme-color" content="#ED1C24">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="images/icon-192.png">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; line-height: 1.5; min-height: 100vh; }
+        
+        .mobile-message { display: none; padding: 60px 24px; text-align: center; background: white; min-height: 100vh; flex-direction: column; align-items: center; justify-content: center; gap: 24px; }
+        .mobile-message img { width: 80px; }
+        .mobile-message h2 { font-size: 20px; font-weight: 600; color: #333; }
+        .mobile-message p { color: #666; font-size: 15px; }
+        .mobile-message a { display: inline-block; padding: 14px 32px; background: #ED1C24; color: white; text-decoration: none; border-radius: 24px; font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .desktop-app { display: block; }
+        @media (max-width: 768px) { .mobile-message { display: flex; } .desktop-app { display: none; } }
+        
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        /* Header - top section with logo */
+        .header-top { background: white; border-bottom: 3px solid #ED1C24; padding: 24px 32px; display: flex; justify-content: space-between; align-items: center; }
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .header-left a { display: flex; align-items: center; text-decoration: none; }
+        .client-logo { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: white; cursor: pointer; overflow: hidden; background: #f0f0f0; transition: opacity 0.15s ease; }
+        .client-logo:hover { opacity: 0.85; }
+        .client-logo img { width: 100%; height: 100%; object-fit: cover; }
+        .header-logo { height: 48px; width: auto; }
+        .header-right { display: flex; align-items: center; gap: 12px; }
+        .header-right img { height: 48px; width: auto; }
+        
+        /* Controls bar */
+        .controls-bar { background: white; padding: 20px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e5e5; position: sticky; top: 0; z-index: 100; }
+        .filter-select { padding: 8px 28px 8px 14px; border: none; border-radius: 24px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #999; background: white; cursor: pointer; min-width: 140px; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 4px center; background-size: 16px; transition: color 0.15s ease; }
+        .filter-select:hover { color: #ED1C24; }
+        .filter-select:focus { outline: none; color: #ED1C24; }
+        
+        /* Mode toggle */
+        .mode-toggle { display: flex; align-items: center; gap: 12px; }
+        .mode-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #999; cursor: pointer; transition: color 0.15s ease; }
+        .mode-label.active { color: #ED1C24; }
+        .mode-switch { position: relative; width: 44px; height: 24px; cursor: pointer; }
+        .mode-switch input { opacity: 0; width: 0; height: 0; }
+        .mode-switch-slider { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: #ED1C24; border-radius: 24px; transition: 0.2s; }
+        .mode-switch-slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .mode-switch input:checked + .mode-switch-slider:before { transform: translateX(20px); }
+        
+        main { padding: 24px 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .column { display: flex; flex-direction: column; gap: 24px; }
+        .section { }
+        .section.hidden { display: none; }
+        .section-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: #999; padding: 10px 0; margin-bottom: 8px; }
+        
+        .job-card { background: white; border-radius: 12px; padding: 16px 18px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); cursor: pointer; transition: all 0.2s ease; }
+        .job-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+        .job-card.expanded { cursor: default; }
+        .job-header { display: flex; align-items: flex-start; gap: 12px; }
+        .job-logo { width: 36px; height: 36px; border-radius: 50%; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 9px; color: white; flex-shrink: 0; overflow: hidden; margin-top: 1px; }
+        .job-logo img { width: 100%; height: 100%; object-fit: cover; }
+        .job-main { flex: 1; min-width: 0; }
+        .job-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+        .job-title { font-size: 15px; font-weight: 600; color: #333; }
+        .expand-icon { color: #ED1C24; font-size: 18px; transition: transform 0.2s ease; flex-shrink: 0; line-height: 1; margin-top: 2px; }
+        .job-card.expanded .expand-icon { transform: rotate(180deg); }
+        .job-card.compact { padding: 12px 16px; }
+        .job-card.compact .job-logo { width: 28px; height: 28px; font-size: 8px; }
+        .job-card.compact .job-title { font-size: 14px; }
+        .job-card.compact .job-meta-compact { margin-top: 6px; }
+        .job-update-preview { font-size: 13px; color: #555; margin-top: 4px; line-height: 1.4; }
+        .job-meta-compact { font-size: 12px; color: #999; display: flex; align-items: center; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+        .job-meta-compact .dot { color: #ddd; }
+        .stage-tag { background: #f0f0f0; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+        .days-ago.stale { color: #ED1C24; font-weight: 500; }
+        
+        .job-expanded { display: none; margin-top: 16px; padding-top: 16px; border-top: 1px solid #f0f0f0; }
+        .job-card.expanded .job-expanded { display: block; }
+        .section-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #999; margin-bottom: 4px; }
+        .job-description { font-size: 14px; color: #666; margin-bottom: 4px; line-height: 1.5; }
+        .job-owner { font-size: 13px; color: #666; margin-bottom: 16px; }
+        .job-controls { display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; align-items: flex-end; }
+        .control-group { display: flex; flex-direction: column; gap: 4px; }
+        .control-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #999; }
+        .control-select { padding: 8px 28px 8px 10px; border: 1.5px solid #e5e5e5; border-radius: 20px; font-size: 13px; color: #666; background: white; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; background-size: 14px; }
+        .control-select:focus { outline: none; border-color: #ED1C24; }
+        
+        .toggle { position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer; }
+        .toggle input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: #e5e5e5; border-radius: 24px; transition: 0.2s; }
+        .toggle-slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .toggle input:checked + .toggle-slider { background-color: #ED1C24; }
+        .toggle input:checked + .toggle-slider:before { transform: translateX(20px); }
+        
+        .job-dates { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+        .date-group { display: flex; flex-direction: column; gap: 4px; }
+        .date-input { padding: 8px 12px; border: 1.5px solid #e5e5e5; border-radius: 20px; font-size: 13px; font-family: inherit; color: #666; cursor: pointer; }
+        .date-input:focus { outline: none; border-color: #ED1C24; }
+        
+        .update-input { flex: 1; padding: 10px 14px; border: 1.5px solid #e5e5e5; border-radius: 24px; font-size: 13px; font-family: inherit; }
+        .update-input:focus { outline: none; border-color: #ED1C24; }
+        .update-input::placeholder { color: #bbb; }
+        .update-input.full-width { width: 66%; margin-bottom: 12px; display: block; }
+        .update-btn-row { text-align: left; margin-bottom: 16px; }
+        .update-btn-row .pill-btn { width: 66%; }
+        .pill-btn { padding: 10px 24px; background: #ED1C24; color: white; border: none; border-radius: 24px; font-size: 11px; font-weight: 600; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: background 0.15s ease; }
+        .pill-btn:hover { background: #c41820; }
+        .pill-btn:disabled { background: #ccc; cursor: not-allowed; }
+        .pill-btn.success { background: #22a822; }
+        
+        .job-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+        .teams-link { display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 10px; font-weight: 600; color: #999; text-decoration: none; text-transform: uppercase; letter-spacing: 0.5px; height: 24px; padding: 0 14px; border: 1.5px solid #e5e5e5; border-radius: 24px; transition: all 0.15s ease; }
+        .teams-link:hover { border-color: #ED1C24; color: #ED1C24; }
+        .with-client-toggle { display: flex; align-items: center; gap: 8px; }
+        .with-client-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #999; }
+        
+        .empty-section { color: #333; font-size: 16px; font-weight: 600; padding: 40px; text-align: center; background: white; border-radius: 16px; border: 2px solid #e5e5e5; display: flex; align-items: center; justify-content: center; gap: 24px; }
+        .empty-section img { width: 120px; height: auto; }
+        .loading { grid-column: 1 / -1; text-align: center; padding: 60px 24px; color: #999; }
+        .loading-spinner { width: 40px; height: 40px; border: 3px solid #e5e5e5; border-top-color: #ED1C24; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 24px; font-size: 14px; font-weight: 500; z-index: 3000; opacity: 0; transition: opacity 0.2s ease; pointer-events: none; }
+        .toast.visible { opacity: 1; }
+        .toast.error { background: #333; color: white; }
+        .toast.success { background: #22a822; color: white; }
+        
+        .pin-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; transition: opacity 0.3s ease, visibility 0.3s ease; }
+        .pin-screen.hidden { opacity: 0; visibility: hidden; }
+        .pin-logo { width: 80px; margin-bottom: 2rem; }
+        .pin-title { font-size: 14px; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1.5rem; }
+        .pin-dots { display: flex; gap: 12px; margin-bottom: 2rem; }
+        .pin-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #e5e5e5; background: transparent; transition: all 0.15s ease; }
+        .pin-dot.filled { background: #ED1C24; border-color: #ED1C24; }
+        .pin-dot.error { border-color: #ED1C24; animation: shake 0.4s ease; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        .pin-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 280px; }
+        .pin-key { width: 72px; height: 72px; border-radius: 50%; border: 1.5px solid #e5e5e5; background: #fff; font-size: 1.75rem; font-weight: 500; color: #000; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s ease; }
+        .pin-key:hover { border-color: #ED1C24; }
+        .pin-key:active { background: #f5f5f5; }
+        .pin-key.empty { border: none; background: transparent; cursor: default; }
+        .pin-key.delete { font-size: 1.25rem; }
+    </style>
+</head>
+<body>
+    <div class="toast" id="toast"></div>
+
+    <div class="pin-screen" id="pin-screen">
+        <img src="images/Robot.png" alt="Dot" class="pin-logo">
+        <p class="pin-title">Enter PIN</p>
+        <div class="pin-dots">
+            <div class="pin-dot" id="dot-0"></div>
+            <div class="pin-dot" id="dot-1"></div>
+            <div class="pin-dot" id="dot-2"></div>
+            <div class="pin-dot" id="dot-3"></div>
+        </div>
+        <div class="pin-keypad">
+            <button class="pin-key" onclick="enterPin(1)">1</button>
+            <button class="pin-key" onclick="enterPin(2)">2</button>
+            <button class="pin-key" onclick="enterPin(3)">3</button>
+            <button class="pin-key" onclick="enterPin(4)">4</button>
+            <button class="pin-key" onclick="enterPin(5)">5</button>
+            <button class="pin-key" onclick="enterPin(6)">6</button>
+            <button class="pin-key" onclick="enterPin(7)">7</button>
+            <button class="pin-key" onclick="enterPin(8)">8</button>
+            <button class="pin-key" onclick="enterPin(9)">9</button>
+            <button class="pin-key empty"></button>
+            <button class="pin-key" onclick="enterPin(0)">0</button>
+            <button class="pin-key delete" onclick="deletePin()">⌫</button>
+        </div>
+    </div>
+
+    <div class="mobile-message">
+        <img src="images/Robot.png" alt="Dot">
+        <h2>Best on desktop</h2>
+        <p>This view is designed for bigger screens.<br>Use Remote for quick actions on mobile.</p>
+        <a href="remote.html">Open Remote</a>
+    </div>
+
+    <div class="desktop-app">
+        <div class="container">
+            <div class="header-top">
+                <div class="header-left">
+                    <a href="hub.html" title="Home">
+                        <img src="images/Hub-whatswhat-header.png" alt="What's What" class="header-logo">
+                    </a>
+                </div>
+                <div class="header-right">
+                    <img src="images/dot-ai2-logo.png" alt="ai²">
+                </div>
+            </div>
+            <div class="controls-bar">
+                <select class="filter-select" id="client-filter" onchange="applyFilters()">
+                    <option value="all">All Clients</option>
+                </select>
+                <div class="mode-toggle">
+                    <span class="mode-label" id="mode-todo" onclick="setMode('todo')">TO DO</span>
+                    <label class="mode-switch">
+                        <input type="checkbox" id="mode-switch" onchange="toggleMode()">
+                        <span class="mode-switch-slider"></span>
+                    </label>
+                    <span class="mode-label" id="mode-wip" onclick="setMode('wip')">WIP</span>
+                </div>
+            </div>
+            <main id="content">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading jobs...</p>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://dot-remote-api.up.railway.app';
+        const PROXY_BASE = 'https://dot-proxy.up.railway.app';
+        
+        let currentMode = 'todo'; // 'todo' or 'wip'
+        let currentClient = 'all';
+        let allJobs = [];
+        let clients = [];
+        const CORRECT_PIN = '1919';
+        let enteredPin = '';
+
+        // PIN screen
+        if (sessionStorage.getItem('dotUnlocked') === 'true') {
+            document.getElementById('pin-screen').classList.add('hidden');
+        }
+
+        function enterPin(digit) {
+            if (enteredPin.length >= 4) return;
+            enteredPin += digit;
+            updatePinDots();
+            if (enteredPin.length === 4) setTimeout(checkPin, 150);
+        }
+
+        function deletePin() {
+            enteredPin = enteredPin.slice(0, -1);
+            updatePinDots();
+        }
+
+        function updatePinDots() {
+            for (let i = 0; i < 4; i++) {
+                const dot = document.getElementById('dot-' + i);
+                dot.classList.remove('filled', 'error');
+                if (i < enteredPin.length) dot.classList.add('filled');
+            }
+        }
+
+        function checkPin() {
+            if (enteredPin === CORRECT_PIN) {
+                sessionStorage.setItem('dotUnlocked', 'true');
+                document.getElementById('pin-screen').classList.add('hidden');
+            } else {
+                document.querySelectorAll('.pin-dot').forEach(d => d.classList.add('error'));
+                setTimeout(() => { enteredPin = ''; updatePinDots(); }, 400);
+            }
+        }
+
+        // Mode toggle
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('mode-switch').checked = (mode === 'wip');
+            updateModeLabels();
+            render();
+        }
+
+        function toggleMode() {
+            currentMode = document.getElementById('mode-switch').checked ? 'wip' : 'todo';
+            updateModeLabels();
+            render();
+        }
+
+        function updateModeLabels() {
+            document.getElementById('mode-todo').classList.toggle('active', currentMode === 'todo');
+            document.getElementById('mode-wip').classList.toggle('active', currentMode === 'wip');
+        }
+        updateModeLabels();
+
+        // Helpers
+        function formatDueDate(d) { if (!d) return 'TBC'; return new Date(d).toLocaleDateString('en-NZ', { weekday: 'short', day: 'numeric' }); }
+        function formatDateForInput(d) { if (!d) return ''; return new Date(d).toISOString().split('T')[0]; }
+        function getDaysUntilDue(d) { if (!d) return 999; return Math.ceil((new Date(d) - new Date()) / 86400000); }
+        function getDaysSinceUpdate(d) { if (!d) return 999; return Math.floor((new Date() - new Date(d)) / 86400000); }
+        function getDaysAgoClass(days) { return days > 7 ? 'days-ago stale' : 'days-ago'; }
+        function getLogoUrl(code) {
+            var logoCode = (code === 'ONB' || code === 'ONS') ? 'ONE' : code;
+            return 'images/logos/' + logoCode + '.png';
+        }
+        function handleLogoError(img) { img.onerror = null; img.src = 'images/logos/Unknown.png'; }
+
+        function applyFilters() {
+            currentClient = document.getElementById('client-filter').value;
+            render();
+        }
+
+        function getFilteredJobs() {
+            return currentClient === 'all' ? allJobs.slice() : allJobs.filter(function(j) { return j.clientCode === currentClient; });
+        }
+
+        // TO DO grouping
+        function groupByTodo(jobs) {
+            var g = { doNow: [], doSoon: [], comingUp: [], withClient: [] };
+            jobs.forEach(function(j) {
+                if (j.status === 'On Hold' || j.status === 'Completed' || j.status === 'Archived') {
+                    // Skip - not relevant for TO DO
+                }
+                else if (j.withClient) {
+                    g.withClient.push(j);
+                }
+                else if (j.status === 'Incoming') {
+                    g.comingUp.push(j);
+                }
+                else {
+                    var d = getDaysUntilDue(j.updateDue);
+                    if (d <= 1) g.doNow.push(j);
+                    else if (d <= 5) g.doSoon.push(j);
+                    else g.comingUp.push(j);
+                }
+            });
+            var s = function(a, b) { return getDaysUntilDue(a.updateDue) - getDaysUntilDue(b.updateDue); };
+            Object.values(g).forEach(function(arr) { arr.sort(s); });
+            return {
+                leftTop: { title: 'DO IT NOW', jobs: g.doNow, compact: false },
+                leftBottom: { title: 'DO IT SOON', jobs: g.doSoon, compact: false },
+                rightTop: { title: 'COMING UP', jobs: g.comingUp, compact: true },
+                rightBottom: { title: 'WITH CLIENT', jobs: g.withClient, compact: true }
+            };
+        }
+
+        // WIP grouping
+        function groupByWip(jobs) {
+            var g = { withUs: [], withYou: [], incoming: [], onHold: [] };
+            jobs.forEach(function(j) {
+                if (j.status === 'Incoming') g.incoming.push(j);
+                else if (j.status === 'On Hold') g.onHold.push(j);
+                else if (j.status === 'Completed' || j.status === 'Archived') {}
+                else if (j.withClient) g.withYou.push(j);
+                else g.withUs.push(j);
+            });
+            var s = function(a, b) { return getDaysUntilDue(a.updateDue) - getDaysUntilDue(b.updateDue); };
+            Object.values(g).forEach(function(arr) { arr.sort(s); });
+            return {
+                leftTop: { title: "WE'RE ON IT", jobs: g.withUs, compact: false },
+                rightTop: { title: 'WITH YOU', jobs: g.withYou, compact: false },
+                leftBottom: { title: 'INCOMING', jobs: g.incoming, compact: true },
+                rightBottom: { title: 'ON HOLD', jobs: g.onHold, compact: true }
+            };
+        }
+
+        function createJobCard(job) {
+            var dueDate = formatDueDate(job.updateDue);
+            var daysAgo = getDaysSinceUpdate(job.lastUpdated);
+            return '<div class="job-card" onclick="toggleCard(this)" data-job="' + job.jobNumber + '">' +
+                '<div class="job-header">' +
+                    '<div class="job-logo"><img src="' + getLogoUrl(job.clientCode) + '" alt="' + job.clientCode + '" onerror="handleLogoError(this)"></div>' +
+                    '<div class="job-main">' +
+                        '<div class="job-title-row">' +
+                            '<span class="job-title">' + job.jobNumber + ' — ' + job.jobName + '</span>' +
+                            '<span class="expand-icon">⌄</span>' +
+                        '</div>' +
+                        '<div class="job-update-preview">' + (job.update || 'No updates yet') + '</div>' +
+                        '<div class="job-meta-compact">' +
+                            '🕐 ' + dueDate +
+                            '<span class="dot">·</span>' +
+                            '<span class="stage-tag">' + job.stage + '</span>' +
+                            '<span class="dot">·</span>' +
+                            '<span class="' + getDaysAgoClass(daysAgo) + '">' + daysAgo + ' days ago</span>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="job-expanded">' +
+                    '<div class="section-label">The Project</div>' +
+                    '<div class="job-description">' + (job.description || 'No description') + '</div>' +
+                    '<div class="section-label" style="margin-top:14px">Client Owner</div>' +
+                    '<div class="job-owner">' + (job.projectOwner || 'TBC') + '</div>' +
+                    '<div class="job-controls">' +
+                        '<div class="control-group">' +
+                            '<span class="control-label">Stage</span>' +
+                            '<select class="control-select" onclick="event.stopPropagation()" data-field="stage">' +
+                                '<option' + (job.stage==='Clarify'?' selected':'') + '>Clarify</option>' +
+                                '<option' + (job.stage==='Simplify'?' selected':'') + '>Simplify</option>' +
+                                '<option' + (job.stage==='Craft'?' selected':'') + '>Craft</option>' +
+                                '<option' + (job.stage==='Refine'?' selected':'') + '>Refine</option>' +
+                                '<option' + (job.stage==='Deliver'?' selected':'') + '>Deliver</option>' +
+                            '</select>' +
+                        '</div>' +
+                        '<div class="control-group">' +
+                            '<span class="control-label">Status</span>' +
+                            '<select class="control-select" onclick="event.stopPropagation()" data-field="status">' +
+                                '<option' + (job.status==='Incoming'?' selected':'') + '>Incoming</option>' +
+                                '<option' + (job.status==='In Progress'?' selected':'') + '>In Progress</option>' +
+                                '<option' + (job.status==='On Hold'?' selected':'') + '>On Hold</option>' +
+                                '<option' + (job.status==='Completed'?' selected':'') + '>Completed</option>' +
+                            '</select>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="job-dates">' +
+                        '<div class="date-group">' +
+                            '<span class="control-label">Update Due</span>' +
+                            '<input type="date" class="date-input" value="' + formatDateForInput(job.updateDue) + '" onclick="event.stopPropagation()" data-field="updateDue">' +
+                        '</div>' +
+                        '<div class="date-group">' +
+                            '<span class="control-label">Live Date</span>' +
+                            '<input type="date" class="date-input" value="' + formatDateForInput(job.liveDate) + '" onclick="event.stopPropagation()" data-field="liveDate">' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="section-label">New Update</div>' +
+                    '<input type="text" class="update-input full-width" placeholder="What\'s the latest?" onclick="event.stopPropagation()" data-field="message">' +
+                    '<div class="update-btn-row">' +
+                        '<button class="pill-btn" onclick="event.stopPropagation();submitJobUpdate(\'' + job.jobNumber + '\',this)">UPDATE</button>' +
+                    '</div>' +
+                    '<div class="job-footer">' +
+                        '<a href="' + (job.channelUrl||'#') + '" class="teams-link" target="_blank" onclick="event.stopPropagation()">↗ TEAMS</a>' +
+                        '<div class="with-client-toggle" onclick="event.stopPropagation()">' +
+                            '<span class="with-client-label">With Client</span>' +
+                            '<label class="toggle">' +
+                                '<input type="checkbox"' + (job.withClient?' checked':'') + ' onchange="toggleWithClient(\'' + job.jobNumber + '\',this.checked)">' +
+                                '<span class="toggle-slider"></span>' +
+                            '</label>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+        }
+
+        function createJobRow(job) {
+            var dueDate = formatDueDate(job.updateDue);
+            var daysAgo = getDaysSinceUpdate(job.lastUpdated);
+            return '<div class="job-card compact" onclick="toggleCard(this)" data-job="' + job.jobNumber + '">' +
+                '<div class="job-header">' +
+                    '<div class="job-logo"><img src="' + getLogoUrl(job.clientCode) + '" alt="' + job.clientCode + '" onerror="handleLogoError(this)"></div>' +
+                    '<div class="job-main">' +
+                        '<div class="job-title-row">' +
+                            '<span class="job-title">' + job.jobNumber + ' — ' + job.jobName + '</span>' +
+                            '<span class="expand-icon">⌄</span>' +
+                        '</div>' +
+                        '<div class="job-meta-compact">' +
+                            '🕐 ' + dueDate +
+                            '<span class="dot">·</span>' +
+                            '<span class="' + getDaysAgoClass(daysAgo) + '">' + daysAgo + 'd</span>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="job-expanded">' +
+                    '<div class="section-label">The Project</div>' +
+                    '<div class="job-description">' + (job.description || 'No description') + '</div>' +
+                    '<div class="section-label" style="margin-top:14px">Client Owner</div>' +
+                    '<div class="job-owner">' + (job.projectOwner || 'TBC') + '</div>' +
+                    '<div class="job-controls">' +
+                        '<div class="control-group">' +
+                            '<span class="control-label">Stage</span>' +
+                            '<select class="control-select" onclick="event.stopPropagation()" data-field="stage">' +
+                                '<option' + (job.stage==='Clarify'?' selected':'') + '>Clarify</option>' +
+                                '<option' + (job.stage==='Simplify'?' selected':'') + '>Simplify</option>' +
+                                '<option' + (job.stage==='Craft'?' selected':'') + '>Craft</option>' +
+                                '<option' + (job.stage==='Refine'?' selected':'') + '>Refine</option>' +
+                                '<option' + (job.stage==='Deliver'?' selected':'') + '>Deliver</option>' +
+                            '</select>' +
+                        '</div>' +
+                        '<div class="control-group">' +
+                            '<span class="control-label">Status</span>' +
+                            '<select class="control-select" onclick="event.stopPropagation()" data-field="status">' +
+                                '<option' + (job.status==='Incoming'?' selected':'') + '>Incoming</option>' +
+                                '<option' + (job.status==='In Progress'?' selected':'') + '>In Progress</option>' +
+                                '<option' + (job.status==='On Hold'?' selected':'') + '>On Hold</option>' +
+                                '<option' + (job.status==='Completed'?' selected':'') + '>Completed</option>' +
+                            '</select>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="job-dates">' +
+                        '<div class="date-group">' +
+                            '<span class="control-label">Update Due</span>' +
+                            '<input type="date" class="date-input" value="' + formatDateForInput(job.updateDue) + '" onclick="event.stopPropagation()" data-field="updateDue">' +
+                        '</div>' +
+                        '<div class="date-group">' +
+                            '<span class="control-label">Live Date</span>' +
+                            '<input type="date" class="date-input" value="' + formatDateForInput(job.liveDate) + '" onclick="event.stopPropagation()" data-field="liveDate">' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="section-label">New Update</div>' +
+                    '<input type="text" class="update-input full-width" placeholder="What\'s the latest?" onclick="event.stopPropagation()" data-field="message">' +
+                    '<div class="update-btn-row">' +
+                        '<button class="pill-btn" onclick="event.stopPropagation();submitJobUpdate(\'' + job.jobNumber + '\',this)">UPDATE</button>' +
+                    '</div>' +
+                    '<div class="job-footer">' +
+                        '<a href="' + (job.channelUrl||'#') + '" class="teams-link" target="_blank" onclick="event.stopPropagation()">↗ TEAMS</a>' +
+                        '<div class="with-client-toggle" onclick="event.stopPropagation()">' +
+                            '<span class="with-client-label">With Client</span>' +
+                            '<label class="toggle">' +
+                                '<input type="checkbox"' + (job.withClient?' checked':'') + ' onchange="toggleWithClient(\'' + job.jobNumber + '\',this.checked)">' +
+                                '<span class="toggle-slider"></span>' +
+                            '</label>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+        }
+
+        function renderSection(section) {
+            // Hide empty sections
+            if (section.jobs.length === 0) {
+                return '';
+            }
+            var html = '<div class="section"><div class="section-title">' + section.title + '</div>';
+            section.jobs.forEach(function(j) {
+                html += section.compact ? createJobRow(j) : createJobCard(j);
+            });
+            html += '</div>';
+            return html;
+        }
+
+        function render() {
+            var jobs = getFilteredJobs();
+            var sections = currentMode === 'wip' ? groupByWip(jobs) : groupByTodo(jobs);
+            
+            var leftHtml = renderSection(sections.leftTop) + renderSection(sections.leftBottom);
+            var rightHtml = renderSection(sections.rightTop) + renderSection(sections.rightBottom);
+            
+            // Handle empty columns with robot
+            var emptyHtml = '<div class="empty-section"><img src="images/dot-sitting.png" alt="Dot"><span>Nothing to see here.</span></div>';
+            if (!leftHtml) leftHtml = emptyHtml;
+            if (!rightHtml) rightHtml = emptyHtml;
+            
+            document.getElementById('content').innerHTML =
+                '<div class="column">' + leftHtml + '</div>' +
+                '<div class="column">' + rightHtml + '</div>';
+        }
+
+        function toggleCard(card) { card.classList.toggle('expanded'); }
+
+        function submitJobUpdate(jobNumber, btn) {
+            var card = btn.closest('.job-card');
+            
+            var stage = card.querySelector('[data-field="stage"]').value;
+            var status = card.querySelector('[data-field="status"]').value;
+            var updateDue = card.querySelector('[data-field="updateDue"]').value;
+            var liveDate = card.querySelector('[data-field="liveDate"]').value;
+            var message = card.querySelector('[data-field="message"]').value.trim();
+            
+            btn.disabled = true;
+            btn.textContent = 'SAVING...';
+            
+            var airtablePayload = {
+                stage: stage,
+                status: status
+            };
+            if (updateDue) airtablePayload.updateDue = updateDue;
+            if (liveDate) airtablePayload.liveDate = liveDate;
+            
+            var promises = [];
+            
+            promises.push(
+                fetch(API_BASE + '/job/' + encodeURIComponent(jobNumber) + '/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(airtablePayload)
+                })
+            );
+            
+            if (message) {
+                promises.push(
+                    fetch(PROXY_BASE + '/proxy/update', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            clientCode: jobNumber.split(' ')[0], 
+                            jobNumber: jobNumber, 
+                            message: message 
+                        })
+                    })
+                );
+            }
+            
+            Promise.all(promises)
+            .then(function(responses) {
+                var allOk = responses.every(function(r) { return r.ok; });
+                if (!allOk) throw new Error('Update failed');
+                
+                var job = allJobs.find(function(j) { return j.jobNumber === jobNumber; });
+                if (job) {
+                    job.stage = stage;
+                    job.status = status;
+                    if (updateDue) job.updateDue = updateDue;
+                    if (liveDate) job.liveDate = liveDate;
+                    if (message) job.update = message;
+                }
+                
+                btn.textContent = '✓ DONE';
+                btn.classList.add('success');
+                if (message) {
+                    card.querySelector('[data-field="message"]').value = '';
+                    var preview = card.querySelector('.job-update-preview');
+                    if (preview) preview.textContent = message;
+                }
+                
+                showToast('On it.', 'success');
+                
+                setTimeout(function() { 
+                    btn.textContent = 'UPDATE'; 
+                    btn.classList.remove('success'); 
+                    btn.disabled = false;
+                    render();
+                }, 1500);
+            })
+            .catch(function(e) {
+                btn.textContent = 'ERROR';
+                showToast("Doh, that didn't work.", 'error');
+                setTimeout(function() { btn.textContent = 'UPDATE'; btn.disabled = false; }, 2000);
+            });
+        }
+
+        function toggleWithClient(jobNumber, isWithClient) {
+            var job = allJobs.find(function(j) { return j.jobNumber === jobNumber; });
+            var oldValue = job ? job.withClient : null;
+            
+            if (job) {
+                job.withClient = isWithClient;
+                render();
+            }
+            
+            fetch(API_BASE + '/job/' + encodeURIComponent(jobNumber) + '/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ withClient: isWithClient })
+            })
+            .then(function(res) {
+                if (!res.ok) throw new Error('Update failed');
+                showToast('On it.', 'success');
+            })
+            .catch(function(e) {
+                if (job) {
+                    job.withClient = oldValue;
+                    render();
+                }
+                showToast("Doh, that didn't work.", 'error');
+            });
+        }
+
+        function showToast(message, type) {
+            var toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + type + ' visible';
+            setTimeout(function() { toast.classList.remove('visible'); }, 2500);
+        }
+
+        function loadClients() {
+            fetch(API_BASE + '/clients')
+            .then(function(res) { return res.json(); })
+            .then(function(data) { clients = data; populateClientDropdown(); })
+            .catch(function() {
+                clients = [{code:'SKY',name:'Sky'},{code:'ONE',name:'One NZ'},{code:'HUN',name:'Hunch'},{code:'FIS',name:'Fisher Funds'},{code:'TOW',name:'Tower'}];
+                populateClientDropdown();
+            });
+        }
+
+        function populateClientDropdown() {
+            var sel = document.getElementById('client-filter');
+            sel.innerHTML = '<option value="all">All Clients</option>';
+            clients.forEach(function(c) {
+                var o = document.createElement('option');
+                o.value = c.code;
+                o.textContent = c.name;
+                sel.appendChild(o);
+            });
+        }
+
+        function loadJobs() {
+            fetch(API_BASE + '/jobs/all')
+            .then(function(res) { return res.json(); })
+            .then(function(data) { allJobs = data; render(); })
+            .catch(function() {
+                allJobs = [];
+                render();
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadClients();
+            loadJobs();
+        });
+    </script>
+</body>
+</html>
