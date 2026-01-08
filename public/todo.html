@@ -115,8 +115,8 @@
         .with-client-toggle { display: flex; align-items: center; gap: 8px; }
         .with-client-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #999; }
         
-        .empty-section { color: #333; font-size: 16px; font-weight: 600; padding: 40px; text-align: center; background: white; border-radius: 16px; border: 2px solid #e5e5e5; display: flex; align-items: center; justify-content: center; gap: 24px; }
-        .empty-section img { width: 120px; height: auto; }
+        .empty-section { color: #333; font-size: 14px; font-weight: 600; padding: 32px; text-align: center; background: white; border-radius: 16px; border: 2px solid #e5e5e5; display: flex; align-items: center; justify-content: center; gap: 20px; }
+        .empty-section img { width: 80px; height: auto; }
         .loading { grid-column: 1 / -1; text-align: center; padding: 60px 24px; color: #999; }
         .loading-spinner { width: 40px; height: 40px; border: 3px solid #e5e5e5; border-top-color: #ED1C24; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -296,7 +296,12 @@
         }
 
         function getFilteredJobs() {
-            return currentClient === 'all' ? allJobs.slice() : allJobs.filter(function(j) { return j.clientCode === currentClient; });
+            var jobs = currentClient === 'all' ? allJobs.slice() : allJobs.filter(function(j) { return j.clientCode === currentClient; });
+            // Exclude finance jobs (000 and 999)
+            return jobs.filter(function(j) {
+                var num = j.jobNumber.split(' ')[1];
+                return num !== '000' && num !== '999';
+            });
         }
 
         // TO DO grouping
@@ -499,14 +504,14 @@
         }
 
         function renderSection(section) {
-            // Hide empty sections
-            if (section.jobs.length === 0) {
-                return '';
-            }
             var html = '<div class="section"><div class="section-title">' + section.title + '</div>';
-            section.jobs.forEach(function(j) {
-                html += section.compact ? createJobRow(j) : createJobCard(j);
-            });
+            if (section.jobs.length === 0) {
+                html += '<div class="empty-section"><img src="images/dot-sitting.png" alt="Dot"><span>Nothing to see here.</span></div>';
+            } else {
+                section.jobs.forEach(function(j) {
+                    html += section.compact ? createJobRow(j) : createJobCard(j);
+                });
+            }
             html += '</div>';
             return html;
         }
@@ -517,11 +522,6 @@
             
             var leftHtml = renderSection(sections.leftTop) + renderSection(sections.leftBottom);
             var rightHtml = renderSection(sections.rightTop) + renderSection(sections.rightBottom);
-            
-            // Handle empty columns with robot
-            var emptyHtml = '<div class="empty-section"><img src="images/dot-sitting.png" alt="Dot"><span>Nothing to see here.</span></div>';
-            if (!leftHtml) leftHtml = emptyHtml;
-            if (!rightHtml) rightHtml = emptyHtml;
             
             document.getElementById('content').innerHTML =
                 '<div class="column">' + leftHtml + '</div>' +
