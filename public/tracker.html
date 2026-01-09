@@ -366,52 +366,12 @@
     </div>
     
     <script>
-        // ========== CLIENT DATA FROM CLIENTS TAB ==========
-        // Year end determines quarter boundaries
-        // March year end: Q1=Apr-Jun, Q2=Jul-Sep, Q3=Oct-Dec, Q4=Jan-Mar
-        // June year end: Q1=Jul-Sep, Q2=Oct-Dec, Q3=Jan-Mar, Q4=Apr-Jun
-        // September year end: Q1=Oct-Dec, Q2=Jan-Mar, Q3=Apr-Jun, Q4=Jul-Sep
+        // ========== API CONFIGURATION ==========
+        var API_BASE = 'https://dot-remote-api.up.railway.app';
         
-        var clients = {
-            'ONE': { 
-                name: 'One NZ – Marketing', 
-                quarterlyCommitted: 37500,
-                committed: 12500,
-                rollover: 0
-            },
-            'ONS': { 
-                name: 'One NZ – Simplification', 
-                quarterlyCommitted: 75000,
-                committed: 25000,
-                rollover: 22500,
-                rolloverFrom: 'Oct-Dec'
-            },
-            'ONB': { 
-                name: 'One NZ – Business', 
-                quarterlyCommitted: 37500,
-                committed: 12500,
-                rollover: 0
-            },
-            'SKY': { 
-                name: 'Sky', 
-                quarterlyCommitted: 30000,
-                committed: 10000,
-                rollover: 0
-            },
-            'TOW': { 
-                name: 'Tower', 
-                quarterlyCommitted: 30000,
-                committed: 10000,
-                rollover: 8000,
-                rolloverFrom: 'Jul-Sep'
-            },
-            'FIS': { 
-                name: 'Fisher Funds', 
-                quarterlyCommitted: 13500,
-                committed: 4500,
-                rollover: 0
-            }
-        };
+        // ========== CLIENT DATA (loaded from API) ==========
+        var clients = {};
+        var trackerData = [];
         
         // Calendar quarters (fixed) - clients just label them differently
         var calendarQuarters = {
@@ -433,113 +393,6 @@
             'SKY': 'Q3',
             'TOW': 'Q2',
             'FIS': 'Q4'
-        };
-        
-        // Tracker data from Airtable CSV export
-        var trackerData = [
-            // TOW - Tower
-            { client: 'TOW', jobNumber: 'TOW 087', projectName: '8-Month Health Check', owner: 'Paige Buckland', description: 'Simple Strategy', spend: 5000, month: 'January', spendType: 'Project budget' },
-            { client: 'TOW', jobNumber: 'TOW 083', projectName: 'Great Summer Promo', owner: 'Paige Buckland', description: 'Concept and Comms', spend: 3000, month: 'January', spendType: 'Project budget' },
-            { client: 'TOW', jobNumber: 'TOW 000', projectName: 'Always on', owner: 'Dino Ligouri', description: 'Wips/Meetings/Consult etc.', spend: 1000, month: 'October', spendType: 'Project budget' },
-            { client: 'TOW', jobNumber: 'TOW 000', projectName: 'Always on', owner: 'Dino Ligouri', description: 'Wips/Meetings/Consult etc.', spend: 1000, month: 'November', spendType: 'Project budget' },
-            { client: 'TOW', jobNumber: 'TOW 000', projectName: 'Always on', owner: 'Dino Ligouri', description: 'Wips/Meetings/Consult etc.', spend: 1000, month: 'December', spendType: 'Project budget' },
-            { client: 'TOW', jobNumber: 'TOW 000', projectName: 'Always on', owner: 'Dino Ligouri', description: 'Wips/Meetings/Consult etc.', spend: 1000, month: 'January', spendType: 'Project budget' },
-            { client: 'TOW', jobNumber: 'TOW 070', projectName: 'Email Tips', owner: '', description: 'Final tweaks on Email Tips', spend: 1000, month: 'December', spendType: 'Project budget' },
-            { client: 'TOW', jobNumber: 'TOW 070', projectName: 'Email Tips', owner: '', description: 'Refining tips', spend: 3000, month: 'October', spendType: 'Project budget' },
-            { client: 'TOW', jobNumber: 'TOW 086', projectName: 'Medalists', owner: '', description: 'Refining tips', spend: 2000, month: 'November', spendType: 'Project budget' },
-            { client: 'TOW', jobNumber: 'TOW 999', projectName: 'Home Elsewhere Cross-Sell email', owner: 'Tali Abercrombie', description: 'Announcing the top 100 nominations', spend: 3000, month: 'October', spendType: 'Project budget' },
-            { client: 'TOW', jobNumber: 'TOW 998', projectName: 'RBP - Cross-Sell module', owner: 'Tali Abercrombie', description: 'TBC - Likely Oct', spend: 5000, month: 'October', spendType: 'Project budget' },
-            { client: 'TOW', jobNumber: 'TOW 083', projectName: 'Great Summer Promo', owner: 'Paige Buckland', description: 'Email programme of giveaways over Summer.', spend: 5000, month: 'October', spendType: 'Project budget' },
-            
-            // ONE - Marketing
-            { client: 'ONE', jobNumber: 'ONE 090', projectName: 'April Price Increase', owner: 'Jess Downey', description: 'Email set up for Pete', spend: 3000, month: 'November', spendType: 'Project budget' },
-            { client: 'ONE', jobNumber: 'ONE 090', projectName: 'April Price Increase', owner: 'Jess Downey', description: 'Craft of first round comms', spend: 4000, month: 'December', spendType: 'Project budget' },
-            { client: 'ONE', jobNumber: 'ONE 090', projectName: 'April Price Increase', owner: 'Jess Downey', description: 'Tweaks to first round comms', spend: 1000, month: 'December', spendType: 'Project budget' },
-            { client: 'ONE', jobNumber: 'ONE 000', projectName: 'Always on', owner: 'Katherine Kazalbash', description: 'Wips/Meetings/Consult etc.', spend: 1250, month: 'October', spendType: 'Project budget' },
-            { client: 'ONE', jobNumber: 'ONE 000', projectName: 'Always on', owner: 'Katherine Kazalbash', description: 'Wips/Meetings/Consult etc.', spend: 1250, month: 'November', spendType: 'Project budget' },
-            { client: 'ONE', jobNumber: 'ONE 000', projectName: 'Always on', owner: 'Katherine Kazalbash', description: 'Wips/Meetings/Consult etc.', spend: 1250, month: 'December', spendType: 'Project budget' },
-            { client: 'ONE', jobNumber: 'ONE 000', projectName: 'Always on', owner: 'Katherine Kazalbash', description: 'Wips/Meetings/Consult etc.', spend: 1250, month: 'January', spendType: 'Project budget' },
-            { client: 'ONE', jobNumber: 'ONE 091', projectName: 'Prepay Free Data Weekends', owner: 'Catherine Preitner', description: 'To clarify brief and outputs', spend: 8000, month: 'December', spendType: 'Project budget' },
-            { client: 'ONE', jobNumber: 'ONE 091', projectName: 'Prepay Free Data Weekends', owner: 'Catherine Preitner', description: 'Craft SMS for prepay+ free data', spend: 3000, month: 'November', spendType: 'Project budget' },
-            { client: 'ONE', jobNumber: 'ONE 092', projectName: 'Online Eftpos Launch', owner: 'Pete Douglas Bell', description: 'Craft SMS for prepay+ free data', spend: 6000, month: 'December', spendType: 'Project budget' },
-            { client: 'ONE', jobNumber: 'ONE 093', projectName: 'Win One Give One', owner: 'Anita Campbell', description: 'Refine email copy', spend: 3000, month: 'November', spendType: 'Project budget' },
-            { client: 'ONE', jobNumber: 'ONE 066', projectName: 'Email Design System', owner: 'Anita Campbell', description: 'Create a succinct story', spend: 8000, month: 'December', spendType: 'Project budget' },
-            { client: 'ONE', jobNumber: 'ONE 066', projectName: 'Email Design System', owner: 'Anita Campbell', description: 'Update existing programme comms', spend: 12000, month: 'October', spendType: 'Project budget' },
-            { client: 'ONE', jobNumber: 'ONE 066', projectName: 'Email Design System', owner: 'Anita Campbell', description: 'Tweaks and consult on guidelines', spend: 1000, month: 'October', spendType: 'Project on us' },
-            { client: 'ONE', jobNumber: 'ONE 066', projectName: 'Email Design System', owner: 'Anita Campbell', description: 'Tweaks and consult on guidelines', spend: 1000, month: 'November', spendType: 'Project on us' },
-            
-            // ONB - Business
-            { client: 'ONB', jobNumber: 'ONB 094', projectName: 'Adaptive Armour', owner: 'Salah Mohammed', description: 'Clarify brief', spend: 3000, month: 'December', spendType: 'Project budget' },
-            { client: 'ONB', jobNumber: 'ONB 094', projectName: 'Adaptive Armour', owner: 'Salah Mohammed', description: 'Craft of story/principles', spend: 3000, month: 'January', spendType: 'Project budget' },
-            { client: 'ONB', jobNumber: 'ONB 094', projectName: 'Adaptive Armour', owner: 'Salah Mohammed', description: 'Refinements', spend: 4000, month: 'November', spendType: 'Project budget' },
-            { client: 'ONB', jobNumber: 'ONB 000', projectName: 'Always on', owner: 'Keith Goi', description: 'Wips/Meetings/Consult etc.', spend: 1250, month: 'October', spendType: 'Project budget' },
-            { client: 'ONB', jobNumber: 'ONB 000', projectName: 'Always on', owner: 'Keith Goi', description: 'Wips/Meetings/Consult etc.', spend: 1250, month: 'November', spendType: 'Project budget' },
-            { client: 'ONB', jobNumber: 'ONB 000', projectName: 'Always on', owner: 'Keith Goi', description: 'Wips/Meetings/Consult etc.', spend: 1250, month: 'December', spendType: 'Project budget' },
-            { client: 'ONB', jobNumber: 'ONB 000', projectName: 'Always on', owner: 'Keith Goi', description: 'Wips/Meetings/Consult etc.', spend: 1250, month: 'January', spendType: 'Project budget' },
-            { client: 'ONB', jobNumber: 'ONB 083', projectName: 'Business First 30 Days', owner: 'Anita Campbell', description: 'Refine EDM to fit business customers', spend: 10000, month: 'October', spendType: 'Project budget' },
-            { client: 'ONB', jobNumber: 'ONB 083', projectName: 'Business First 30 Days', owner: 'Anita Campbell', description: 'Refine EDM to fit business customers', spend: 10000, month: 'November', spendType: 'Project budget' },
-            { client: 'ONB', jobNumber: 'ONB 086', projectName: 'Business RFP', owner: 'Sophie Kerkin', description: 'Refine EDM', spend: 2000, month: 'December', spendType: 'Project budget' },
-            { client: 'ONB', jobNumber: 'ONB 069', projectName: 'Staff Plans', owner: 'Beth Laughton', description: 'Create consistency in bids & RFPs', spend: 3000, month: 'October', spendType: 'Project budget' },
-            { client: 'ONB', jobNumber: 'ONB 088', projectName: 'Business IFP First 100 Days', owner: 'Beth Laughton', description: 'Design tweaks', spend: 1000, month: 'October', spendType: 'Project budget' },
-            { client: 'ONB', jobNumber: 'ONB 089', projectName: 'ESM Packs', owner: 'Sophie Kerkin', description: 'Weekend job', spend: 3000, month: 'November', spendType: 'Project budget' },
-            
-            // ONS - Simplification
-            { client: 'ONS', jobNumber: 'ONS 076', projectName: '3G FWA Closure', owner: 'Tracey Barclay', description: 'Comms for multiple versions/outputs', spend: 10000, month: 'October', spendType: 'Project budget' },
-            { client: 'ONS', jobNumber: 'ONS 078', projectName: 'HFC Shutdown', owner: 'Tracey Barclay', description: 'Additional artwork', spend: 3000, month: 'November', spendType: 'Project budget' },
-            { client: 'ONS', jobNumber: 'ONS 088', projectName: 'Monthly consult/fix ups (ad hoc)', owner: 'Tracey Barclay', description: 'Monthly consult/fix ups', spend: 10000, month: 'October', spendType: 'Project budget' },
-            { client: 'ONS', jobNumber: 'ONS 088', projectName: 'Monthly consult/fix ups (ad hoc)', owner: 'Tracey Barclay', description: 'Monthly consult/fix ups', spend: 5000, month: 'November', spendType: 'Project budget' },
-            { client: 'ONS', jobNumber: 'ONS 088', projectName: 'Monthly consult/fix ups (ad hoc)', owner: 'Tracey Barclay', description: 'Monthly consult/fix ups', spend: 5000, month: 'December', spendType: 'Project budget' },
-            { client: 'ONS', jobNumber: 'ONS 088', projectName: 'Monthly consult/fix ups (ad hoc)', owner: 'Tracey Barclay', description: 'Monthly consult/fix ups', spend: 5000, month: 'January', spendType: 'Project budget' },
-            { client: 'ONS', jobNumber: 'ONS 089', projectName: 'Red Share 5+', owner: 'Laura Nyberg', description: 'Email comms', spend: 12000, month: 'November', spendType: 'Project budget' },
-            { client: 'ONS', jobNumber: 'ONS 000', projectName: 'Always on', owner: 'Tracey Barclay', description: 'Wips/Meetings/Consult etc.', spend: 2500, month: 'October', spendType: 'Project budget' },
-            { client: 'ONS', jobNumber: 'ONS 000', projectName: 'Always on', owner: 'Tracey Barclay', description: 'Wips/Meetings/Consult etc.', spend: 2500, month: 'November', spendType: 'Project budget' },
-            { client: 'ONS', jobNumber: 'ONS 000', projectName: 'Always on', owner: 'Tracey Barclay', description: 'Wips/Meetings/Consult etc.', spend: 2500, month: 'December', spendType: 'Project budget' },
-            { client: 'ONS', jobNumber: 'ONS 000', projectName: 'Always on', owner: 'Tracey Barclay', description: 'Wips/Meetings/Consult etc.', spend: 2500, month: 'January', spendType: 'Project budget' },
-            
-            // SKY
-            { client: 'SKY', jobNumber: 'SKY 015', projectName: 'Neon Churn Journey', owner: '', description: 'Email sequence rework', spend: 2000, month: 'October', spendType: 'Extra budget' },
-            { client: 'SKY', jobNumber: 'SKY 009', projectName: 'Project Fair', owner: 'Glennis Chan', description: 'Support with customer churn journey strategy', spend: 5000, month: 'October', spendType: 'Project budget' },
-            { client: 'SKY', jobNumber: 'SKY 012', projectName: 'Customer Journeys', owner: 'Cindy Carelton', description: 'Social campaign', spend: 5000, month: 'October', spendType: 'Project budget' },
-            { client: 'SKY', jobNumber: 'SKY 012', projectName: 'Customer Journeys', owner: 'Cindy Carelton', description: 'First 30 days welcome journey', spend: 10000, month: 'October', spendType: 'Project budget' },
-            { client: 'SKY', jobNumber: 'SKY 016', projectName: 'Project Upgrade', owner: 'Maja Lee', description: 'First 30 days welcome journey', spend: 3000, month: 'November', spendType: 'Project budget' },
-            { client: 'SKY', jobNumber: 'SKY 017', projectName: 'Faulty Swap/Upgrade', owner: 'Mikaila Watts', description: 'Strategy work', spend: 5000, month: 'November', spendType: 'Project budget' },
-            { client: 'SKY', jobNumber: 'SKY 018', projectName: 'Offboarding Journey', owner: 'Mikaila Watts', description: 'Refine device swaps journey', spend: 4000, month: 'November', spendType: 'Project budget' },
-            { client: 'SKY', jobNumber: 'SKY 999', projectName: 'Partner Offer Name', owner: 'Glennis Chan', description: 'Rework journey', spend: 8000, month: 'December', spendType: 'Project budget' },
-            { client: 'SKY', jobNumber: 'SKY 998', projectName: 'Price Increase Template', owner: 'Maja Lee', description: 'Extension from Friends and Whanau', spend: 1500, month: 'October', spendType: 'Project budget' },
-            { client: 'SKY', jobNumber: 'SKY 014', projectName: 'Anniversary Programme', owner: '', description: 'Price increase template', spend: 3000, month: 'October', spendType: 'Project budget' },
-            { client: 'SKY', jobNumber: 'SKY 000', projectName: 'Always on', owner: 'Glennis Chan', description: 'Wips/Meetings/Consult etc.', spend: 1000, month: 'October', spendType: 'Project budget' },
-            { client: 'SKY', jobNumber: 'SKY 000', projectName: 'Always on', owner: 'Glennis Chan', description: 'Wips/Meetings/Consult etc.', spend: 1000, month: 'November', spendType: 'Project budget' },
-            { client: 'SKY', jobNumber: 'SKY 000', projectName: 'Always on', owner: 'Glennis Chan', description: 'Wips/Meetings/Consult etc.', spend: 1000, month: 'December', spendType: 'Project budget' },
-            { client: 'SKY', jobNumber: 'SKY 000', projectName: 'Always on', owner: 'Glennis Chan', description: 'Wips/Meetings/Consult etc.', spend: 1000, month: 'January', spendType: 'Project budget' },
-            
-            // FIS - Fisher Funds
-            { client: 'FIS', jobNumber: 'FIS 022', projectName: 'Nest Evolution Strategy', owner: 'Jade Jordan', description: 'Simple strategy', spend: 0, month: 'January', spendType: 'Project on us' },
-            { client: 'FIS', jobNumber: 'FIS 020', projectName: 'December Nest', owner: '', description: 'Intros for the email', spend: 1500, month: 'October', spendType: 'Project budget' },
-            { client: 'FIS', jobNumber: 'FIS 016', projectName: 'October Nest', owner: 'Alexandra Jackman', description: 'Intros for the email', spend: 1500, month: 'December', spendType: 'Project budget' },
-            { client: 'FIS', jobNumber: 'FIS 019', projectName: 'November Nest', owner: 'Jade Jordan', description: '', spend: 2000, month: 'October', spendType: 'Project budget' },
-            { client: 'FIS', jobNumber: 'FIS 021', projectName: 'Proof Points One Pager', owner: '', description: '2 blogs', spend: 4000, month: 'November', spendType: 'Project budget' },
-            { client: 'FIS', jobNumber: 'FIS 020', projectName: 'December Nest', owner: '', description: 'Recraft copy', spend: 3000, month: 'November', spendType: 'Project budget' },
-            { client: 'FIS', jobNumber: 'FIS 020', projectName: 'December Nest', owner: '', description: 'MTMOYM Blog refinement', spend: 2000, month: 'December', spendType: 'Project budget' },
-            { client: 'FIS', jobNumber: 'FIS 000', projectName: 'Always on', owner: 'Alexandra Jackman', description: 'Wips/Meetings/Consult etc.', spend: 450, month: 'October', spendType: 'Project budget' },
-            { client: 'FIS', jobNumber: 'FIS 000', projectName: 'Always on', owner: 'Alexandra Jackman', description: 'Wips/Meetings/Consult etc.', spend: 450, month: 'November', spendType: 'Project budget' },
-            { client: 'FIS', jobNumber: 'FIS 000', projectName: 'Always on', owner: 'Alexandra Jackman', description: 'Wips/Meetings/Consult etc.', spend: 450, month: 'January', spendType: 'Project budget' },
-            
-            // Extra budget and On Us examples
-            { client: 'ONS', jobNumber: 'ONS 091', projectName: 'Emergency Campaign', owner: 'Tracey Barclay', description: 'Rush job outside retainer', spend: 8000, month: 'January', spendType: 'Extra budget' },
-            { client: 'SKY', jobNumber: 'SKY 020', projectName: 'Brand Guidelines Update', owner: 'Glennis Chan', description: 'Favour for the team', spend: 2500, month: 'January', spendType: 'Project on us' },
-            { client: 'TOW', jobNumber: 'TOW 015', projectName: 'App Store Screenshots', owner: 'Dino Ligouri', description: 'Quick turnaround request', spend: 3500, month: 'January', spendType: 'Extra budget' }
-        ];
-        
-        // Historical data - REAL Oct-Dec 2025 actuals from old tracker
-        // This is now "previous quarter" for clients on March year end (Q3)
-        // For display purposes, showing as previous quarter comparison
-        var historicalData = {
-            'ONS': { m1: 22500, m2: 27500, m3: 12500 },  // Oct, Nov, Dec - Simplification
-            'ONE': { m1: 21500, m2: 33500, m3: 26500 },  // Oct, Nov, Dec - Consumer & Business (combined in old system, now split)
-            'ONB': { m1: 10000, m2: 15000, m3: 12000 },  // Estimated split from ONE
-            'SKY': { m1: 32500, m2: 12000, m3: 8000 },   // Oct, Nov, Dec - Always On + Other combined
-            'TOW': { m1: 9000, m2: 3000, m3: 1000 },     // Oct, Nov, Dec - Always On + Other combined
-            'FIS': { m1: 3500, m2: 7000, m3: 4500 }      // Oct, Nov, Dec - The Nest
         };
         
         var currentClient = 'ONS';
@@ -943,10 +796,7 @@
         }
         
         // Event listeners
-        document.getElementById('clientFilter').addEventListener('change', function() {
-            currentClient = this.value;
-            render();
-        });
+        // Client filter is handled by async handler at bottom
         
         document.getElementById('monthFilter').addEventListener('change', function() {
             currentMonth = this.value;
@@ -1073,8 +923,102 @@
             updateBallparkUI(this.checked);
         });
         
-        // Initial render
-        render();
+        // ========== API LOADING ==========
+        async function loadClients() {
+            try {
+                var response = await fetch(API_BASE + '/tracker/clients');
+                var data = await response.json();
+                
+                // Populate clients object
+                data.forEach(function(c) {
+                    clients[c.code] = {
+                        name: c.name,
+                        committed: c.committed,
+                        quarterlyCommitted: c.committed * 3,
+                        rollover: c.rollover || 0,
+                        rolloverFrom: c.rolloverFrom || '',
+                        yearEnd: c.yearEnd,
+                        currentQuarter: c.currentQuarter
+                    };
+                });
+                
+                // Populate client dropdown
+                var select = document.getElementById('clientFilter');
+                select.innerHTML = '';
+                data.forEach(function(c) {
+                    var option = document.createElement('option');
+                    option.value = c.code;
+                    option.textContent = c.name;
+                    select.appendChild(option);
+                });
+                
+                // Set first client as default
+                if (data.length > 0) {
+                    currentClient = data[0].code;
+                }
+                
+                return true;
+            } catch (e) {
+                console.error('Failed to load clients:', e);
+                return false;
+            }
+        }
+        
+        async function loadTrackerData(clientCode) {
+            try {
+                var response = await fetch(API_BASE + '/tracker/data?client=' + clientCode);
+                var data = await response.json();
+                
+                // Transform to match expected format
+                trackerData = data.map(function(d) {
+                    return {
+                        id: d.id,
+                        client: d.client,
+                        jobNumber: d.jobNumber,
+                        projectName: d.projectName,
+                        owner: d.owner,
+                        description: d.description,
+                        spend: d.spend,
+                        month: d.month,
+                        spendType: d.spendType,
+                        ballpark: d.ballpark
+                    };
+                });
+                
+                return true;
+            } catch (e) {
+                console.error('Failed to load tracker data:', e);
+                return false;
+            }
+        }
+        
+        async function init() {
+            // Show loading state
+            document.querySelector('main').style.opacity = '0.5';
+            
+            // Load clients first
+            await loadClients();
+            
+            // Load tracker data for default client
+            await loadTrackerData(currentClient);
+            
+            // Restore opacity and render
+            document.querySelector('main').style.opacity = '1';
+            render();
+        }
+        
+        // Update client change handler to reload data
+        var originalClientFilter = document.getElementById('clientFilter');
+        originalClientFilter.addEventListener('change', async function() {
+            currentClient = this.value;
+            document.querySelector('main').style.opacity = '0.5';
+            await loadTrackerData(currentClient);
+            document.querySelector('main').style.opacity = '1';
+            render();
+        });
+        
+        // Initialize
+        init();
     </script>
 </body>
 </html>
