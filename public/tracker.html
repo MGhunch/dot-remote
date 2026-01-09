@@ -511,15 +511,28 @@
             var client = clients[currentClient];
             var committed = client.committed;
             var rollover = client.rollover || 0;
-            var rolloverFrom = client.rolloverFrom || '';
+            var rolloverUseIn = client.rolloverUseIn || '';
             
             // Get quarter info based on selected month (not hardcoded current quarter)
             var qInfo = getQuarterInfoForMonth(currentClient, currentMonth);
             var prevQ = getPreviousQuarter(currentClient);
             
+            // Convert qInfo.label to match rolloverUseIn format
+            // e.g., "Jan › Mar" -> "JAN-MAR" or "Oct › Dec" -> "OCT-DEC"
+            var labelMap = {
+                'Jan › Mar': 'JAN-MAR',
+                'Apr › Jun': 'APR-JUN', 
+                'Jul › Sep': 'JUL-SEP',
+                'Oct › Dec': 'OCT-DEC'
+            };
+            var viewedQuarterKey = labelMap[qInfo.label] || '';
+            
             console.log('Render - currentClient:', currentClient);
             console.log('Render - currentMonth:', currentMonth);
             console.log('Render - qInfo:', qInfo);
+            console.log('Render - qInfo.label:', qInfo.label);
+            console.log('Render - viewedQuarterKey:', viewedQuarterKey);
+            console.log('Render - rolloverUseIn:', rolloverUseIn);
             console.log('Render - trackerData length:', trackerData.length);
             console.log('Render - sample trackerData[0].client:', trackerData[0] ? trackerData[0].client : 'none');
             
@@ -553,12 +566,16 @@
             document.getElementById('committedValue').textContent = formatCurrency(committed * monthsInQuarter);
             document.getElementById('toDateValue').textContent = formatCurrency(toDate);
             
-            // Show rollover credit in both views when there's rollover
+            // Show rollover credit only when viewing the quarter it applies to
             var rolloverEl = document.getElementById('rolloverCredit');
-            if (rollover > 0) {
+            var showRollover = rollover > 0 && rolloverUseIn && viewedQuarterKey === rolloverUseIn;
+            
+            if (showRollover) {
                 rolloverEl.style.display = 'block';
                 document.getElementById('rolloverAmount').textContent = '+' + formatCurrency(rollover);
-                document.getElementById('rolloverFrom').textContent = 'credit from ' + rolloverFrom;
+                // Show where the credit came from (previous quarter)
+                var fromLabel = prevQ.quarter + ' (' + prevQ.label + ')';
+                document.getElementById('rolloverFrom').textContent = 'credit from ' + fromLabel;
             } else {
                 rolloverEl.style.display = 'none';
             }
@@ -1041,12 +1058,12 @@
         
         // Fallback data for testing when API is unavailable
         var fallbackClients = [
-            { code: 'ONS', name: 'One NZ – Simplification', committed: 25000, rollover: 0, rolloverFrom: '', yearEnd: 'March', currentQuarter: 'Q4' },
-            { code: 'ONE', name: 'One NZ – Marketing', committed: 12500, rollover: 2400, rolloverFrom: 'Q3', yearEnd: 'March', currentQuarter: 'Q4' },
-            { code: 'ONB', name: 'One NZ – Business', committed: 12500, rollover: 0, rolloverFrom: '', yearEnd: 'March', currentQuarter: 'Q4' },
-            { code: 'SKY', name: 'Sky', committed: 10000, rollover: 0, rolloverFrom: '', yearEnd: 'June', currentQuarter: 'Q3' },
-            { code: 'TOW', name: 'Tower', committed: 10000, rollover: 1500, rolloverFrom: 'Q1', yearEnd: 'September', currentQuarter: 'Q2' },
-            { code: 'FIS', name: 'Fisher Funds', committed: 4500, rollover: 500, rolloverFrom: 'Q3', yearEnd: 'March', currentQuarter: 'Q4' }
+            { code: 'ONS', name: 'One NZ – Simplification', committed: 25000, rollover: 0, rolloverUseIn: '', yearEnd: 'March', currentQuarter: 'Q4' },
+            { code: 'ONE', name: 'One NZ – Marketing', committed: 12500, rollover: 2400, rolloverUseIn: 'JAN-MAR', yearEnd: 'March', currentQuarter: 'Q4' },
+            { code: 'ONB', name: 'One NZ – Business', committed: 12500, rollover: 0, rolloverUseIn: '', yearEnd: 'March', currentQuarter: 'Q4' },
+            { code: 'SKY', name: 'Sky', committed: 10000, rollover: 0, rolloverUseIn: '', yearEnd: 'June', currentQuarter: 'Q3' },
+            { code: 'TOW', name: 'Tower', committed: 10000, rollover: 1500, rolloverUseIn: 'JAN-MAR', yearEnd: 'September', currentQuarter: 'Q2' },
+            { code: 'FIS', name: 'Fisher Funds', committed: 4500, rollover: 500, rolloverUseIn: 'JAN-MAR', yearEnd: 'March', currentQuarter: 'Q4' }
         ];
         
         var fallbackTrackerData = {
@@ -1081,7 +1098,7 @@
                     committed: c.committed,
                     quarterlyCommitted: c.committed * 3,
                     rollover: c.rollover || 0,
-                    rolloverFrom: c.rolloverFrom || '',
+                    rolloverUseIn: c.rolloverUseIn || '',
                     yearEnd: c.yearEnd,
                     currentQuarter: c.currentQuarter
                 };
