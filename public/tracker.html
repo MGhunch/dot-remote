@@ -79,8 +79,8 @@
         .progress-fill.over { background: #f59e0b; }
         .rollover-credit { margin-top: 16px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
         .rollover-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: #999; margin-bottom: 4px; }
-        .rollover-amount { font-size: 13px; color: #333; }
-        .rollover-amount strong { font-weight: 700; }
+        .rollover-amount { font-size: 13px; color: #666; }
+        .rollover-amount strong { font-weight: 600; color: #666; }
         
         /* Projects table */
         .projects-section { background: white; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
@@ -573,9 +573,8 @@
             if (showRollover) {
                 rolloverEl.style.display = 'block';
                 document.getElementById('rolloverAmount').textContent = '+' + formatCurrency(rollover);
-                // Show where the credit came from (previous quarter)
-                var fromLabel = prevQ.quarter + ' (' + prevQ.label + ')';
-                document.getElementById('rolloverFrom').textContent = 'credit from ' + fromLabel;
+                // Show where the credit came from (previous quarter label only)
+                document.getElementById('rolloverFrom').textContent = 'credit from ' + prevQ.quarter;
             } else {
                 rolloverEl.style.display = 'none';
             }
@@ -1108,16 +1107,31 @@
             var menu = document.getElementById('clientMenu');
             var trigger = document.getElementById('clientTrigger');
             menu.innerHTML = '';
+            
+            // Check for remembered client
+            var lastClient = localStorage.getItem('trackerLastClient');
+            var defaultClient = null;
+            var defaultClientName = '';
+            
             data.forEach(function(c, idx) {
                 var option = document.createElement('div');
-                option.className = 'custom-dropdown-option' + (idx === 0 ? ' selected' : '');
+                var isDefault = lastClient ? (c.code === lastClient) : (idx === 0);
+                option.className = 'custom-dropdown-option' + (isDefault ? ' selected' : '');
                 option.dataset.value = c.code;
                 option.textContent = c.name;
                 menu.appendChild(option);
+                
+                if (isDefault) {
+                    defaultClient = c.code;
+                    defaultClientName = c.name;
+                }
             });
             
-            // Set first client as default
-            if (data.length > 0) {
+            // Set default client (remembered or first)
+            if (defaultClient) {
+                currentClient = defaultClient;
+                trigger.querySelector('span').textContent = defaultClientName;
+            } else if (data.length > 0) {
                 currentClient = data[0].code;
                 trigger.querySelector('span').textContent = data[0].name;
             }
@@ -1125,6 +1139,7 @@
             // Setup client dropdown handler
             setupCustomDropdown('clientTrigger', 'clientMenu', async function(value) {
                 currentClient = value;
+                localStorage.setItem('trackerLastClient', value);
                 document.querySelector('main').style.opacity = '0.5';
                 await loadTrackerData(currentClient);
                 document.querySelector('main').style.opacity = '1';
