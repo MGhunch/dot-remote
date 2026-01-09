@@ -496,6 +496,12 @@
             var qInfo = getQuarterInfoForMonth(currentClient, currentMonth);
             var prevQ = getPreviousQuarter(currentClient);
             
+            console.log('Render - currentClient:', currentClient);
+            console.log('Render - currentMonth:', currentMonth);
+            console.log('Render - qInfo:', qInfo);
+            console.log('Render - trackerData length:', trackerData.length);
+            console.log('Render - sample trackerData[0].client:', trackerData[0] ? trackerData[0].client : 'none');
+            
             // Update quarter context
             document.getElementById('quarterContext').textContent = qInfo.quarter + ' (' + qInfo.label + ')';
             
@@ -892,23 +898,58 @@
             currentEditData = null;
         }
         
-        function saveProject() {
+        async function saveProject() {
             if (!currentEditData) return;
             
-            // Update the data (mocked - would call Airtable API here)
-            currentEditData.projectName = document.getElementById('editProjectName').value;
-            currentEditData.owner = document.getElementById('editOwner').value;
-            currentEditData.description = document.getElementById('editDescription').value;
-            currentEditData.spend = parseFloat(document.getElementById('editSpend').value) || 0;
-            currentEditData.month = document.getElementById('editMonth').value;
-            currentEditData.spendType = document.getElementById('editSpendType').value;
-            currentEditData.ballpark = document.getElementById('editBallpark').checked;
+            // Get values from form
+            var updates = {
+                id: currentEditData.id,
+                description: document.getElementById('editDescription').value,
+                spend: parseFloat(document.getElementById('editSpend').value) || 0,
+                month: document.getElementById('editMonth').value,
+                spendType: document.getElementById('editSpendType').value,
+                ballpark: document.getElementById('editBallpark').checked
+            };
             
-            // TODO: Call Airtable API here
-            console.log('Saving to Airtable (mocked):', currentEditData);
+            // Show saving state
+            var saveBtn = document.querySelector('.btn-primary');
+            var originalText = saveBtn.textContent;
+            saveBtn.textContent = 'Saving...';
+            saveBtn.disabled = true;
             
-            closeModal();
-            render();
+            try {
+                var response = await fetch(API_BASE + '/tracker/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updates)
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to save');
+                }
+                
+                var result = await response.json();
+                console.log('Saved to Airtable:', result);
+                
+                // Update local data
+                currentEditData.description = updates.description;
+                currentEditData.spend = updates.spend;
+                currentEditData.month = updates.month;
+                currentEditData.spendType = updates.spendType;
+                currentEditData.ballpark = updates.ballpark;
+                
+                closeModal();
+                
+                // Reload data to ensure sync
+                await loadTrackerData(currentClient);
+                render();
+                
+            } catch (e) {
+                console.error('Save failed:', e);
+                alert('Failed to save. Please try again.');
+                saveBtn.textContent = originalText;
+                saveBtn.disabled = false;
+            }
         }
         
         // Close modal on overlay click
