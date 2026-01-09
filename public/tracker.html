@@ -969,8 +969,11 @@
         
         async function loadTrackerData(clientCode) {
             try {
+                console.log('Loading tracker data for:', clientCode);
                 var response = await fetch(API_BASE + '/tracker/data?client=' + clientCode);
                 var data = await response.json();
+                console.log('API returned:', data.length, 'records');
+                console.log('First record:', data[0]);
                 
                 // Transform to match expected format
                 trackerData = data.map(function(d) {
@@ -987,6 +990,9 @@
                         ballpark: d.ballpark
                     };
                 });
+                
+                console.log('trackerData now has:', trackerData.length, 'records');
+                console.log('Sample transformed:', trackerData[0]);
                 
                 return true;
             } catch (e) {
