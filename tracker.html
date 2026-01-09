@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dot Tracker</title>
+    <meta name="theme-color" content="#ED1C24">
+    <link rel="icon" href="images/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; line-height: 1.5; min-height: 100vh; }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+        
+        /* Header */
+        .header-top { background: white; border-bottom: 3px solid #ED1C24; padding: 24px 0; }
+        .header-inner { max-width: 1200px; margin: 0 auto; padding: 0 32px; display: flex; justify-content: space-between; align-items: center; }
+        .header-left { display: flex; align-items: center; }
+        .header-left a { display: flex; align-items: center; text-decoration: none; }
+        .header-logo { height: 48px; width: auto; }
+        .header-right { display: flex; align-items: center; }
+        .header-ai-logo { height: 48px; width: auto; }
+        
+        /* Controls bar */
+        .controls-bar { background: white; padding: 20px 0; border-bottom: 1px solid #e5e5e5; position: sticky; top: 0; z-index: 100; }
+        .controls-inner { max-width: 1200px; margin: 0 auto; padding: 0 32px; display: flex; justify-content: space-between; align-items: center; }
+        .controls-left { display: flex; align-items: center; gap: 16px; }
+        .filter-select { padding: 8px 20px 8px 0; border: none; border-radius: 24px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #999; background: white; cursor: pointer; min-width: auto; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ED1C24' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0 center; background-size: 16px; transition: color 0.15s ease; }
+        .filter-select:hover { color: #ED1C24; }
+        .filter-select:focus { outline: none; color: #ED1C24; }
+        
+        /* Custom dropdown */
+        .custom-dropdown { position: relative; display: inline-block; }
+        .custom-dropdown-trigger { padding: 8px 0; padding-right: 20px; border: none; background: white; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #999; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: color 0.15s ease; }
+        .custom-dropdown-trigger:hover { color: #ED1C24; }
+        .custom-dropdown-trigger.open { color: #ED1C24; }
+        .custom-dropdown-trigger svg { width: 16px; height: 16px; transition: transform 0.2s ease; flex-shrink: 0; }
+        .custom-dropdown-trigger.open svg { transform: rotate(180deg); }
+        .custom-dropdown-menu { position: absolute; top: calc(100% + 8px); left: 0; min-width: 180px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); padding: 8px 0; z-index: 200; opacity: 0; visibility: hidden; transform: translateY(-8px); transition: all 0.15s ease; }
+        .custom-dropdown-menu.open { opacity: 1; visibility: visible; transform: translateY(0); }
+        .custom-dropdown-option { padding: 10px 16px; font-size: 13px; color: #666; cursor: pointer; transition: all 0.1s ease; }
+        .custom-dropdown-option:hover { background: #f5f5f5; color: #333; }
+        .custom-dropdown-option.selected { color: #ED1C24; font-weight: 600; }
+        
+        /* Mode toggle */
+        .mode-toggle { display: flex; align-items: center; gap: 8px; }
+        .mode-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #999; cursor: pointer; transition: color 0.15s ease; height: 24px; display: flex; align-items: center; }
+        .mode-label:first-of-type { width: 50px; justify-content: flex-end; }
+        .mode-label:last-of-type { width: 62px; justify-content: flex-start; }
+        .mode-label.active { color: #ED1C24; }
+        .mode-switch { position: relative; width: 44px; height: 24px; cursor: pointer; flex-shrink: 0; }
+        .mode-switch input { opacity: 0; width: 0; height: 0; }
+        .mode-switch-slider { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: #ED1C24; border-radius: 24px; transition: 0.2s; }
+        .mode-switch-slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .mode-switch input:checked + .mode-switch-slider:before { transform: translateX(20px); }
+        
+        /* Main content */
+        main { padding: 24px 0; }
+        .main-inner { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+        
+        /* Section titles */
+        .section-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: #999; padding: 10px 0; margin-bottom: 8px; }
+        .section-title .quarter-context { color: #ccc; margin-left: 8px; }
+        
+        /* The Numbers */
+        .numbers-section { background: white; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        .numbers-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+        .stat-box { background: #f5f5f5; border-radius: 8px; padding: 16px 12px; text-align: center; }
+        .stat-value { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: #333; }
+        .stat-value.grey { color: #666; }
+        .stat-value.red { color: #ED1C24; }
+        .stat-value.orange { color: #f59e0b; }
+        .stat-label { font-size: 10px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+        .progress-bar { position: relative; height: 8px; background: #e5e5e5; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: #ED1C24; border-radius: 4px; transition: width 0.3s ease; }
+        .progress-fill.over { background: #f59e0b; }
+        .rollover-credit { margin-top: 16px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+        .rollover-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: #999; margin-bottom: 4px; }
+        .rollover-amount { font-size: 13px; color: #333; }
+        .rollover-amount strong { font-weight: 700; }
+        
+        /* Projects table */
+        .projects-section { background: white; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        .projects-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        .projects-table th { text-align: left; font-size: 10px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 1px; padding: 10px 0; border-bottom: 2px solid #f0f0f0; }
+        .projects-table th:nth-child(1) { width: 24px; } /* chevron */
+        .projects-table th:nth-child(2) { width: 35%; } /* project name */
+        .projects-table th:nth-child(3) { width: 20%; } /* owner */
+        .projects-table th:nth-child(4) { } /* description - takes remaining */
+        .projects-table th:last-child { text-align: right; width: 80px; } /* amount */
+        .projects-table td { padding: 14px 0; border-bottom: 1px solid #f5f5f5; font-size: 13px; color: #666; overflow: hidden; text-overflow: ellipsis; }
+        .projects-table tr:last-child td { border-bottom: none; }
+        .project-name { font-weight: 600; color: #333; }
+        .amount { font-size: 13px; font-weight: 600; color: #333; text-align: right; }
+        .amount.ballpark { color: #ED1C24; }
+        .onus-col { text-align: center; width: 60px; }
+        .onus-tick { color: #ED1C24; font-size: 16px; }
+        
+        /* Bottom row */
+        .bottom-row { display: grid; grid-template-columns: 1.3fr 1fr; gap: 24px; }
+        
+        /* Chart */
+        .chart-section { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); height: 280px; display: flex; flex-direction: column; }
+        .chart-wrapper { position: relative; padding-left: 40px; flex: 1; display: flex; flex-direction: column; }
+        .chart-container { display: flex; align-items: flex-end; gap: 12px; flex: 1; position: relative; }
+        .y-axis { position: absolute; left: 0; top: 0; bottom: 20px; width: 36px; display: flex; flex-direction: column; justify-content: space-between; }
+        .y-label { font-size: 9px; color: #999; text-align: right; padding-right: 6px; }
+        .committed-line { position: absolute; left: 40px; right: 0; height: 0; border-top: 2px dashed #c0c0c0; z-index: 5; bottom: 20px; }
+        .bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
+        .bar-stack { position: relative; width: 32px; }
+        .bar-committed { width: 100%; background: #e0e0e0; border-radius: 3px 3px 0 0; }
+        .bar-committed.future { opacity: 0.5; }
+        .bar-spend { position: absolute; bottom: 0; left: 0; right: 0; background: #ED1C24; border-radius: 3px 3px 0 0; }
+        .bar-spend.future { opacity: 0.4; }
+        .bar-ballpark { position: absolute; left: 0; right: 0; background: rgba(237, 28, 36, 0.15); border: 2px dashed rgba(237, 28, 36, 0.5); border-radius: 3px 3px 0 0; }
+        .bar-label { font-size: 9px; color: #999; text-transform: uppercase; margin-top: 8px; letter-spacing: 0.5px; }
+        .chart-legend { display: flex; justify-content: center; gap: 20px; margin-top: 16px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 10px; color: #666; }
+        .legend-swatch { width: 16px; height: 10px; border-radius: 2px; }
+        .legend-swatch.projects { background: #ED1C24; }
+        .legend-swatch.committed-swatch { background: #e0e0e0; }
+        .legend-swatch.incoming-swatch { background: rgba(237, 28, 36, 0.15); border: 2px dashed rgba(237, 28, 36, 0.5); }
+        
+        /* Notes */
+        .notes-section { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); display: flex; flex-direction: column; height: 280px; }
+        .notes-list { list-style: none; flex: 1; }
+        .notes-list li { font-size: 13px; color: #666; padding: 8px 0 8px 16px; position: relative; line-height: 1.5; }
+        .notes-list li::before { content: '•'; position: absolute; left: 0; color: #ED1C24; font-weight: bold; }
+        .actions { display: flex; gap: 24px; margin-top: 16px; padding-top: 16px; border-top: 1px solid #f0f0f0; }
+        .action-link { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #ED1C24; text-decoration: none; cursor: pointer; transition: opacity 0.15s ease; }
+        .action-link:hover { opacity: 0.7; }
+        
+        /* Chevron in table */
+        .chevron-cell { width: 24px; padding-right: 8px !important; }
+        .chevron-btn { background: none; border: none; cursor: pointer; padding: 0; color: #ED1C24; font-size: 16px; transition: opacity 0.15s ease; line-height: 1; }
+        .chevron-btn:hover { opacity: 0.7; }
+        
+        /* Modal */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.2s ease, visibility 0.2s ease; }
+        .modal-overlay.visible { opacity: 1; visibility: visible; }
+        .modal { background: white; border-radius: 12px; padding: 24px; width: 100%; max-width: 480px; box-shadow: 0 4px 24px rgba(0,0,0,0.15); transform: translateY(20px); transition: transform 0.2s ease; }
+        .modal-overlay.visible .modal { transform: translateY(0); }
+        .modal.ballpark-active { border: 2px solid rgba(237, 28, 36, 0.3); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header-right { display: flex; align-items: center; gap: 16px; }
+        .modal-title { font-size: 18px; font-weight: 600; color: #333; }
+        .ballpark-toggle { display: flex; align-items: center; gap: 8px; }
+        .ballpark-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #999; transition: color 0.15s ease; }
+        .ballpark-label.active { color: #ED1C24; }
+        .toggle { position: relative; width: 44px; height: 24px; cursor: pointer; display: inline-block; }
+        .toggle input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: #e5e5e5; border-radius: 24px; transition: 0.2s; }
+        .toggle-slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .toggle input:checked + .toggle-slider { background-color: #ED1C24; }
+        .toggle input:checked + .toggle-slider:before { transform: translateX(20px); }
+        .modal-close { background: none; border: none; font-size: 24px; color: #999; cursor: pointer; padding: 0; line-height: 1; }
+        .modal-close:hover { color: #ED1C24; }
+        .modal-body { display: flex; flex-direction: column; gap: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 4px; }
+        .form-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #999; }
+        .form-input { padding: 10px 12px; border: 1.5px solid #e5e5e5; border-radius: 8px; font-size: 14px; font-family: inherit; color: #333; }
+        .form-input:focus { outline: none; border-color: #ED1C24; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .modal-footer { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; padding-top: 16px; border-top: 1px solid #f0f0f0; }
+        .btn { padding: 10px 20px; border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; transition: all 0.15s ease; }
+        .btn-secondary { background: white; border: 1.5px solid #e5e5e5; color: #666; }
+        .btn-secondary:hover { border-color: #999; }
+        .btn-primary { background: #ED1C24; border: none; color: white; }
+        .btn-primary:hover { background: #c41820; }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header-top">
+        <div class="header-inner">
+            <div class="header-left">
+                <a href="hub.html">
+                    <img src="images/tracker-header.png" alt="Tracker" class="header-logo">
+                </a>
+            </div>
+            <div class="header-right">
+                <img src="images/dot-ai2-logo.png" alt="ai²" class="header-ai-logo">
+            </div>
+        </div>
+    </header>
+    
+    <!-- Controls -->
+    <div class="controls-bar">
+        <div class="controls-inner">
+            <div class="controls-left">
+                <div class="custom-dropdown" id="clientDropdown">
+                    <button class="custom-dropdown-trigger" id="clientTrigger">
+                        <span>One NZ – Simplification</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#ED1C24" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="custom-dropdown-menu" id="clientMenu">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+                <div class="custom-dropdown" id="monthDropdown">
+                    <button class="custom-dropdown-trigger" id="monthTrigger">
+                        <span>January</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#ED1C24" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="custom-dropdown-menu" id="monthMenu">
+                        <div class="custom-dropdown-option selected" data-value="January">January</div>
+                        <div class="custom-dropdown-option" data-value="February">February</div>
+                        <div class="custom-dropdown-option" data-value="March">March</div>
+                        <div class="custom-dropdown-option" data-value="December">December</div>
+                        <div class="custom-dropdown-option" data-value="November">November</div>
+                        <div class="custom-dropdown-option" data-value="October">October</div>
+                    </div>
+                </div>
+            </div>
+            <div class="mode-toggle">
+                <span class="mode-label active" id="labelMonth">Month</span>
+                <label class="mode-switch">
+                    <input type="checkbox" id="modeToggle">
+                    <span class="mode-switch-slider"></span>
+                </label>
+                <span class="mode-label" id="labelQuarter">Quarter</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main -->
+    <main>
+        <div class="main-inner">
+        <!-- The Numbers -->
+        <div class="section-title"><span id="numbersTitle">January Numbers</span> <span class="quarter-context" id="quarterContext"></span></div>
+        <div class="numbers-section">
+            <div class="numbers-grid">
+                <div class="stat-box">
+                    <div class="stat-value grey" id="committedValue">$25K</div>
+                    <div class="stat-label">Committed</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="toDateValue">$45K</div>
+                    <div class="stat-label">To Date</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value red" id="remainingValue">$20K</div>
+                    <div class="stat-label">To Spend</div>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 100%;"></div>
+            </div>
+            <div class="rollover-credit" id="rolloverCredit" style="display: none;">
+                <div class="rollover-label">Rollover</div>
+                <div class="rollover-amount"><strong id="rolloverAmount">+$10K</strong> <span id="rolloverFrom">credit from Q3</span></div>
+            </div>
+        </div>
+        
+        <!-- Projects -->
+        <div class="section-title">The Work</div>
+        <div class="projects-section">
+            <table class="projects-table">
+                <thead>
+                    <tr>
+                        <th class="chevron-cell"></th>
+                        <th>Project Name</th>
+                        <th>Owner</th>
+                        <th>Description</th>
+                        <th id="monthHeader">January</th>
+                    </tr>
+                </thead>
+                <tbody id="projectsBody">
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Other Stuff (Extra budget + On Us) -->
+        <div class="section-title" id="otherWorkTitle" style="display:none;">Other Stuff</div>
+        <div class="projects-section" id="otherWorkSection" style="display:none;">
+            <table class="projects-table">
+                <thead>
+                    <tr>
+                        <th class="chevron-cell"></th>
+                        <th>Project Name</th>
+                        <th>Owner</th>
+                        <th>Description</th>
+                        <th id="otherWorkMonthHeader">January</th>
+                    </tr>
+                </thead>
+                <tbody id="otherWorkBody">
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Chart + Notes -->
+        <div class="bottom-row">
+            <div>
+                <div class="section-title">Tracker</div>
+                <div class="chart-section">
+                    <div class="chart-wrapper">
+                        <div class="y-axis" id="yAxis"></div>
+                        <div class="committed-line" id="committedLine" style="top: 54px;"></div>
+                        <div class="chart-container" id="chartContainer"></div>
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item"><div class="legend-swatch projects"></div><span>Projects</span></div>
+                        <div class="legend-item"><div class="legend-swatch committed-swatch"></div><span>Committed</span></div>
+                        <div class="legend-item"><div class="legend-swatch incoming-swatch"></div><span>Ballpark</span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <div class="section-title">Notes</div>
+                <div class="notes-section">
+                    <ul class="notes-list" id="notesList">
+                        <li><strong>Ballparks</strong> – Red numbers are ballparks. Most jobs start as a $5K ballpark before we lock in scope.</li>
+                        <li><strong>Rollover</strong> – You can use rollover credit any time during the quarter. It's extra on top of committed spend.</li>
+                        <li><strong>Always on</strong> – Numbers include always-on time for meetings, consults and reporting.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        </div>
+    </main>
+    
+    <!-- Edit Project Modal -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title" id="modalTitle">Update Project</span>
+                <div class="modal-header-right">
+                    <div class="ballpark-toggle">
+                        <span class="ballpark-label" id="ballparkLabel">Ballpark</span>
+                        <label class="toggle">
+                            <input type="checkbox" id="editBallpark">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <button class="modal-close" onclick="closeModal()">&times;</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editIndex">
+                <div class="form-group">
+                    <label class="form-label">Project Name</label>
+                    <input type="text" class="form-input" id="editProjectName">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Owner</label>
+                    <input type="text" class="form-input" id="editOwner">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <input type="text" class="form-input" id="editDescription">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Spend</label>
+                        <input type="number" class="form-input" id="editSpend">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Month</label>
+                        <select class="form-input" id="editMonth">
+                            <option value="January">January</option>
+                            <option value="February">February</option>
+                            <option value="March">March</option>
+                            <option value="October">October</option>
+                            <option value="November">November</option>
+                            <option value="December">December</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Spend Type</label>
+                    <select class="form-input" id="editSpendType">
+                        <option value="Project budget">Project budget</option>
+                        <option value="Extra budget">Extra budget</option>
+                        <option value="Project on us">Project on us</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveProject()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ========== API CONFIGURATION ==========
+        var API_BASE = 'https://dot-remote-api.up.railway.app';
+        
+        // ========== CLIENT DATA (loaded from API) ==========
+        var clients = {};
+        var trackerData = [];
+        
+        // Calendar quarters (fixed) - clients just label them differently
+        var calendarQuarters = {
+            'Q1-cal': { months: ['January', 'February', 'March'], label: 'Jan › Mar' },
+            'Q2-cal': { months: ['April', 'May', 'June'], label: 'Apr › Jun' },
+            'Q3-cal': { months: ['July', 'August', 'September'], label: 'Jul › Sep' },
+            'Q4-cal': { months: ['October', 'November', 'December'], label: 'Oct › Dec' }
+        };
+        
+        // Current calendar quarter (Jan-Mar 2026)
+        var currentCalendarQuarter = 'Q1-cal';
+        
+        // Map client's Q label to calendar quarter
+        // e.g. One NZ calls Jan-Mar "Q4", Tower calls it "Q2"
+        var clientQuarterLabels = {
+            'ONE': 'Q4',
+            'ONS': 'Q4', 
+            'ONB': 'Q4',
+            'SKY': 'Q3',
+            'TOW': 'Q2',
+            'FIS': 'Q4'
+        };
+        
+        var currentClient = 'ONS';
+        var currentMonth = 'January';
+        var isQuarterView = false;
+        
+        function getQuarterForMonth(month) {
+            // Find which calendar quarter contains this month
+            for (var key in calendarQuarters) {
+                if (calendarQuarters[key].months.indexOf(month) !== -1) {
+                    return key;
+                }
+            }
+            return currentCalendarQuarter;
+        }
+        
+        function getQuarterInfoForMonth(clientCode, month) {
+            var calQ = getQuarterForMonth(month);
+            var quarter = calendarQuarters[calQ];
+            
+            // Work out the client's label for this quarter
+            // Map calendar quarter to client's Q number
+            var calQNum = parseInt(calQ.replace('Q', '').replace('-cal', ''));
+            var clientCurrentCalQ = parseInt(currentCalendarQuarter.replace('Q', '').replace('-cal', ''));
+            var clientCurrentLabel = parseInt(clientQuarterLabels[clientCode].replace('Q', ''));
+            
+            // Calculate offset
+            var offset = calQNum - clientCurrentCalQ;
+            var clientQNum = clientCurrentLabel + offset;
+            if (clientQNum > 4) clientQNum -= 4;
+            if (clientQNum < 1) clientQNum += 4;
+            
+            return {
+                quarter: 'Q' + clientQNum,
+                months: quarter.months,
+                label: quarter.label
+            };
+        }
+        
+        function getCurrentQuarterInfo(clientCode) {
+            var quarter = calendarQuarters[currentCalendarQuarter];
+            var clientLabel = clientQuarterLabels[clientCode];
+            return {
+                quarter: clientLabel,
+                months: quarter.months,
+                label: quarter.label
+            };
+        }
+        
+        function getPreviousQuarter(clientCode) {
+            // Previous calendar quarter is Oct-Dec
+            var quarter = calendarQuarters['Q4-cal'];
+            // Work out what the client called that quarter
+            var clientCurrentQ = parseInt(clientQuarterLabels[clientCode].replace('Q', ''));
+            var prevQ = clientCurrentQ === 1 ? 'Q4' : 'Q' + (clientCurrentQ - 1);
+            return {
+                quarter: prevQ,
+                months: quarter.months,
+                label: quarter.label
+            };
+        }
+        
+        function formatCurrency(amount) {
+            if (Math.abs(amount) >= 1000) {
+                return '$' + (amount / 1000).toFixed(Math.abs(amount) % 1000 === 0 ? 0 : 1) + 'K';
+            }
+            return '$' + Math.abs(amount).toLocaleString();
+        }
+        
+        function getMonthSpend(client, month) {
+            return trackerData
+                .filter(function(d) { return d.client === client && d.month === month; })
+                .reduce(function(sum, d) { return sum + d.spend; }, 0);
+        }
+        
+        function getQuarterSpend(clientCode) {
+            var qInfo = getCurrentQuarterInfo(clientCode);
+            return qInfo.months.reduce(function(sum, m) { return sum + getMonthSpend(clientCode, m); }, 0);
+        }
+        
+        function getProjectsForMonth(client, month) {
+            return trackerData.filter(function(d) { 
+                return d.client === client && d.month === month; 
+            });
+        }
+        
+        function getProjectsForQuarter(clientCode) {
+            var qInfo = getCurrentQuarterInfo(clientCode);
+            return trackerData.filter(function(d) { 
+                return d.client === clientCode && qInfo.months.indexOf(d.month) !== -1; 
+            });
+        }
+        
+        function render() {
+            var client = clients[currentClient];
+            var committed = client.committed;
+            var rollover = client.rollover || 0;
+            var rolloverUseIn = client.rolloverUseIn || '';
+            
+            // Get quarter info based on selected month (not hardcoded current quarter)
+            var qInfo = getQuarterInfoForMonth(currentClient, currentMonth);
+            var prevQ = getPreviousQuarter(currentClient);
+            
+            // Convert qInfo.label to match rolloverUseIn format (e.g., "Jan › Mar" -> "JAN-MAR")
+            var viewedQuarterKey = qInfo.label.replace(' › ', '-').toUpperCase();
+            
+            console.log('Render - currentClient:', currentClient);
+            console.log('Render - currentMonth:', currentMonth);
+            console.log('Render - qInfo:', qInfo);
+            console.log('Render - viewedQuarterKey:', viewedQuarterKey);
+            console.log('Render - rolloverUseIn:', rolloverUseIn);
+            console.log('Render - trackerData length:', trackerData.length);
+            console.log('Render - sample trackerData[0].client:', trackerData[0] ? trackerData[0].client : 'none');
+            
+            // Update quarter context
+            document.getElementById('quarterContext').textContent = qInfo.quarter + ' (' + qInfo.label + ')';
+            
+            // Calculate spend
+            var toDate, projects, monthsInQuarter;
+            if (isQuarterView) {
+                toDate = qInfo.months.reduce(function(sum, m) { return sum + getMonthSpend(currentClient, m); }, 0);
+                projects = trackerData.filter(function(d) { 
+                    return d.client === currentClient && qInfo.months.indexOf(d.month) !== -1; 
+                });
+                monthsInQuarter = qInfo.months.length;
+                document.getElementById('numbersTitle').textContent = qInfo.quarter + ' Numbers';
+                document.getElementById('monthHeader').textContent = qInfo.quarter + ' Total';
+                document.getElementById('otherWorkMonthHeader').textContent = qInfo.quarter + ' Total';
+            } else {
+                toDate = getMonthSpend(currentClient, currentMonth);
+                projects = getProjectsForMonth(currentClient, currentMonth);
+                monthsInQuarter = 1;
+                document.getElementById('numbersTitle').textContent = currentMonth + ' Numbers';
+                document.getElementById('monthHeader').textContent = currentMonth;
+                document.getElementById('otherWorkMonthHeader').textContent = currentMonth;
+            }
+            
+            var totalBudget = committed * monthsInQuarter;
+            var remaining = totalBudget - toDate;
+            
+            // Update numbers
+            document.getElementById('committedValue').textContent = formatCurrency(committed * monthsInQuarter);
+            document.getElementById('toDateValue').textContent = formatCurrency(toDate);
+            
+            // Show rollover credit only when viewing the quarter it applies to
+            var rolloverEl = document.getElementById('rolloverCredit');
+            var showRollover = rollover > 0 && rolloverUseIn && viewedQuarterKey === rolloverUseIn;
+            
+            if (showRollover) {
+                rolloverEl.style.display = 'block';
+                document.getElementById('rolloverAmount').textContent = '+' + formatCurrency(rollover);
+                // Show client's quarter label (e.g., "Q3" for their financial year)
+                document.getElementById('rolloverFrom').textContent = 'credit for ' + qInfo.quarter;
+            } else {
+                rolloverEl.style.display = 'none';
+            }
+            
+            var remainingEl = document.getElementById('remainingValue');
+            if (remaining < 0) {
+                remainingEl.textContent = '-' + formatCurrency(Math.abs(remaining));
+                remainingEl.className = 'stat-value orange';
+            } else {
+                remainingEl.textContent = formatCurrency(remaining);
+                remainingEl.className = 'stat-value red';
+            }
+            
+            // Progress bar
+            var progress = totalBudget > 0 ? Math.min((toDate / totalBudget) * 100, 100) : 0;
+            var progressBar = document.getElementById('progressBar');
+            progressBar.style.width = progress + '%';
+            progressBar.className = toDate > totalBudget ? 'progress-fill over' : 'progress-fill';
+            
+            // Projects table - filter out Always on (000) jobs AND separate by spend type
+            var tbody = document.getElementById('projectsBody');
+            tbody.innerHTML = '';
+            
+            // Separate projects: Project budget goes to main table, Extra/On Us goes to Other Work
+            var mainProjects = projects.filter(function(p) {
+                return !p.jobNumber.endsWith('000') && p.spendType === 'Project budget';
+            });
+            
+            var otherProjects = projects.filter(function(p) {
+                return !p.jobNumber.endsWith('000') && (p.spendType === 'Extra budget' || p.spendType === 'Project on us');
+            });
+            
+            // Store original indices for editing (before grouping)
+            mainProjects.forEach(function(p, i) {
+                p._displayIndex = i;
+            });
+            
+            // Group by job number for quarter view
+            if (isQuarterView) {
+                var grouped = {};
+                mainProjects.forEach(function(p) {
+                    var key = p.jobNumber + '|' + p.projectName;
+                    if (!grouped[key]) {
+                        grouped[key] = { jobNumber: p.jobNumber, projectName: p.projectName, owner: p.owner, description: p.description, spend: 0, spendType: p.spendType, ballpark: p.ballpark, _isGrouped: true };
+                    }
+                    grouped[key].spend += p.spend;
+                });
+                mainProjects = Object.values(grouped);
+            }
+            
+            mainProjects.forEach(function(p, idx) {
+                var tr = document.createElement('tr');
+                var isBallpark = p.ballpark || false;
+                var chevronDisabled = p._isGrouped ? ' style="color:#e5e5e5;cursor:default;" title="Switch to month view to edit"' : '';
+                tr.innerHTML = '<td class="chevron-cell"><button class="chevron-btn"' + chevronDisabled + ' onclick="' + (p._isGrouped ? '' : 'openEditModal(\'' + p.jobNumber + '\', \'' + currentMonth + '\')') + '">›</button></td>' +
+                    '<td class="project-name">' + p.jobNumber + ' · ' + p.projectName + '</td>' +
+                    '<td>' + (p.owner || '') + '</td>' +
+                    '<td>' + (p.description || '') + '</td>' +
+                    '<td class="amount' + (isBallpark ? ' ballpark' : '') + '">' + formatCurrency(p.spend) + '</td>';
+                tbody.appendChild(tr);
+            });
+            
+            if (mainProjects.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#999;padding:24px;">No projects for ' + (isQuarterView ? qInfo.quarter : currentMonth) + '</td></tr>';
+            }
+            
+            // Other Work table (Extra budget + Project on us)
+            var otherWorkTitle = document.getElementById('otherWorkTitle');
+            var otherWorkSection = document.getElementById('otherWorkSection');
+            var otherWorkBody = document.getElementById('otherWorkBody');
+            
+            if (otherProjects.length > 0) {
+                otherWorkTitle.style.display = 'block';
+                otherWorkSection.style.display = 'block';
+                otherWorkBody.innerHTML = '';
+                
+                // Group for quarter view
+                if (isQuarterView) {
+                    var grouped = {};
+                    otherProjects.forEach(function(p) {
+                        var key = p.jobNumber + '|' + p.projectName;
+                        if (!grouped[key]) {
+                            grouped[key] = { jobNumber: p.jobNumber, projectName: p.projectName, owner: p.owner, description: p.description, spend: 0, spendType: p.spendType, _isGrouped: true };
+                        }
+                        grouped[key].spend += p.spend;
+                    });
+                    otherProjects = Object.values(grouped);
+                }
+                
+                otherProjects.forEach(function(p) {
+                    var tr = document.createElement('tr');
+                    var isOnUs = p.spendType === 'Project on us';
+                    var description = isOnUs ? 'On us: ' + (p.description || '') : (p.description || '');
+                    var chevronDisabled = p._isGrouped ? ' style="color:#e5e5e5;cursor:default;" title="Switch to month view to edit"' : '';
+                    tr.innerHTML = '<td class="chevron-cell"><button class="chevron-btn"' + chevronDisabled + ' onclick="' + (p._isGrouped ? '' : 'openEditModal(\'' + p.jobNumber + '\', \'' + currentMonth + '\')') + '">›</button></td>' +
+                        '<td class="project-name">' + p.jobNumber + ' · ' + p.projectName + '</td>' +
+                        '<td>' + (p.owner || '') + '</td>' +
+                        '<td>' + description + '</td>' +
+                        '<td class="amount">' + formatCurrency(p.spend) + '</td>';
+                    otherWorkBody.appendChild(tr);
+                });
+            } else {
+                otherWorkTitle.style.display = 'none';
+                otherWorkSection.style.display = 'none';
+            }
+            
+            // Chart
+            renderChart();
+        }
+        
+        function renderChart() {
+            var client = clients[currentClient];
+            var committed = client.committed;
+            var qInfo = getCurrentQuarterInfo(currentClient);
+            var prevQ = getPreviousQuarter(currentClient);
+            
+            // Chart height (matches CSS)
+            var chartHeight = 160;
+            
+            // Previous quarter actual spends (calculated from trackerData)
+            var prevSpends = prevQ.months.map(function(m) {
+                return trackerData
+                    .filter(function(d) { return d.client === currentClient && d.month === m && d.spendType === 'Project budget'; })
+                    .reduce(function(sum, d) { return sum + d.spend; }, 0);
+            });
+            
+            // Get current quarter month spends - split by type
+            var currentConfirmed = [];
+            var currentBallpark = [];
+            qInfo.months.forEach(function(m) {
+                var confirmed = trackerData
+                    .filter(function(d) { return d.client === currentClient && d.month === m && d.spendType === 'Project budget'; })
+                    .reduce(function(sum, d) { return sum + d.spend; }, 0);
+                var ballpark = trackerData
+                    .filter(function(d) { return d.client === currentClient && d.month === m && d.spendType !== 'Project budget'; })
+                    .reduce(function(sum, d) { return sum + d.spend; }, 0);
+                currentConfirmed.push(confirmed);
+                currentBallpark.push(ballpark);
+            });
+            
+            // Y axis - fixed at committed + 10K for each client
+            var yMax = committed + 10000;
+            
+            // Y axis labels
+            var yAxis = document.getElementById('yAxis');
+            yAxis.innerHTML = '';
+            for (var i = 5; i >= 0; i--) {
+                var label = document.createElement('span');
+                label.className = 'y-label';
+                label.textContent = '$' + Math.round(yMax * i / 5 / 1000) + 'k';
+                yAxis.appendChild(label);
+            }
+            
+            // Committed line position - use bottom positioning to match bar tops
+            // Grey bar height calculation (used for both line and bars)
+            var greyBarHeight = chartHeight - (10000 / yMax * chartHeight);
+            document.getElementById('committedLine').style.bottom = (greyBarHeight + 20) + 'px';
+            document.getElementById('committedLine').style.top = 'auto';
+            
+            // Chart bars
+            var container = document.getElementById('chartContainer');
+            container.innerHTML = '';
+            
+            var prevMonthLabels = prevQ.months.map(function(m) { return m.substring(0, 3); });
+            var currMonthLabels = qInfo.months.map(function(m) { return m.substring(0, 3); });
+            
+            // Determine current month for future detection
+            var today = new Date();
+            var currentMonthName = today.toLocaleString('en-US', { month: 'long' });
+            var currentMonthIndex = qInfo.months.indexOf(currentMonthName);
+            
+            // Previous quarter - single bar per month (grey base, red overlay)
+            prevMonthLabels.forEach(function(label, i) {
+                var group = document.createElement('div');
+                group.className = 'bar-group';
+                
+                // Grey bar height = chartHeight minus the space above committed line
+                var greyBarHeight = chartHeight - (10000 / yMax * chartHeight);
+                
+                var barStack = document.createElement('div');
+                barStack.className = 'bar-stack';
+                barStack.style.height = greyBarHeight + 'px';
+                
+                // Grey committed base (fills the stack)
+                var greyBar = document.createElement('div');
+                greyBar.className = 'bar-committed';
+                greyBar.style.height = '100%';
+                greyBar.title = 'Committed: ' + formatCurrency(committed);
+                barStack.appendChild(greyBar);
+                
+                // Red spend overlay
+                var redBar = document.createElement('div');
+                redBar.className = 'bar-spend';
+                redBar.style.height = (prevSpends[i] / committed * 100) + '%';
+                redBar.title = 'Actual: ' + formatCurrency(prevSpends[i]);
+                barStack.appendChild(redBar);
+                
+                var labelEl = document.createElement('span');
+                labelEl.className = 'bar-label';
+                labelEl.textContent = label;
+                
+                group.appendChild(barStack);
+                group.appendChild(labelEl);
+                container.appendChild(group);
+            });
+            
+            // Current quarter - single bar per month
+            currMonthLabels.forEach(function(label, i) {
+                var group = document.createElement('div');
+                group.className = 'bar-group';
+                
+                // Grey bar height = chartHeight minus the space above committed line
+                var greyBarHeight = chartHeight - (10000 / yMax * chartHeight);
+                
+                var barStack = document.createElement('div');
+                barStack.className = 'bar-stack';
+                barStack.style.height = greyBarHeight + 'px';
+                
+                var isFuture = currentMonthIndex !== -1 && i > currentMonthIndex;
+                var isCurrent = currentMonthIndex !== -1 && i === currentMonthIndex;
+                
+                // Grey committed base (fills the stack)
+                var greyBar = document.createElement('div');
+                greyBar.className = isFuture ? 'bar-committed future' : 'bar-committed';
+                greyBar.style.height = '100%';
+                greyBar.title = 'Committed: ' + formatCurrency(committed);
+                barStack.appendChild(greyBar);
+                
+                // Red spend overlay - only for past and current months (not future)
+                var confirmedSpend = currentConfirmed[i] || 0;
+                
+                if (!isFuture && confirmedSpend > 0) {
+                    var redBar = document.createElement('div');
+                    redBar.className = 'bar-spend';
+                    redBar.style.height = (confirmedSpend / committed * 100) + '%';
+                    redBar.title = 'Actual: ' + formatCurrency(confirmedSpend);
+                    barStack.appendChild(redBar);
+                }
+                
+                // Ballpark overlay (dashed) - only if there's actual ballpark data
+                var ballparkSpend = currentBallpark[i] || 0;
+                
+                if (ballparkSpend > 0) {
+                    var dashedBar = document.createElement('div');
+                    dashedBar.className = 'bar-ballpark';
+                    dashedBar.style.height = (ballparkSpend / committed * 100) + '%';
+                    // Position: stack on top of red spend if present, otherwise from bottom
+                    if (!isFuture && confirmedSpend > 0) {
+                        dashedBar.style.bottom = (confirmedSpend / committed * 100) + '%';
+                    } else {
+                        dashedBar.style.bottom = '0';
+                    }
+                    dashedBar.title = 'Ballpark: ' + formatCurrency(ballparkSpend);
+                    barStack.appendChild(dashedBar);
+                }
+                
+                var labelEl = document.createElement('span');
+                labelEl.className = 'bar-label';
+                labelEl.textContent = label;
+                
+                group.appendChild(barStack);
+                group.appendChild(labelEl);
+                container.appendChild(group);
+            });
+        }
+        
+        // Event listeners
+        // Client filter is handled by async handler at bottom
+        
+        // Custom dropdown functionality
+        function setupCustomDropdown(triggerId, menuId, onChange) {
+            var trigger = document.getElementById(triggerId);
+            var menu = document.getElementById(menuId);
+            
+            trigger.addEventListener('click', function(e) {
+                e.stopPropagation();
+                // Close other dropdowns
+                document.querySelectorAll('.custom-dropdown-menu.open').forEach(function(m) {
+                    if (m.id !== menuId) {
+                        m.classList.remove('open');
+                        m.previousElementSibling.classList.remove('open');
+                    }
+                });
+                trigger.classList.toggle('open');
+                menu.classList.toggle('open');
+            });
+            
+            menu.querySelectorAll('.custom-dropdown-option').forEach(function(opt) {
+                opt.addEventListener('click', function() {
+                    var value = this.dataset.value;
+                    var text = this.textContent;
+                    
+                    // Update selection
+                    menu.querySelectorAll('.custom-dropdown-option').forEach(function(o) {
+                        o.classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                    trigger.querySelector('span').textContent = text;
+                    
+                    // Close menu
+                    trigger.classList.remove('open');
+                    menu.classList.remove('open');
+                    
+                    // Callback
+                    if (onChange) onChange(value);
+                });
+            });
+        }
+        
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function() {
+            document.querySelectorAll('.custom-dropdown-menu.open').forEach(function(m) {
+                m.classList.remove('open');
+                m.previousElementSibling.classList.remove('open');
+            });
+        });
+        
+        // Setup month dropdown
+        setupCustomDropdown('monthTrigger', 'monthMenu', function(value) {
+            currentMonth = value;
+            render();
+        });
+        
+        var toggle = document.getElementById('modeToggle');
+        var labelMonth = document.getElementById('labelMonth');
+        var labelQuarter = document.getElementById('labelQuarter');
+        
+        toggle.addEventListener('change', function() {
+            isQuarterView = this.checked;
+            if (this.checked) {
+                labelMonth.classList.remove('active');
+                labelQuarter.classList.add('active');
+            } else {
+                labelMonth.classList.add('active');
+                labelQuarter.classList.remove('active');
+            }
+            render();
+        });
+        
+        labelMonth.addEventListener('click', function() {
+            toggle.checked = false;
+            isQuarterView = false;
+            labelMonth.classList.add('active');
+            labelQuarter.classList.remove('active');
+            render();
+        });
+        
+        labelQuarter.addEventListener('click', function() {
+            toggle.checked = true;
+            isQuarterView = true;
+            labelMonth.classList.remove('active');
+            labelQuarter.classList.add('active');
+            render();
+        });
+        
+        // Modal functions
+        var currentEditData = null;
+        
+        function updateBallparkUI(isBallpark) {
+            var modal = document.querySelector('.modal');
+            var label = document.getElementById('ballparkLabel');
+            if (isBallpark) {
+                modal.classList.add('ballpark-active');
+                label.classList.add('active');
+            } else {
+                modal.classList.remove('ballpark-active');
+                label.classList.remove('active');
+            }
+        }
+        
+        function openEditModal(jobNumber, month) {
+            // Find the project in trackerData
+            var project = trackerData.find(function(p) {
+                return p.jobNumber === jobNumber && p.month === month;
+            });
+            
+            if (!project) {
+                // If not found for specific month, find any match
+                project = trackerData.find(function(p) {
+                    return p.jobNumber === jobNumber;
+                });
+            }
+            
+            if (!project) return;
+            
+            currentEditData = project;
+            
+            document.getElementById('modalTitle').textContent = 'Update ' + jobNumber;
+            document.getElementById('editProjectName').value = project.projectName;
+            document.getElementById('editOwner').value = project.owner || '';
+            document.getElementById('editDescription').value = project.description || '';
+            document.getElementById('editSpend').value = project.spend;
+            document.getElementById('editMonth').value = project.month;
+            document.getElementById('editSpendType').value = project.spendType;
+            
+            // Set ballpark toggle
+            var isBallpark = project.ballpark || false;
+            document.getElementById('editBallpark').checked = isBallpark;
+            updateBallparkUI(isBallpark);
+            
+            document.getElementById('editModal').classList.add('visible');
+        }
+        
+        function closeModal() {
+            document.getElementById('editModal').classList.remove('visible');
+            document.querySelector('.modal').classList.remove('ballpark-active');
+            currentEditData = null;
+        }
+        
+        async function saveProject() {
+            if (!currentEditData) return;
+            
+            // Get values from form
+            var updates = {
+                id: currentEditData.id,
+                description: document.getElementById('editDescription').value,
+                spend: parseFloat(document.getElementById('editSpend').value) || 0,
+                month: document.getElementById('editMonth').value,
+                spendType: document.getElementById('editSpendType').value,
+                ballpark: document.getElementById('editBallpark').checked
+            };
+            
+            // Show saving state
+            var saveBtn = document.querySelector('.btn-primary');
+            var originalText = saveBtn.textContent;
+            saveBtn.textContent = 'Saving...';
+            saveBtn.disabled = true;
+            
+            try {
+                var response = await fetch(API_BASE + '/tracker/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updates)
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to save');
+                }
+                
+                var result = await response.json();
+                console.log('Saved to Airtable:', result);
+                
+                // Update local data
+                currentEditData.description = updates.description;
+                currentEditData.spend = updates.spend;
+                currentEditData.month = updates.month;
+                currentEditData.spendType = updates.spendType;
+                currentEditData.ballpark = updates.ballpark;
+                
+                closeModal();
+                
+                // Reload data to ensure sync
+                await loadTrackerData(currentClient);
+                render();
+                
+            } catch (e) {
+                console.error('Save failed:', e);
+                alert('Failed to save. Please try again.');
+                saveBtn.textContent = originalText;
+                saveBtn.disabled = false;
+            }
+        }
+        
+        // Close modal on overlay click
+        document.getElementById('editModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+        
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+        
+        // Ballpark toggle listener
+        document.getElementById('editBallpark').addEventListener('change', function() {
+            updateBallparkUI(this.checked);
+        });
+        
+        // ========== API LOADING ==========
+        
+        // Fallback data for testing when API is unavailable
+        var fallbackClients = [
+            { code: 'ONS', name: 'One NZ – Simplification', committed: 25000, rollover: 0, rolloverUseIn: '', yearEnd: 'March', currentQuarter: 'Q4' },
+            { code: 'ONE', name: 'One NZ – Marketing', committed: 12500, rollover: 2400, rolloverUseIn: 'JAN-MAR', yearEnd: 'March', currentQuarter: 'Q4' },
+            { code: 'ONB', name: 'One NZ – Business', committed: 12500, rollover: 0, rolloverUseIn: '', yearEnd: 'March', currentQuarter: 'Q4' },
+            { code: 'SKY', name: 'Sky', committed: 10000, rollover: 0, rolloverUseIn: '', yearEnd: 'June', currentQuarter: 'Q3' },
+            { code: 'TOW', name: 'Tower', committed: 10000, rollover: 1500, rolloverUseIn: 'JAN-MAR', yearEnd: 'September', currentQuarter: 'Q2' },
+            { code: 'FIS', name: 'Fisher Funds', committed: 4500, rollover: 500, rolloverUseIn: 'JAN-MAR', yearEnd: 'March', currentQuarter: 'Q4' }
+        ];
+        
+        var fallbackTrackerData = {
+            'ONS': [
+                { id: '1', client: 'ONS', jobNumber: 'ONS 088', projectName: 'Quick Fixes', owner: 'Tracey Barclay', description: 'Content updates', spend: 5000, month: 'January', spendType: 'Project budget', ballpark: false },
+                { id: '2', client: 'ONS', jobNumber: 'ONS 089', projectName: 'New Landing Page', owner: 'Sarah Chen', description: 'Homepage redesign', spend: 8000, month: 'January', spendType: 'Project budget', ballpark: true },
+                { id: '3', client: 'ONS', jobNumber: 'ONS 000', projectName: 'Always On', owner: 'Team', description: 'WIPs/Meetings', spend: 2500, month: 'January', spendType: 'Project budget', ballpark: false }
+            ],
+            'SKY': [
+                { id: '4', client: 'SKY', jobNumber: 'SKY 045', projectName: 'Customer Journey', owner: 'Emma', description: 'Journey mapping', spend: 4500, month: 'January', spendType: 'Project budget', ballpark: false },
+                { id: '5', client: 'SKY', jobNumber: 'SKY 046', projectName: 'Email Templates', owner: 'Jess', description: 'Refresh templates', spend: 3000, month: 'January', spendType: 'Project budget', ballpark: true }
+            ],
+            'TOW': [
+                { id: '6', client: 'TOW', jobNumber: 'TOW 087', projectName: 'Summer Promo', owner: 'Caroline', description: 'Campaign creative', spend: 6000, month: 'January', spendType: 'Project budget', ballpark: false }
+            ],
+            'ONE': [
+                { id: '7', client: 'ONE', jobNumber: 'ONE 128', projectName: 'FAQ Refresh', owner: 'Emma', description: 'Content update', spend: 3500, month: 'January', spendType: 'Project budget', ballpark: false }
+            ],
+            'ONB': [
+                { id: '8', client: 'ONB', jobNumber: 'ONB 034', projectName: 'Business Portal', owner: 'Stu', description: 'Portal updates', spend: 5500, month: 'January', spendType: 'Project budget', ballpark: false }
+            ],
+            'FIS': [
+                { id: '9', client: 'FIS', jobNumber: 'FIS 022', projectName: 'Nest Articles', owner: 'Michael', description: 'Monthly content', spend: 2500, month: 'January', spendType: 'Project budget', ballpark: false }
+            ]
+        };
+        
+        function populateFromData(data) {
+            // Populate clients object
+            data.forEach(function(c) {
+                clients[c.code] = {
+                    name: c.name,
+                    committed: c.committed,
+                    quarterlyCommitted: c.committed * 3,
+                    rollover: c.rollover || 0,
+                    rolloverUseIn: c.rolloverUseIn || '',
+                    yearEnd: c.yearEnd,
+                    currentQuarter: c.currentQuarter
+                };
+            });
+            
+            // Populate client dropdown (custom)
+            var menu = document.getElementById('clientMenu');
+            var trigger = document.getElementById('clientTrigger');
+            menu.innerHTML = '';
+            data.forEach(function(c, idx) {
+                var option = document.createElement('div');
+                option.className = 'custom-dropdown-option' + (idx === 0 ? ' selected' : '');
+                option.dataset.value = c.code;
+                option.textContent = c.name;
+                menu.appendChild(option);
+            });
+            
+            // Set first client as default
+            if (data.length > 0) {
+                currentClient = data[0].code;
+                trigger.querySelector('span').textContent = data[0].name;
+            }
+            
+            // Setup client dropdown handler
+            setupCustomDropdown('clientTrigger', 'clientMenu', async function(value) {
+                currentClient = value;
+                document.querySelector('main').style.opacity = '0.5';
+                await loadTrackerData(currentClient);
+                document.querySelector('main').style.opacity = '1';
+                render();
+            });
+        }
+        
+        async function loadClients() {
+            try {
+                var response = await fetch(API_BASE + '/tracker/clients');
+                if (!response.ok) throw new Error('API returned ' + response.status);
+                var data = await response.json();
+                populateFromData(data);
+                return true;
+            } catch (e) {
+                console.error('Failed to load clients:', e);
+                console.log('Using fallback data');
+                populateFromData(fallbackClients);
+                return true; // Return true so init continues
+            }
+        }
+        
+        async function loadTrackerData(clientCode) {
+            try {
+                console.log('Loading tracker data for:', clientCode);
+                var response = await fetch(API_BASE + '/tracker/data?client=' + clientCode);
+                if (!response.ok) throw new Error('API returned ' + response.status);
+                var data = await response.json();
+                console.log('API returned:', data.length, 'records');
+                
+                // Transform to match expected format
+                trackerData = data.map(function(d) {
+                    return {
+                        id: d.id,
+                        client: d.client,
+                        jobNumber: d.jobNumber,
+                        projectName: d.projectName,
+                        owner: d.owner,
+                        description: d.description,
+                        spend: d.spend,
+                        month: d.month,
+                        spendType: d.spendType,
+                        ballpark: d.ballpark
+                    };
+                });
+                
+                console.log('trackerData now has:', trackerData.length, 'records');
+                
+                return true;
+            } catch (e) {
+                console.error('Failed to load tracker data:', e);
+                console.log('Using fallback tracker data for:', clientCode);
+                trackerData = fallbackTrackerData[clientCode] || [];
+                return true; // Return true so render continues
+            }
+        }
+        
+        async function init() {
+            // Show loading state
+            document.querySelector('main').style.opacity = '0.5';
+            
+            // Load clients first
+            await loadClients();
+            
+            // Load tracker data for default client
+            await loadTrackerData(currentClient);
+            
+            // Restore opacity and render
+            document.querySelector('main').style.opacity = '1';
+            render();
+        }
+        
+        // Initialize
+        init();
+    </script>
+</body>
+</html>
