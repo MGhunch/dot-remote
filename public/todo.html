@@ -34,9 +34,22 @@
         
         /* Controls bar */
         .controls-bar { background: white; padding: 20px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e5e5; position: sticky; top: 0; z-index: 100; }
-        .filter-select { padding: 8px 28px 8px 14px; border: none; border-radius: 24px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #999; background: white; cursor: pointer; min-width: 140px; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 4px center; background-size: 16px; transition: color 0.15s ease; }
+        .filter-select { padding: 8px 28px 8px 14px; border: none; border-radius: 24px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #999; background: white; cursor: pointer; min-width: 140px; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ED1C24' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 4px center; background-size: 16px; transition: color 0.15s ease; }
         .filter-select:hover { color: #ED1C24; }
         .filter-select:focus { outline: none; color: #ED1C24; }
+        
+        /* Custom dropdown */
+        .custom-dropdown { position: relative; display: inline-block; }
+        .custom-dropdown-trigger { padding: 8px 14px; padding-right: 28px; border: none; background: white; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #999; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: color 0.15s ease; }
+        .custom-dropdown-trigger:hover { color: #ED1C24; }
+        .custom-dropdown-trigger.open { color: #ED1C24; }
+        .custom-dropdown-trigger svg { width: 16px; height: 16px; transition: transform 0.2s ease; flex-shrink: 0; }
+        .custom-dropdown-trigger.open svg { transform: rotate(180deg); }
+        .custom-dropdown-menu { position: absolute; top: calc(100% + 8px); left: 0; min-width: 180px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); padding: 8px 0; z-index: 200; opacity: 0; visibility: hidden; transform: translateY(-8px); transition: all 0.15s ease; }
+        .custom-dropdown-menu.open { opacity: 1; visibility: visible; transform: translateY(0); }
+        .custom-dropdown-option { padding: 10px 16px; font-size: 13px; color: #666; cursor: pointer; transition: all 0.1s ease; }
+        .custom-dropdown-option:hover { background: #f5f5f5; color: #333; }
+        .custom-dropdown-option.selected { color: #ED1C24; font-weight: 600; }
         
         /* Mode toggle */
         .mode-toggle { display: flex; align-items: center; gap: 12px; }
@@ -83,7 +96,7 @@
         .job-controls { display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; align-items: flex-end; }
         .control-group { display: flex; flex-direction: column; gap: 4px; }
         .control-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #999; }
-        .control-select { padding: 8px 28px 8px 10px; border: 1.5px solid #e5e5e5; border-radius: 20px; font-size: 13px; color: #666; background: white; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; background-size: 14px; }
+        .control-select { padding: 8px 28px 8px 10px; border: 1.5px solid #e5e5e5; border-radius: 20px; font-size: 13px; color: #666; background: white; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ED1C24' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; background-size: 14px; }
         .control-select:focus { outline: none; border-color: #ED1C24; }
         
         .toggle { position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer; }
@@ -191,9 +204,15 @@
                 </div>
             </div>
             <div class="controls-bar">
-                <select class="filter-select" id="client-filter" onchange="applyFilters()">
-                    <option value="all">All Clients</option>
-                </select>
+                <div class="custom-dropdown" id="clientDropdown">
+                    <button class="custom-dropdown-trigger" id="clientTrigger">
+                        <span>All Clients</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#ED1C24" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="custom-dropdown-menu" id="clientMenu">
+                        <div class="custom-dropdown-option selected" data-value="all">All Clients</div>
+                    </div>
+                </div>
                 <div class="mode-toggle">
                     <span class="mode-label" id="mode-todo" onclick="setMode('todo')">TO DO</span>
                     <label class="mode-switch">
@@ -289,11 +308,6 @@
             return 'images/logos/' + logoCode + '.png';
         }
         function handleLogoError(img) { img.onerror = null; img.src = 'images/logos/Unknown.png'; }
-
-        function applyFilters() {
-            currentClient = document.getElementById('client-filter').value;
-            render();
-        }
 
         function getFilteredJobs() {
             var jobs = currentClient === 'all' ? allJobs.slice() : allJobs.filter(function(j) { return j.clientCode === currentClient; });
@@ -645,6 +659,55 @@
             setTimeout(function() { toast.classList.remove('visible'); }, 2500);
         }
 
+        // Custom dropdown functionality
+        function setupCustomDropdown(triggerId, menuId, onChange) {
+            var trigger = document.getElementById(triggerId);
+            var menu = document.getElementById(menuId);
+            
+            trigger.addEventListener('click', function(e) {
+                e.stopPropagation();
+                // Close other dropdowns
+                document.querySelectorAll('.custom-dropdown-menu.open').forEach(function(m) {
+                    if (m.id !== menuId) {
+                        m.classList.remove('open');
+                        m.previousElementSibling.classList.remove('open');
+                    }
+                });
+                trigger.classList.toggle('open');
+                menu.classList.toggle('open');
+            });
+            
+            menu.addEventListener('click', function(e) {
+                var opt = e.target.closest('.custom-dropdown-option');
+                if (!opt) return;
+                
+                var value = opt.dataset.value;
+                var text = opt.textContent;
+                
+                // Update selection
+                menu.querySelectorAll('.custom-dropdown-option').forEach(function(o) {
+                    o.classList.remove('selected');
+                });
+                opt.classList.add('selected');
+                trigger.querySelector('span').textContent = text;
+                
+                // Close menu
+                trigger.classList.remove('open');
+                menu.classList.remove('open');
+                
+                // Callback
+                if (onChange) onChange(value);
+            });
+        }
+        
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function() {
+            document.querySelectorAll('.custom-dropdown-menu.open').forEach(function(m) {
+                m.classList.remove('open');
+                m.previousElementSibling.classList.remove('open');
+            });
+        });
+
         function loadClients() {
             fetch(API_BASE + '/clients')
             .then(function(res) { return res.json(); })
@@ -656,13 +719,20 @@
         }
 
         function populateClientDropdown() {
-            var sel = document.getElementById('client-filter');
-            sel.innerHTML = '<option value="all">All Clients</option>';
+            var menu = document.getElementById('clientMenu');
+            menu.innerHTML = '<div class="custom-dropdown-option selected" data-value="all">All Clients</div>';
             clients.forEach(function(c) {
-                var o = document.createElement('option');
-                o.value = c.code;
-                o.textContent = c.name;
-                sel.appendChild(o);
+                var opt = document.createElement('div');
+                opt.className = 'custom-dropdown-option';
+                opt.dataset.value = c.code;
+                opt.textContent = c.name;
+                menu.appendChild(opt);
+            });
+            
+            // Setup dropdown handler
+            setupCustomDropdown('clientTrigger', 'clientMenu', function(value) {
+                currentClient = value;
+                render();
             });
         }
 
