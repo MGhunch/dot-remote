@@ -12,22 +12,20 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; line-height: 1.5; min-height: 100vh; }
         
-        .container { max-width: 1200px; margin: 0 auto; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
         
         /* Header */
-        .header-top { background: white; border-bottom: 3px solid #ED1C24; padding: 24px 32px; display: flex; justify-content: space-between; align-items: center; }
-        .header-left { display: flex; align-items: center; gap: 20px; }
+        .header-top { background: white; border-bottom: 3px solid #ED1C24; padding: 24px 0; }
+        .header-inner { max-width: 1200px; margin: 0 auto; padding: 0 32px; display: flex; justify-content: space-between; align-items: center; }
+        .header-left { display: flex; align-items: center; }
         .header-left a { display: flex; align-items: center; text-decoration: none; }
-        .header-inline { display: flex; align-items: center; gap: 12px; }
-        .logo-circle { width: 40px; height: 40px; background: #ED1C24; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .logo-circle span { color: white; font-family: 'Bebas Neue', sans-serif; font-size: 24px; }
-        .header-title { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: #1a1a1a; letter-spacing: 1px; }
-        .header-title em { font-style: normal; color: #ED1C24; }
-        .header-right { display: flex; align-items: center; gap: 12px; }
-        .ai-badge { background: #1a1a1a; color: white; padding: 6px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; }
+        .header-logo { height: 48px; width: auto; }
+        .header-right { display: flex; align-items: center; }
+        .header-ai-logo { height: 48px; width: auto; }
         
         /* Controls bar */
-        .controls-bar { background: white; padding: 20px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e5e5; position: sticky; top: 0; z-index: 100; }
+        .controls-bar { background: white; padding: 20px 0; border-bottom: 1px solid #e5e5e5; position: sticky; top: 0; z-index: 100; }
+        .controls-inner { max-width: 1200px; margin: 0 auto; padding: 0 32px; display: flex; justify-content: space-between; align-items: center; }
         .controls-left { display: flex; align-items: center; gap: 16px; }
         .filter-select { padding: 8px 20px 8px 0; border: none; border-radius: 24px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #999; background: white; cursor: pointer; min-width: auto; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0 center; background-size: 16px; transition: color 0.15s ease; }
         .filter-select:hover { color: #ED1C24; }
@@ -46,7 +44,8 @@
         .mode-switch input:checked + .mode-switch-slider:before { transform: translateX(20px); }
         
         /* Main content */
-        main { padding: 24px 32px; }
+        main { padding: 24px 0; }
+        .main-inner { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
         
         /* Section titles */
         .section-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: #999; padding: 10px 0; margin-bottom: 8px; }
@@ -162,30 +161,32 @@
 <body>
     <!-- Header -->
     <header class="header-top">
-        <div class="header-left">
-            <a href="hub.html" class="header-inline">
-                <div class="logo-circle"><span>h</span></div>
-                <div class="header-title">THE <em>TRACKER</em></div>
-            </a>
-        </div>
-        <div class="header-right">
-            <span class="ai-badge">ai²</span>
+        <div class="header-inner">
+            <div class="header-left">
+                <a href="hub.html">
+                    <img src="images/tracker-header.png" alt="Tracker" class="header-logo">
+                </a>
+            </div>
+            <div class="header-right">
+                <img src="images/dot-ai2-logo.png" alt="ai²" class="header-ai-logo">
+            </div>
         </div>
     </header>
     
     <!-- Controls -->
     <div class="controls-bar">
-        <div class="controls-left">
-            <select class="filter-select" id="clientFilter">
-                <option value="ONS">One NZ – Simplification</option>
-                <option value="ONE">One NZ – Marketing</option>
-                <option value="ONB">One NZ – Business</option>
-                <option value="SKY">Sky</option>
-                <option value="TOW">Tower</option>
-                <option value="FIS">Fisher Funds</option>
-            </select>
-            <select class="filter-select" id="monthFilter">
-                <option value="January">January</option>
+        <div class="controls-inner">
+            <div class="controls-left">
+                <select class="filter-select" id="clientFilter">
+                    <option value="ONS">One NZ – Simplification</option>
+                    <option value="ONE">One NZ – Marketing</option>
+                    <option value="ONB">One NZ – Business</option>
+                    <option value="SKY">Sky</option>
+                    <option value="TOW">Tower</option>
+                    <option value="FIS">Fisher Funds</option>
+                </select>
+                <select class="filter-select" id="monthFilter">
+                    <option value="January">January</option>
                 <option value="February">February</option>
                 <option value="March">March</option>
                 <option value="December">December</option>
@@ -200,11 +201,13 @@
                 <span class="mode-switch-slider"></span>
             </label>
             <span class="mode-label" id="labelQuarter">Quarter</span>
+            </div>
         </div>
     </div>
     
     <!-- Main -->
     <main>
+        <div class="main-inner">
         <!-- The Numbers -->
         <div class="section-title"><span id="numbersTitle">January Numbers</span> <span class="quarter-context" id="quarterContext"></span></div>
         <div class="numbers-section">
@@ -295,6 +298,7 @@
                     </ul>
                 </div>
             </div>
+        </div>
         </div>
     </main>
     
