@@ -651,9 +651,12 @@
             // Chart height (matches CSS)
             var chartHeight = 160;
             
-            // Previous quarter actual spends (from historical data)
-            var historical = historicalData[currentClient] || { m1: 0, m2: 0, m3: 0 };
-            var prevSpends = [historical.m1, historical.m2, historical.m3];
+            // Previous quarter actual spends (calculated from trackerData)
+            var prevSpends = prevQ.months.map(function(m) {
+                return trackerData
+                    .filter(function(d) { return d.client === currentClient && d.month === m && d.spendType === 'Project budget'; })
+                    .reduce(function(sum, d) { return sum + d.spend; }, 0);
+            });
             
             // Get current quarter month spends - split by type
             var currentConfirmed = [];
