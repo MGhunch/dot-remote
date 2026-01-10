@@ -133,6 +133,11 @@
         .action-link { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #ED1C24; text-decoration: none; cursor: pointer; transition: opacity 0.15s ease; }
         .action-link:hover { opacity: 0.7; }
         
+        /* PDF Button */
+        .pdf-btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; border: 2px solid #ED1C24; border-radius: 24px; background: white; color: #ED1C24; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: all 0.15s ease; text-decoration: none; margin-top: 16px; }
+        .pdf-btn:hover { background: #ED1C24; color: white; }
+        .pdf-btn svg { width: 14px; height: 14px; }
+        
         /* Chevron in table */
         .chevron-cell { width: 24px; padding-right: 8px !important; }
         .chevron-btn { background: none; border: none; cursor: pointer; padding: 0; color: #ED1C24; font-size: 16px; transition: opacity 0.15s ease; line-height: 1; }
@@ -313,10 +318,19 @@
                 <div class="section-title">Notes</div>
                 <div class="notes-section">
                     <ul class="notes-list" id="notesList">
-                        <li><strong>Always on</strong> – This covers ongoing support, consults, and reporting outside specific jobs.</li>
-                         <li><strong>Ballparks</strong> – Red numbers are ballparks. Most jobs start as a $5K ballpark before we lock in scope.</li>
+                        <li><strong>Ballparks</strong> – Red numbers are ballparks. Most jobs start as a $5K ballpark before we lock in scope.</li>
                         <li><strong>Rollover</strong> – You can use your rollover credit any time during the quarter. It's extra on top of committed spend.</li>
+                        <li><strong>Always on</strong> – Numbers include always-on time for meetings, consults and reporting.</li>
                     </ul>
+                    <button class="pdf-btn" onclick="getPDF()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="12" y1="18" x2="12" y2="12"></line>
+                            <line x1="9" y1="15" x2="15" y2="15"></line>
+                        </svg>
+                        Get PDF
+                    </button>
                 </div>
             </div>
         </div>
@@ -419,6 +433,14 @@
         var currentClient = 'ONS';
         var currentMonth = 'January';
         var isQuarterView = false;
+        
+        function getPDF() {
+            var url = 'https://dot-tracker-pdf.up.railway.app/pdf?client=' + currentClient + '&month=' + currentMonth;
+            if (isQuarterView) {
+                url += '&quarter=true';
+            }
+            window.open(url, '_blank');
+        }
         
         function getQuarterForMonth(month) {
             // Find which calendar quarter contains this month
