@@ -1003,6 +1003,10 @@
         function closeModal() {
             document.getElementById('editModal').classList.remove('visible');
             document.querySelector('.modal').classList.remove('ballpark-active');
+            // Reset save button state
+            var saveBtn = document.querySelector('.btn-primary');
+            saveBtn.textContent = 'Save Changes';
+            saveBtn.disabled = false;
             currentEditData = null;
         }
         
