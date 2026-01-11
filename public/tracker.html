@@ -270,6 +270,7 @@
                         <th>Project Name</th>
                         <th>Owner</th>
                         <th>Description</th>
+                        <th id="toDateHeader">To Date</th>
                         <th id="monthHeader">January</th>
                     </tr>
                 </thead>
@@ -288,6 +289,7 @@
                         <th>Project Name</th>
                         <th>Owner</th>
                         <th>Description</th>
+                        <th id="otherToDateHeader">To Date</th>
                         <th id="otherWorkMonthHeader">January</th>
                     </tr>
                 </thead>
@@ -572,6 +574,9 @@
                 document.getElementById('numbersTitle').textContent = qInfo.quarter + ' Numbers';
                 document.getElementById('monthHeader').textContent = qInfo.quarter + ' Total';
                 document.getElementById('otherWorkMonthHeader').textContent = qInfo.quarter + ' Total';
+                // Hide To Date column in quarter view
+                document.getElementById('toDateHeader').style.display = 'none';
+                document.getElementById('otherToDateHeader').style.display = 'none';
             } else {
                 toDate = getMonthSpend(currentClient, currentMonth);
                 projects = getProjectsForMonth(currentClient, currentMonth);
@@ -579,6 +584,9 @@
                 document.getElementById('numbersTitle').textContent = currentMonth + ' Numbers';
                 document.getElementById('monthHeader').textContent = currentMonth;
                 document.getElementById('otherWorkMonthHeader').textContent = currentMonth;
+                // Show To Date column in monthly view
+                document.getElementById('toDateHeader').style.display = '';
+                document.getElementById('otherToDateHeader').style.display = '';
             }
             
             var totalBudget = committed * monthsInQuarter;
@@ -647,20 +655,34 @@
                 mainProjects = Object.values(grouped);
             }
             
+            // Calculate spend to date (excluding current month) for each job
+            var spendToDate = {};
+            if (!isQuarterView) {
+                trackerData.forEach(function(d) {
+                    if (d.client === currentClient && d.month !== currentMonth) {
+                        if (!spendToDate[d.jobNumber]) spendToDate[d.jobNumber] = 0;
+                        spendToDate[d.jobNumber] += d.spend;
+                    }
+                });
+            }
+            
             mainProjects.forEach(function(p, idx) {
                 var tr = document.createElement('tr');
                 var isBallpark = p.ballpark || false;
                 var chevronDisabled = p._isGrouped ? ' style="color:#e5e5e5;cursor:default;" title="Switch to month view to edit"' : '';
+                var toDateCell = isQuarterView ? '' : '<td class="amount" style="color:#999;">(' + formatCurrency(spendToDate[p.jobNumber] || 0) + ')</td>';
                 tr.innerHTML = '<td class="chevron-cell"><button class="chevron-btn"' + chevronDisabled + ' onclick="' + (p._isGrouped ? '' : 'openEditModal(\'' + p.jobNumber + '\', \'' + currentMonth + '\')') + '">›</button></td>' +
                     '<td class="project-name">' + p.jobNumber + ' · ' + p.projectName + '</td>' +
                     '<td>' + (p.owner || '') + '</td>' +
                     '<td>' + (p.description || '') + '</td>' +
+                    toDateCell +
                     '<td class="amount' + (isBallpark ? ' ballpark' : '') + '">' + formatCurrency(p.spend) + '</td>';
                 tbody.appendChild(tr);
             });
             
             if (mainProjects.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#999;padding:24px;">No projects for ' + (isQuarterView ? qInfo.quarter : currentMonth) + '</td></tr>';
+                var colspan = isQuarterView ? 5 : 6;
+                tbody.innerHTML = '<tr><td colspan="' + colspan + '" style="text-align:center;color:#999;padding:24px;">No projects for ' + (isQuarterView ? qInfo.quarter : currentMonth) + '</td></tr>';
             }
             
             // Other Work table (Extra budget + Project on us)
@@ -689,10 +711,12 @@
                 otherProjects.forEach(function(p) {
                     var tr = document.createElement('tr');
                     var chevronDisabled = p._isGrouped ? ' style="color:#e5e5e5;cursor:default;" title="Switch to month view to edit"' : '';
+                    var toDateCell = isQuarterView ? '' : '<td class="amount" style="color:#999;">(' + formatCurrency(spendToDate[p.jobNumber] || 0) + ')</td>';
                     tr.innerHTML = '<td class="chevron-cell"><button class="chevron-btn"' + chevronDisabled + ' onclick="' + (p._isGrouped ? '' : 'openEditModal(\'' + p.jobNumber + '\', \'' + currentMonth + '\')') + '">›</button></td>' +
                         '<td class="project-name">' + p.jobNumber + ' · ' + p.projectName + '</td>' +
                         '<td>' + (p.owner || '') + '</td>' +
                         '<td>' + (p.description || '') + '</td>' +
+                        toDateCell +
                         '<td class="amount">' + formatCurrency(p.spend) + '</td>';
                     otherWorkBody.appendChild(tr);
                 });
