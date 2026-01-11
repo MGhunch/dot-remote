@@ -616,17 +616,17 @@
             progressBar.style.width = progress + '%';
             progressBar.className = toDate > totalBudget ? 'progress-fill over' : 'progress-fill';
             
-            // Projects table - filter out Always on (000) jobs AND separate by spend type
+            // Projects table - separate by spend type
             var tbody = document.getElementById('projectsBody');
             tbody.innerHTML = '';
             
             // Separate projects: Project budget goes to main table, Extra/On Us goes to Other Work
             var mainProjects = projects.filter(function(p) {
-                return !p.jobNumber.endsWith('000') && p.spendType === 'Project budget';
+                return p.spendType === 'Project budget';
             });
             
             var otherProjects = projects.filter(function(p) {
-                return !p.jobNumber.endsWith('000') && (p.spendType === 'Extra budget' || p.spendType === 'Project on us');
+                return p.spendType === 'Extra budget' || p.spendType === 'Project on us';
             });
             
             // Store original indices for editing (before grouping)
@@ -688,13 +688,11 @@
                 
                 otherProjects.forEach(function(p) {
                     var tr = document.createElement('tr');
-                    var isOnUs = p.spendType === 'Project on us';
-                    var description = isOnUs ? 'On us: ' + (p.description || '') : (p.description || '');
                     var chevronDisabled = p._isGrouped ? ' style="color:#e5e5e5;cursor:default;" title="Switch to month view to edit"' : '';
                     tr.innerHTML = '<td class="chevron-cell"><button class="chevron-btn"' + chevronDisabled + ' onclick="' + (p._isGrouped ? '' : 'openEditModal(\'' + p.jobNumber + '\', \'' + currentMonth + '\')') + '">›</button></td>' +
                         '<td class="project-name">' + p.jobNumber + ' · ' + p.projectName + '</td>' +
                         '<td>' + (p.owner || '') + '</td>' +
-                        '<td>' + description + '</td>' +
+                        '<td>' + (p.description || '') + '</td>' +
                         '<td class="amount">' + formatCurrency(p.spend) + '</td>';
                     otherWorkBody.appendChild(tr);
                 });
