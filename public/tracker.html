@@ -656,10 +656,11 @@
             }
             
             // Calculate spend to date (excluding current month) for each job
+            // Excludes 000 and 001 jobs
             var spendToDate = {};
             if (!isQuarterView) {
                 trackerData.forEach(function(d) {
-                    if (d.client === currentClient && d.month !== currentMonth) {
+                    if (d.month !== currentMonth) {
                         if (!spendToDate[d.jobNumber]) spendToDate[d.jobNumber] = 0;
                         spendToDate[d.jobNumber] += d.spend;
                     }
@@ -670,7 +671,10 @@
                 var tr = document.createElement('tr');
                 var isBallpark = p.ballpark || false;
                 var chevronDisabled = p._isGrouped ? ' style="color:#e5e5e5;cursor:default;" title="Switch to month view to edit"' : '';
-                var toDateCell = isQuarterView ? '' : '<td class="amount" style="color:#999;">(' + formatCurrency(spendToDate[p.jobNumber] || 0) + ')</td>';
+                // Show to date only for non-000/001 jobs, and only if there's previous spend
+                var jobNum = p.jobNumber.split(' ')[1] || '';
+                var showToDate = !isQuarterView && jobNum !== '000' && jobNum !== '001' && (spendToDate[p.jobNumber] || 0) > 0;
+                var toDateCell = isQuarterView ? '' : '<td style="text-align:right;color:#999;font-weight:normal;">' + (showToDate ? '(' + formatCurrency(spendToDate[p.jobNumber]) + ')' : '') + '</td>';
                 tr.innerHTML = '<td class="chevron-cell"><button class="chevron-btn"' + chevronDisabled + ' onclick="' + (p._isGrouped ? '' : 'openEditModal(\'' + p.jobNumber + '\', \'' + currentMonth + '\')') + '">›</button></td>' +
                     '<td class="project-name">' + p.jobNumber + ' · ' + p.projectName + '</td>' +
                     '<td>' + (p.owner || '') + '</td>' +
@@ -711,7 +715,9 @@
                 otherProjects.forEach(function(p) {
                     var tr = document.createElement('tr');
                     var chevronDisabled = p._isGrouped ? ' style="color:#e5e5e5;cursor:default;" title="Switch to month view to edit"' : '';
-                    var toDateCell = isQuarterView ? '' : '<td class="amount" style="color:#999;">(' + formatCurrency(spendToDate[p.jobNumber] || 0) + ')</td>';
+                    var jobNum = p.jobNumber.split(' ')[1] || '';
+                    var showToDate = !isQuarterView && jobNum !== '000' && jobNum !== '001' && (spendToDate[p.jobNumber] || 0) > 0;
+                    var toDateCell = isQuarterView ? '' : '<td style="text-align:right;color:#999;font-weight:normal;">' + (showToDate ? '(' + formatCurrency(spendToDate[p.jobNumber]) + ')' : '') + '</td>';
                     tr.innerHTML = '<td class="chevron-cell"><button class="chevron-btn"' + chevronDisabled + ' onclick="' + (p._isGrouped ? '' : 'openEditModal(\'' + p.jobNumber + '\', \'' + currentMonth + '\')') + '">›</button></td>' +
                         '<td class="project-name">' + p.jobNumber + ' · ' + p.projectName + '</td>' +
                         '<td>' + (p.owner || '') + '</td>' +
